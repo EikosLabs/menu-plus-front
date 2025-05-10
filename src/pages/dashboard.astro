@@ -1,0 +1,13 @@
+---
+import Layout from '../layouts/Layout.astro';
+import UserDashboard from '../components/UserDashboard.jsx';
+
+// Indica a Astro que esta página debe renderizarse en el servidor
+export const prerender = false;
+---
+<Layout title="Panel de Control - Menu Plus Platform">
+  <div class="min-h-screen flex flex-col">
+    <!-- Navbar con información de usuario y botón de logout se manejará dentro del componente UserDashboard -->
+    <UserDashboard client:load />
+  </div>
+</Layout> 

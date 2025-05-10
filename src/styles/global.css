@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* --color-primary: #E05C33; */
+    /* --color-secondary: #004E71; */
+    /* --color-accent: #FF9B54; */
+    /* --color-background: #E6F4F8; */
+    /* --color-text: #0A3342; */
+
+    /* --color-slate-800: #1e293b; */
+    /* --color-slate-900: #0f172a; */
+    /* --color-sky-400: #38bdf8; */
+    /* --color-sky-500: #0ea5e9; */
+
+    --font-sans: 'Poppins', sans-serif; /* Mantenemos la definición de la fuente */
+  }
+}
+
+/* Estilos globales adicionales que ya tenías en Layout.astro pueden permanecer aquí o en el Layout */
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-sans); /* Aplicar Poppins globalmente usando la variable */
+}

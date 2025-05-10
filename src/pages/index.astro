@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Welcome from '../components/Welcome.astro';
+
+// Verificar si el usuario está autenticado
+const token = Astro.cookies.get('auth_token')?.value;
+
+// Si el usuario está autenticado, redirigir al dashboard
+if (token) {
+  return Astro.redirect('/dashboard');
+}
+
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<Layout>
+	<Welcome />
+</Layout>
