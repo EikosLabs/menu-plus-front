@@ -1,0 +1,142 @@
+<div class="welcome-container">
+  <div class="welcome-content">
+    <img src="/favicon.svg" alt="Menu Plus Logo" class="welcome-logo" />
+    <h1 class="welcome-title">Bienvenido a Menu Plus</h1>
+    <p class="welcome-subtitle">Tu plataforma para gestionar menús de restaurantes</p>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>Gestión de Menús</h3>
+        <p>Administra tus menús de forma sencilla y eficiente</p>
+      </div>
+      <div class="feature-card">
+        <h3>Control de Negocios</h3>
+        <p>Gestiona múltiples establecimientos desde un solo lugar</p>
+      </div>
+      <div class="feature-card">
+        <h3>Actualizaciones en Tiempo Real</h3>
+        <p>Mantén tus menús siempre actualizados</p>
+      </div>
+    </div>
+
+    <div class="cta-buttons">
+      <a href="/login" class="btn btn-primary">Iniciar Sesión</a>
+      <a href="/register" class="btn btn-secondary">Registrarse</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .welcome-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  }
+
+  .welcome-content {
+    max-width: 1200px;
+    text-align: center;
+  }
+  
+  .welcome-logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .welcome-title {
+    font-size: 3rem;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .welcome-subtitle {
+    font-size: 1.5rem;
+    color: #4a5568;
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .feature-card h3 {
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
+  .feature-card p {
+    color: #4a5568;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #4299e1;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #3182ce;
+  }
+
+  .btn-secondary {
+    background-color: white;
+    color: #4299e1;
+    border: 2px solid #4299e1;
+  }
+
+  .btn-secondary:hover {
+    background-color: #ebf8ff;
+  }
+
+  @media (max-width: 768px) {
+    .welcome-title {
+      font-size: 2rem;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.25rem;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+    }
+  }
+</style> 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import menuService from '../services/menuService';
 
 export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
@@ -9,6 +9,38 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [business, setBusiness] = useState(null);
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    const checkBusiness = async () => {
+      setStatus('Verificando el negocio...');
+      try {
+        console.log('Verificando negocio con ID:', businessId);
+        const businessData = await menuService.getFoodBusiness(businessId);
+        console.log('Datos del negocio recibidos:', businessData);
+        setBusiness(businessData);
+        
+        if (businessData.menus && businessData.menus.length > 0) {
+          setError('Este negocio ya tiene un menú. No se pueden crear más menús.');
+          setStatus('Este negocio ya tiene un menú.');
+        } else {
+          setStatus('Negocio verificado correctamente. Puede crear un nuevo menú.');
+        }
+      } catch (err) {
+        console.error('Error al verificar el negocio:', err);
+        setError('Error al verificar el negocio. Por favor, intente de nuevo.');
+        setStatus('Error al verificar el negocio.');
+      }
+    };
+
+    if (businessId) {
+      checkBusiness();
+    } else {
+      setError('No se ha especificado un negocio válido');
+      setStatus('Error: No hay negocio seleccionado');
+    }
+  }, [businessId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,33 +48,83 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
       ...prev,
       [name]: value
     }));
+    if (error) setError(null);
+  };
+
+  const validateForm = () => {
+    console.log('Validando formulario con datos:', formData);
+    
+    if (!formData.name.trim()) {
+      setError('El nombre del menú es requerido');
+      setStatus('Error: Nombre del menú requerido');
+      return false;
+    }
+
+    if (!businessId) {
+      setError('No se ha especificado un negocio válido');
+      setStatus('Error: No hay negocio seleccionado');
+      return false;
+    }
+
+    if (business?.menus?.length > 0) {
+      setError('Este negocio ya tiene un menú. No se pueden crear más menús.');
+      setStatus('Error: Negocio ya tiene un menú');
+      return false;
+    }
+
+    setStatus('Formulario válido, puede proceder');
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setStatus('Iniciando proceso de creación...');
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
+    setStatus('Creando menú...');
 
     try {
+      console.log('Enviando datos del menú:', formData);
       const newMenu = await menuService.createMenu(formData);
+      console.log('Menú creado exitosamente:', newMenu);
       
-      onMenuAdded(newMenu);
+      if (newMenu && newMenu.id) {
+        setStatus('¡Menú creado exitosamente!');
+        onMenuAdded(newMenu);
+      } else {
+        throw new Error('El servidor no devolvió un ID válido para el menú');
+      }
     } catch (err) {
-      setError('Error al crear el menú. Por favor, intente de nuevo.');
-      console.error(err);
+      console.error('Error al crear el menú:', err);
+      setError(err.message || 'Error al crear el menú. Por favor, intente de nuevo.');
+      setStatus('Error al crear el menú');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn">
+    <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn menu-form">
       {error && (
         <div className="p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <span>{error}</span>
+        </div>
+      )}
+
+      {status && !error && (
+        <div className="p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 rounded-md flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{status}</span>
         </div>
       )}
       

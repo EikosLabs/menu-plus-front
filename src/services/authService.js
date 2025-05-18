@@ -73,13 +73,26 @@ export const authService = {
   },
 
   getToken() {
+    // Primero intentar obtener el token de localStorage
+    const localToken = localStorage.getItem('token');
+    if (localToken) {
+      console.log('Token encontrado en localStorage');
+      return localToken;
+    }
+
+    // Si no está en localStorage, buscar en las cookies
     const cookies = document.cookie.split(';');
     const authCookie = cookies.find(cookie => cookie.trim().startsWith('auth_token='));
     if (authCookie) {
-      return authCookie.split('=')[1];
+      const token = authCookie.split('=')[1];
+      console.log('Token encontrado en cookies');
+      // Guardar el token en localStorage para futuras referencias
+      localStorage.setItem('token', token);
+      return token;
     }
     
-    return localStorage.getItem('token');
+    console.warn('No se encontró token ni en localStorage ni en cookies');
+    return null;
   },
 
   isAuthenticated() {
