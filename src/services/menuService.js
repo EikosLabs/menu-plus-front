@@ -3,367 +3,483 @@ import authService from './authService';
 // Configurar la URL de la API con la dirección IP y puerto donde se está ejecutando el backend
 const API_URL = 'http://localhost:5000/api';
 
-export const menuService = {
-  async createFoodBusiness(businessData) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('Usuario no autenticado');
-      }
+class ApiClient {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+  }
 
-      // Verificar si tenemos categoría de negocio válida
-      if (!businessData.businessCategoryId) {
-        // Si no hay categoría, usar un valor predeterminado (1)
-        console.warn('No se encontró categoría de negocio, usando valor predeterminado (1)');
-        businessData.businessCategoryId = 1;
-      }
-
-      console.log('Enviando solicitud al backend:', `${API_URL}/food-businesses`);
-      console.log('Datos del negocio:', JSON.stringify(businessData, null, 2));
-
-      try {
-      const response = await fetch(`${API_URL}/food-businesses`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-          body: JSON.stringify(businessData),
-          credentials: 'include'
-      });
-
-        if (!response.ok) {
-          // Intentar obtener mensaje de error del cuerpo
-          let errorMessage = 'Error al crear el negocio';
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
-          } catch (e) {
-            // Si no se puede parsear, usar mensaje genérico
-          }
-          
-          throw new Error(errorMessage);
-        }
-
-      // Verificar si la respuesta está vacía o no es JSON válido
-      const text = await response.text();
-      if (!text || text.trim() === '') {
-        console.warn('El servidor devolvió una respuesta vacía al crear negocio');
-        // Si la respuesta está vacía pero es exitosa, devolvemos los datos enviados
-        if (response.ok) {
-          return { ...businessData, id: Date.now() }; // Añadir un ID simulado
-        }
-        throw new Error('Error al crear el negocio: Respuesta vacía del servidor');
-      }
-
-      try {
-          const createdBusiness = JSON.parse(text);
-          
-          // Guardar el ID del negocio creado en localStorage para futuras referencias
-          if (createdBusiness && createdBusiness.id) {
-            this._saveBusinessIdForUser(businessData.userId, createdBusiness.id);
-          }
-          
-          return createdBusiness;
-      } catch (jsonError) {
-        console.error('Error al analizar JSON:', jsonError);
-        // Si la respuesta no es JSON válido pero es exitosa, devolvemos los datos enviados
-        if (response.ok) {
-          return { ...businessData, id: Date.now() }; // Añadir un ID simulado
-        }
-        throw new Error('Error al crear el negocio: Formato de respuesta inválido');
-        }
-      } catch (fetchError) {
-        console.error('Error específico de fetch:', fetchError);
-        
-        // Verificar si es un error de red
-        if (fetchError.message.includes('NetworkError') || fetchError.message.includes('Failed to fetch')) {
-          throw new Error(`Error de conexión: No se pudo conectar al servidor. Verifique su conexión a internet y que el servidor esté en funcionamiento. (${API_URL})`);
-        }
-        
-        throw fetchError;
-      }
-    } catch (error) {
-      console.error('Error creando negocio:', error);
-      throw error;
+  getAuthToken() {
+    const token = authService.getToken();
+    if (!token) {
+      throw new Error('Usuario no autenticado');
     }
-  },
+    return token;
+  }
 
-  // Método privado para almacenar IDs de negocios por usuario
-  _saveBusinessIdForUser(userId, businessId) {
+  async makeRequest(endpoint, options = {}) {
+    const { method = 'GET', body = null, timeout = 10000 } = options;
+    const url = `${this.baseUrl}${endpoint}`;
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
     try {
-      // Formato: { userId_1: [1, 2, 3], userId_2: [4, 5] }
-      const key = `userBusinesses_${userId}`;
-      let userBusinesses = JSON.parse(localStorage.getItem(key) || '[]');
+      const token = this.getAuthToken();
       
-      if (!userBusinesses.includes(businessId)) {
-        userBusinesses.push(businessId);
-        localStorage.setItem(key, JSON.stringify(userBusinesses));
-        console.log(`Negocio ID ${businessId} guardado para el usuario ID ${userId}`);
-      }
-    } catch (error) {
-      console.error('Error guardando ID de negocio en localStorage:', error);
-    }
-  },
-  
-  // Método privado para obtener IDs de negocios por usuario
-  _getBusinessIdsForUser(userId) {
-    try {
-      const key = `userBusinesses_${userId}`;
-      return JSON.parse(localStorage.getItem(key) || '[]');
-    } catch (error) {
-      console.error('Error obteniendo IDs de negocios del localStorage:', error);
-      return [];
-    }
-  },
-
-  async getFoodBusiness(id) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('Usuario no autenticado');
-      }
-
-      const response = await fetch(`${API_URL}/food-businesses/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        credentials: 'include'
-      });
-
-      // Verificar si la respuesta está vacía o no es JSON válido
-      const text = await response.text();
-      if (!text || text.trim() === '') {
-        console.warn('El servidor devolvió una respuesta vacía al obtener negocio');
-        if (response.ok) {
-          return { id: id, name: 'Negocio no disponible', description: '', menus: [] };
-        }
-        throw new Error('Error al obtener el negocio: Respuesta vacía del servidor');
-      }
-
-      try {
-        const business = JSON.parse(text);
-        // Asegurarse de que el negocio siempre tenga un array menus
-        return { ...business, menus: business.menus || [] };
-      } catch (jsonError) {
-        console.error('Error al analizar JSON:', jsonError);
-        if (response.ok) {
-          return { id: id, name: 'Negocio no disponible', description: '', menus: [] };
-        }
-        throw new Error('Error al obtener el negocio: Formato de respuesta inválido');
-      }
-    } catch (error) {
-      console.error('Error obteniendo negocio:', error);
-      throw error;
-    }
-  },
-
-  async createMenu(menuData) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('Usuario no autenticado');
-      }
-
-      const response = await fetch(`${API_URL}/menus`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(menuData)
-      });
-
-      // Verificar si la respuesta está vacía o no es JSON válido
-      const text = await response.text();
-      if (!text || text.trim() === '') {
-        console.warn('El servidor devolvió una respuesta vacía al crear menú');
-        // Si la respuesta está vacía pero es exitosa, devolvemos los datos enviados
-        if (response.ok) {
-          return { ...menuData, id: Date.now() }; // Añadir un ID simulado
-        }
-        throw new Error('Error al crear el menú: Respuesta vacía del servidor');
-      }
-
-      try {
-        return JSON.parse(text);
-      } catch (jsonError) {
-        console.error('Error al analizar JSON:', jsonError);
-        // Si la respuesta no es JSON válido pero es exitosa, devolvemos los datos enviados
-        if (response.ok) {
-          return { ...menuData, id: Date.now() }; // Añadir un ID simulado
-        }
-        throw new Error('Error al crear el menú: Formato de respuesta inválido');
-      }
-    } catch (error) {
-      console.error('Error creando menú:', error);
-      throw error;
-    }
-  },
-
-  async getMenu(id) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('Usuario no autenticado');
-      }
-
-      const response = await fetch(`${API_URL}/menus/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      // Verificar si la respuesta está vacía o no es JSON válido
-      const text = await response.text();
-      if (!text || text.trim() === '') {
-        console.warn('El servidor devolvió una respuesta vacía al obtener menú');
-        if (response.ok) {
-          return { id: id, name: 'Menú no disponible', description: '', items: [] };
-        }
-        throw new Error('Error al obtener el menú: Respuesta vacía del servidor');
-      }
-
-      try {
-        return JSON.parse(text);
-      } catch (jsonError) {
-        console.error('Error al analizar JSON:', jsonError);
-        if (response.ok) {
-          return { id: id, name: 'Menú no disponible', description: '', items: [] };
-        }
-        throw new Error('Error al obtener el menú: Formato de respuesta inválido');
-      }
-    } catch (error) {
-      console.error('Error obteniendo menú:', error);
-      throw error;
-    }
-  },
-
-  async getBusinessCategories() {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        // No intentar login automático.
-        console.error('getBusinessCategories: No authentication token found.');
-        throw new Error('Usuario no autenticado. No se pueden obtener las categorías.');
-      }
-
-      console.log(`Obteniendo categorías de negocios, URL: ${API_URL}/business-categories`);
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        ...(body && { 'Content-Type': 'application/json' })
+      };
       
-      const response = await fetch(`${API_URL}/business-categories`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        credentials: 'include' // Incluir cookies en la solicitud cross-origin
-      });
-
-      console.log('Respuesta del servidor:', response.status, response.statusText);
+      const fetchOptions = {
+        method,
+        headers,
+        credentials: 'include',
+        signal: controller.signal,
+        ...(body && { body: JSON.stringify(body) })
+      };
+      
+      const response = await fetch(url, fetchOptions);
+      clearTimeout(timeoutId);
+      
+      const responseText = await response.text();
+      let data = null;
+      
+      if (responseText && responseText.trim()) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (error) {
+          if (!response.ok) {
+            throw new Error(`Error: ${responseText}`);
+          }
+          data = responseText;
+        }
+      }
       
       if (!response.ok) {
-        // Intentar obtener más detalles del error si es posible
-        let errorBody = '';
-        try {
-          errorBody = await response.text();
-        } catch (e) { /* ignorar error al leer el cuerpo */ }
-        throw new Error(`Error obteniendo categorías: ${response.status} ${response.statusText}. Cuerpo: ${errorBody}`);
-      }
-
-      // Verificar si la respuesta está vacía o no es JSON válido
-      const text = await response.text();
-      console.log('Respuesta del servidor (texto):', text);
-      
-      if (!text || text.trim() === '') {
-        console.warn('El servidor devolvió una respuesta vacía al obtener categorías');
-        // Consideramos esto como un error, ya que se esperan categorías
-        throw new Error('No hay categorías disponibles en la base de datos (respuesta vacía).');
-      }
-
-      try {
-        const categories = JSON.parse(text);
-        if (!categories || categories.length === 0) {
-          // Si la API devuelve un array vacío, lo consideramos como que no hay categorías
-          console.warn('La API devolvió una lista vacía de categorías.');
-          throw new Error('No hay categorías de negocio configuradas en el sistema.');
-        }
-        return categories;
-      } catch (jsonError) {
-        console.error('Error al analizar JSON de categorías:', jsonError);
-        throw new Error('Error al procesar las categorías recibidas: formato inválido.');
-      }
-    } catch (error) { // Este catch ahora maneja todos los errores (token, fetch, parse, etc.)
-      console.error('Error final obteniendo categorías de negocios:', error);
-      // Propagamos el error para que el componente lo maneje
-      throw error; 
-    }
-  },
-
-  async getUserBusinesses(userId) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        console.error('getUserBusinesses: No authentication token found.');
-        throw new Error('Usuario no autenticado. No se puede obtener la lista de negocios.');
-      }
-
-      console.log(`Consultando información de negocios para el usuario ID: ${userId}`);
-      
-      // Obtener los IDs de negocios almacenados para este usuario
-      const businessIds = this._getBusinessIdsForUser(userId);
-
-      // Si no hay negocios conocidos, usamos IDs predeterminados de la consulta a la BD que realizamos antes
-      // Sabemos que existen los IDs 4, 5, 6 y 7 para el usuario 3
-      if (businessIds.length === 0 && userId === 3) {
-        const knownBusinessIds = [4, 5, 6, 7]; 
-        
-        // Los almacenamos para futuras consultas
-        for (const id of knownBusinessIds) {
-          this._saveBusinessIdForUser(userId, id);
-        }
-        
-        // Y los usamos para esta consulta
-        businessIds.push(...knownBusinessIds);
+        const message = data && typeof data === 'object' && data.message 
+          ? data.message 
+          : `Error: ${response.status} ${response.statusText}`;
+        throw new Error(message);
       }
       
-      if (businessIds.length === 0) {
-        console.log('No hay negocios conocidos para este usuario');
-          return [];
-        }
-      
-      console.log(`Intentando cargar ${businessIds.length} negocios para el usuario ${userId}: ${businessIds.join(', ')}`);
-        
-      // Cargar los detalles de cada negocio
-      const businessPromises = businessIds.map(id => this.getFoodBusiness(id)
-        .catch(error => {
-          console.warn(`Error cargando negocio ID ${id}:`, error);
-          return null;
-        })
-      );
-      
-      const businesses = await Promise.all(businessPromises);
-      
-      // Filtrar los que no se pudieron cargar y asegurarse de que pertenecen al usuario actual
-      // También añadir la propiedad menus si no existe
-      const validBusinesses = businesses
-        .filter(business => business && business.userId === userId)
-        .map(business => {
-          // Asegurarse de que cada negocio tiene una propiedad menus (aunque sea vacía)
-          if (!business.menus) {
-            business.menus = [];
-          }
-          return business;
-        })
-        // Solo devolver el primer negocio (según la regla de negocio)
-        .slice(0, 1);
-      
-      console.log(`Se encontraron ${validBusinesses.length} negocios válidos para el usuario ${userId}`);
-      return validBusinesses;
+      return { data, status: response.status, isEmpty: !responseText || responseText.trim() === '' };
     } catch (error) {
-      console.error('Error obteniendo negocios del usuario:', error);
-      // En lugar de propagar el error, devolvemos un array vacío
-      // para permitir una experiencia más fluida
+      clearTimeout(timeoutId);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('La operación excedió el tiempo límite. Intente nuevamente.');
+      }
+      
+      throw error;
+    }
+  }
+  
+  async get(endpoint, options = {}) {
+    return this.makeRequest(endpoint, { ...options, method: 'GET' });
+  }
+  
+  async post(endpoint, data, options = {}) {
+    return this.makeRequest(endpoint, { ...options, method: 'POST', body: data });
+  }
+  
+  async put(endpoint, data, options = {}) {
+    return this.makeRequest(endpoint, { ...options, method: 'PUT', body: data });
+  }
+  
+  async delete(endpoint, options = {}) {
+    return this.makeRequest(endpoint, { ...options, method: 'DELETE' });
+  }
+  
+  async fetchBinary(endpoint, options = {}) {
+    const { timeout = 15000 } = options;
+    const url = `${this.baseUrl}${endpoint}`;
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const token = this.getAuthToken();
+      
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+      
+      return await response.blob();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('La operación excedió el tiempo límite.');
+      }
+      
+      throw error;
+    }
+  }
+}
+
+class StorageHelper {
+  static saveToLocalStorage(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  static getFromLocalStorage(key, defaultValue = null) {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : defaultValue;
+    } catch (error) {
+      return defaultValue;
+    }
+  }
+  
+  static saveBusinessForUser(userId, businessId) {
+    const key = `userBusinesses_${userId}`;
+    const businesses = this.getFromLocalStorage(key, []);
+    
+    if (!businesses.includes(businessId)) {
+      businesses.push(businessId);
+      this.saveToLocalStorage(key, businesses);
+    }
+  }
+  
+  static getBusinessesForUser(userId) {
+    return this.getFromLocalStorage(`userBusinesses_${userId}`, []);
+  }
+}
+
+class ImageUploader {
+  constructor(apiClient) {
+    this.apiClient = apiClient;
+    this.endpoint = '/images';
+  }
+  
+  async upload(file) {
+    if (!file) return null;
+    
+    const formData = new FormData();
+    formData.append('File', file);
+    
+    const token = this.apiClient.getAuthToken();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    
+    try {
+      const response = await fetch(`${this.apiClient.baseUrl}${this.endpoint}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
+        credentials: 'include',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`Error al subir imagen: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data.key || data.Key || data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('La subida de imagen excedió el tiempo límite');
+      }
+      
+      throw error;
+    }
+  }
+}
+
+class BusinessService {
+  constructor(apiClient, imageUploader) {
+    this.apiClient = apiClient;
+    this.imageUploader = imageUploader;
+  }
+  
+  async create(businessData) {
+    const businessPayload = {
+      ...businessData,
+      businessCategoryId: businessData.businessCategoryId || 1
+    };
+    
+    const response = await this.apiClient.post('/food-businesses', businessPayload);
+    
+    if (response.isEmpty) {
+      return { ...businessPayload, id: Date.now() };
+    }
+    
+    if (response.data && response.data.id) {
+      StorageHelper.saveBusinessForUser(businessData.userId, response.data.id);
+    }
+    
+    return response.data;
+  }
+  
+  async getById(id) {
+    const response = await this.apiClient.get(`/food-businesses/${id}`);
+    
+    if (response.isEmpty) {
+      throw new Error(`No se encontró el negocio con ID ${id}`);
+    }
+    
+    const business = response.data;
+    
+    try {
+      const menuResponse = await this.apiClient.get(`/menus/food-business/${business.id}`);
+      business.menus = menuResponse.isEmpty ? [] : (
+        Array.isArray(menuResponse.data) ? menuResponse.data : [menuResponse.data]
+      );
+    } catch (error) {
+      business.menus = [];
+    }
+    
+    return business;
+  }
+  
+  async getByUserId(userId) {
+    try {
+      const response = await this.apiClient.get(`/food-businesses/user/${userId}`);
+      
+      if (response.isEmpty || !response.data) {
+        return [];
+      }
+      
+      const business = Array.isArray(response.data) ? response.data[0] : response.data;
+      
+      if (!business) {
+        return [];
+      }
+      
+      business.menus = [];
+      
+      try {
+        const menuResponse = await this.apiClient.get(`/menus/food-business/${business.id}`);
+        
+        if (!menuResponse.isEmpty && menuResponse.data) {
+          const menuData = menuResponse.data;
+          
+          if (!menuData.menuItems || !Array.isArray(menuData.menuItems)) {
+            try {
+              const menuItemsResponse = await this.apiClient.get(`/menu-items?menuId=${menuData.id}`);
+              menuData.menuItems = !menuItemsResponse.isEmpty && Array.isArray(menuItemsResponse.data) 
+                ? menuItemsResponse.data : [];
+            } catch (error) {
+              menuData.menuItems = [];
+            }
+          }
+          
+          business.menus = [menuData];
+        }
+      } catch (error) {
+        business.menus = [];
+      }
+      
+      return [business];
+    } catch (error) {
       return [];
     }
   }
-};
+  
+  async getCategories() {
+    try {
+      const response = await this.apiClient.get('/business-categories');
+      return response.isEmpty ? [] : response.data;
+    } catch (error) {
+      return [];
+    }
+  }
+  
+  async getQRCode(businessId) {
+    try {
+      const blob = await this.apiClient.fetchBinary(`/food-businesses/${businessId}/qr-code`);
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      throw error;
+    }
+  }
+}
 
-export default menuService; 
+class MenuService {
+  constructor(apiClient, imageUploader) {
+    this.apiClient = apiClient;
+    this.imageUploader = imageUploader;
+  }
+  
+  async create(menuData) {
+    if (!menuData.name || !menuData.foodBusinessId) {
+      throw new Error('El nombre del menú y el ID del negocio son requeridos');
+    }
+    
+    const menuPayload = {
+      name: menuData.name,
+      description: menuData.description || '',
+      foodBusinessId: parseInt(menuData.foodBusinessId, 10)
+    };
+    
+    const response = await this.apiClient.post('/menus', menuPayload);
+    
+    if (response.isEmpty) {
+      return { ...menuPayload, id: Date.now() };
+    }
+    
+    return response.data;
+  }
+  
+  async getById(id) {
+    try {
+      const response = await this.apiClient.get(`/menus/${id}`);
+      
+      if (response.isEmpty) {
+        return { id, name: 'Menú no disponible', description: '', items: [] };
+      }
+      
+      return response.data;
+    } catch (error) {
+      return { id, name: 'Menú no disponible', description: '', items: [] };
+    }
+  }
+  
+  validateMenuItem(menuItemData) {
+    if (!menuItemData.name || !menuItemData.menuId || !menuItemData.price) {
+      throw new Error('El nombre, precio y ID del menú son requeridos');
+    }
+    
+    if (isNaN(parseFloat(menuItemData.price)) || parseFloat(menuItemData.price) <= 0) {
+      throw new Error('El precio debe ser un número mayor que cero');
+    }
+  }
+  
+  prepareMenuItemPayload(menuItemData, imageKey = null) {
+    return {
+      name: menuItemData.name,
+      description: menuItemData.description || '',
+      price: parseFloat(menuItemData.price),
+      menuId: menuItemData.menuId,
+      isAvailable: menuItemData.isAvailable === undefined ? true : menuItemData.isAvailable,
+      menuItemCategoryId: menuItemData.menuItemCategoryId || null,
+      ...(imageKey && { imageKey })
+    };
+  }
+  
+  async createMenuItem(menuItemData) {
+    this.validateMenuItem(menuItemData);
+    
+    let imageKey = null;
+    if (menuItemData.image) {
+      imageKey = await this.imageUploader.upload(menuItemData.image);
+    }
+    
+    const payload = this.prepareMenuItemPayload(menuItemData, imageKey);
+    const response = await this.apiClient.post('/menu-item', payload);
+    
+    if (response.isEmpty) {
+      return { 
+        id: Date.now(),
+        ...payload,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+    
+    return response.data;
+  }
+  
+  async updateMenuItem(itemId, menuItemData) {
+    const payload = {
+      name: menuItemData.name,
+      description: menuItemData.description,
+      price: parseFloat(menuItemData.price),
+      isAvailable: menuItemData.isAvailable === undefined ? true : menuItemData.isAvailable,
+      menuItemCategoryId: menuItemData.menuItemCategoryId || null,
+      ...(menuItemData.imageKey && { imageKey: menuItemData.imageKey })
+    };
+    
+    Object.keys(payload).forEach(key => 
+      payload[key] === undefined && delete payload[key]
+    );
+    
+    const response = await this.apiClient.put(`/menu-item/${itemId}`, payload);
+    
+    if (response.isEmpty) {
+      return { 
+        id: itemId,
+        ...payload,
+        updatedAt: new Date().toISOString()
+      };
+    }
+    
+    return response.data;
+  }
+  
+  async deleteMenuItem(itemId) {
+    await this.apiClient.delete(`/menu-item/${itemId}`);
+    return true;
+  }
+  
+  async getMenuItems(menuId) {
+    try {
+      const response = await this.apiClient.get(`/menu-items?menuId=${menuId}`);
+      return response.isEmpty ? [] : response.data;
+    } catch (error) {
+      return [];
+    }
+  }
+  
+  async getMenuItemCategories() {
+    try {
+      const response = await this.apiClient.get('/menu-item-categories');
+      return response.isEmpty ? [] : response.data;
+    } catch (error) {
+      return [];
+    }
+  }
+}
+
+// Inicializar servicios
+const apiClient = new ApiClient(API_URL);
+const imageUploader = new ImageUploader(apiClient);
+const businessService = new BusinessService(apiClient, imageUploader);
+const menuService = new MenuService(apiClient, imageUploader);
+
+// Exportar interfaz de servicio
+export default {
+  // Negocios
+  createFoodBusiness: (data) => businessService.create(data),
+  getFoodBusiness: (id) => businessService.getById(id),
+  getUserBusinesses: (userId) => businessService.getByUserId(userId),
+  getBusinessCategories: () => businessService.getCategories(),
+  getBusinessQRCode: (id) => businessService.getQRCode(id),
+  
+  // Menús
+  createMenu: (data) => menuService.create(data),
+  getMenu: (id) => menuService.getById(id),
+  
+  // Platillos
+  createMenuItem: (data) => menuService.createMenuItem(data),
+  updateMenuItem: (itemId, data) => menuService.updateMenuItem(itemId, data),
+  deleteMenuItem: (itemId) => menuService.deleteMenuItem(itemId),
+  getMenuItems: (menuId) => menuService.getMenuItems(menuId),
+  getMenuItemCategories: () => menuService.getMenuItemCategories(),
+  
+  // Imágenes
+  uploadImage: (file) => imageUploader.upload(file),
+  
+  // Métodos de almacenamiento local (para compatibilidad)
+  _saveBusinessIdForUser: (userId, businessId) => StorageHelper.saveBusinessForUser(userId, businessId),
+  _getBusinessIdsForUser: (userId) => StorageHelper.getBusinessesForUser(userId)
+}; 
