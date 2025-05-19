@@ -1,7 +1,7 @@
 import authService from './authService';
 
 // Configurar la URL de la API con la dirección IP y puerto donde se está ejecutando el backend
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://localhost:5001/api';
 
 class ApiClient {
   constructor(baseUrl) {
