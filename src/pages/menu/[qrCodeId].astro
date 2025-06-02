@@ -31,12 +31,24 @@ try {
   loading = false;
 }
 
-// Organizamos los elementos del menú por categoría
-const menuItemsByCategory = menu?.menuItems?.reduce((acc, item) => {
-  const cat = item.menuItemCategoryId ?? 0;
-  (acc[cat] ||= []).push(item);
+// Organizamos los elementos del menú por sección
+const menuItemsBySection = menu?.menuItems?.reduce((acc, item) => {
+  const sectionId = item.sectionId || 'no-section';
+  (acc[sectionId] ||= []).push(item);
   return acc;
 }, {}) ?? {};
+
+// Obtenemos las secciones del menú
+const sections = menu?.sections || [];
+
+// Creamos un mapa de secciones para facilitar el acceso
+const sectionMap = sections.reduce((acc, section) => {
+  acc[section.id] = section;
+  return acc;
+}, {});
+
+// Si hay elementos sin sección, los organizamos en una sección especial
+const hasItemsWithoutSection = menuItemsBySection['no-section']?.length > 0;
 
 // Nombre de categorías (placeholder - idealmente se obtendrían del backend)
 const categoryNames = {
@@ -102,24 +114,32 @@ const categoryNames = {
     <!-- Menu Content -->
     {!loading && !error && menu && (
       <main class="menu-content">
-        <!-- Navbar de categorías sticky -->
+        <!-- Navbar de secciones sticky -->
         <nav class="category-navbar">
           <div class="category-scroll">
-            {Object.keys(menuItemsByCategory).map((categoryId) => (
-              <a href={`#category-${categoryId}`} class="category-link">
-                {categoryNames[categoryId] || `Categoría ${categoryId}`}
+            {sections.map((section) => (
+              <a href={`#section-${section.id}`} class="category-link">
+                {section.name}
               </a>
             ))}
+            {hasItemsWithoutSection && (
+              <a href="#section-no-section" class="category-link">
+                Otros platos
+              </a>
+            )}
           </div>
         </nav>
 
-        <!-- Secciones de categorías -->
-        {Object.keys(menuItemsByCategory).map((categoryId) => (
-          <section id={`category-${categoryId}`} class="menu-section" data-aos="fade-up">
+        <!-- Secciones con orden -->
+        {sections.sort((a, b) => (a.order || 0) - (b.order || 0)).map((section) => (
+          <section id={`section-${section.id}`} class="menu-section" data-aos="fade-up">
             <div class="category-header">
               <h2 class="category-title">
-                {categoryNames[categoryId] || `Categoría ${categoryId}`}
+                {section.name}
               </h2>
+              {section.description && (
+                <p class="section-description">{section.description}</p>
+              )}
               <div class="category-decoration">
                 <span class="line"></span>
                 <span class="icon"></span>
@@ -128,7 +148,7 @@ const categoryNames = {
             </div>
 
             <div class="items-grid">
-              {menuItemsByCategory[categoryId].map((item) => (
+              {(menuItemsBySection[section.id] || []).map((item) => (
                 <div class={`menu-item ${!item.isAvailable ? 'unavailable' : ''}`} data-aos="fade-up">
                   <div class="item-content">
                     {item.imageUri && (
@@ -173,18 +193,78 @@ const categoryNames = {
           </section>
         ))}
 
+        <!-- Sección para elementos sin sección -->
+        {hasItemsWithoutSection && (
+          <section id="section-no-section" class="menu-section" data-aos="fade-up">
+            <div class="category-header">
+              <h2 class="category-title">
+                Otros platos
+              </h2>
+              <div class="category-decoration">
+                <span class="line"></span>
+                <span class="icon"></span>
+                <span class="line"></span>
+              </div>
+            </div>
+
+            <div class="items-grid">
+              {menuItemsBySection['no-section'].map((item) => (
+                <div class={`menu-item ${!item.isAvailable ? 'unavailable' : ''}`} data-aos="fade-up">
+                  <div class="item-content">
+                    {item.imageUri && (
+                      <div class="item-image-container">
+                        <img 
+                          src={item.imageUri} 
+                          alt={item.name}
+                          loading="lazy"
+                          class="item-image"
+                          style={`view-transition-name: item-image-${item.id}`}
+                        />
+                        {!item.isAvailable && (
+                          <div class="unavailable-tag">No disponible</div>
+                        )}
+                      </div>
+                    )}
+                    <div class="item-details">
+                      <div class="item-header">
+                        <h3 class="item-name" style={`view-transition-name: item-name-${item.id}`}>{item.name}</h3>
+                        <div class="item-price" style={`view-transition-name: item-price-${item.id}`}>${item.price.toFixed(2)}</div>
+                      </div>
+                      {item.description && (
+                        <p class="item-description">{item.description}</p>
+                      )}
+                      <button 
+                        class="view-details-btn" 
+                        data-id={item.id}
+                        data-name={item.name}
+                        data-price={item.price}
+                        data-description={item.description || ''}
+                        data-image={item.imageUri || ''}
+                        data-available={item.isAvailable ? 'true' : 'false'}
+                        onclick="openModalFromButton(this)"
+                      >
+                        Ver detalles
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         <!-- Si no hay elementos en el menú -->
         {menu.menuItems && menu.menuItems.length === 0 && (
           <div class="empty-menu" data-aos="fade-in">
             <div class="empty-icon">🍽️</div>
             <h2>Menú en preparación</h2>
-            <p>Pronto agregaremos deliciosos platillos a este menú.</p>
+            <p>Pronto agregaremos deliciosos platos a este menú.</p>
           </div>
         )}
       </main>
     )}
 
-    <!-- Modal para detalles de platillo -->
+    <!-- Modal para detalles de plato -->
     <div id="item-modal" class="item-modal">
       <div class="modal-content">
         <span class="close-modal">&times;</span>
@@ -342,7 +422,7 @@ const categoryNames = {
         });
       }
 
-      // Modal para detalles de platillo
+      // Modal para detalles de plato
       const modal = document.getElementById('item-modal');
       const closeBtn = document.querySelector('.close-modal');
       
@@ -766,6 +846,14 @@ const categoryNames = {
     font-weight: 700;
     color: var(--primary-color);
     margin-bottom: 1rem;
+  }
+  
+  .section-description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    font-style: italic;
+    opacity: 0.8;
   }
   
   .category-decoration {

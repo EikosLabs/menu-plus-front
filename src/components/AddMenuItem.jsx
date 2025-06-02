@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import menuService from '../services/menuService';
 
-export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingItem, isEditing }) {
+export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, existingItem, isEditing }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -9,6 +9,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
     isAvailable: true,
     menuItemCategoryId: null,
     menuId: menuId,
+    sectionId: sectionId || null,
     image: null,
   });
   
@@ -18,6 +19,8 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [sections, setSections] = useState([]);
+  const [loadingSections, setLoadingSections] = useState(false);
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
   const [touched, setTouched] = useState({
@@ -64,8 +67,30 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
         }
       }
     }
+    
+    async function fetchSections() {
+      if (!isMounted.current || !menuId) return;
+      setLoadingSections(true);
+      try {
+        const sectionsData = await menuService.getSections(menuId);
+        if (isMounted.current) {
+          setSections(sectionsData || []);
+        }
+      } catch (err) {
+        console.error("Error al cargar secciones:", err);
+        if (isMounted.current) {
+          // Solo registramos el error, no lo mostramos
+        }
+      } finally {
+        if (isMounted.current) {
+          setLoadingSections(false);
+        }
+      }
+    }
+    
     fetchCategories();
-  }, []);
+    fetchSections();
+  }, [menuId]);
 
   useEffect(() => {
     if (!isMounted.current) return;
@@ -77,6 +102,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
         price: existingItem.price?.toString() || '',
         isAvailable: existingItem.isAvailable !== undefined ? existingItem.isAvailable : true,
         menuItemCategoryId: existingItem.menuItemCategoryId || null,
+        sectionId: existingItem.sectionId || sectionId || null,
         menuId: existingItem.menuId || menuId,
         image: null,
       });
@@ -89,12 +115,13 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
         price: '',
         isAvailable: true,
         menuItemCategoryId: null,
+        sectionId: sectionId || null,
         menuId: menuId,
         image: null,
       });
       setImagePreview(null);
     }
-  }, [isEditing, existingItem, menuId]);
+  }, [isEditing, existingItem, menuId, sectionId]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -126,7 +153,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
   const validateField = (name, value) => {
     switch (name) {
       case 'name':
-        return value.trim() ? '' : 'El nombre del platillo es obligatorio';
+        return value.trim() ? '' : 'El nombre del plato es obligatorio';
       case 'price':
         return value && parseFloat(value) > 0 ? '' : 'El precio debe ser mayor que cero';
       default:
@@ -184,7 +211,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
     
     // Validación básica sin depender de los estados "touched"
     if (!formData.name || !formData.name.trim()) {
-      setError('El nombre del platillo es obligatorio');
+      setError('El nombre del plato es obligatorio');
       return;
     }
     
@@ -208,10 +235,12 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
         isAvailable: formData.isAvailable,
         menuItemCategoryId: formData.menuItemCategoryId === '' ? null : 
                           formData.menuItemCategoryId ? parseInt(formData.menuItemCategoryId) : null,
+        sectionId: formData.sectionId === '' ? null : 
+                 formData.sectionId ? parseInt(formData.sectionId) : null,
         image: formData.image
       };
       
-      console.log("Enviando datos para " + (isEditing ? "actualizar" : "crear") + " platillo:", dataToSend);
+      console.log("Enviando datos para " + (isEditing ? "actualizar" : "crear") + " plato:", dataToSend);
       
       // Realizar la operación según sea edición o creación
       if (isEditing && existingItem) {
@@ -220,11 +249,12 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
           description: dataToSend.description,
           price: dataToSend.price,
           isAvailable: dataToSend.isAvailable,
-          menuItemCategoryId: dataToSend.menuItemCategoryId
+          menuItemCategoryId: dataToSend.menuItemCategoryId,
+          sectionId: dataToSend.sectionId
         };
         
         await menuService.updateMenuItem(existingItem.id, payload);
-        console.log("Platillo actualizado con éxito");
+        console.log("Plato actualizado con éxito");
         
         // Notificar y cerrar
         if (onItemAdded) {
@@ -233,38 +263,46 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
         
         // Desactivar estado de carga y mostrar mensaje
         setLoading(false);
-        setMessage('¡Platillo actualizado correctamente!');
+        setMessage('¡Plato actualizado correctamente!');
         
         // Cerrar el modal después de un breve retraso
         setTimeout(() => {
           try { if (onCancel) onCancel(); } catch(e) { console.error(e); }
         }, 1500);
       } else {
-        // FLUJO DE CREACIÓN - Simplificado y con recarga forzada
-        console.log("Iniciando creación de platillo para menú ID:", menuId);
+        // FLUJO DE CREACIÓN - Sin recarga de página
+        console.log("Iniciando creación de plato para menú ID:", menuId);
         
         try {
           const result = await menuService.createMenuItem(dataToSend);
-          console.log("Platillo creado exitosamente:", result);
+          console.log("Plato creado exitosamente:", result);
           
-          // Mostrar mensaje de éxito pero mantener cargando
-          setMessage('¡Platillo agregado correctamente! Recargando página...');
-          
-          // Intentar llamar al callback
+          // Notificar al componente padre
           if (onItemAdded) {
-            try { onItemAdded(result); } catch(e) { console.error(e); }
+            try { 
+              onItemAdded(result); 
+            } catch(e) { 
+              console.error("Error en callback onItemAdded:", e); 
+            }
           }
           
-          // FORZAR RECARGA DE LA PÁGINA - Solución radical pero efectiva
-          console.log("Forzando recarga de página en 1 segundo...");
+          // Desactivar estado de carga y mostrar mensaje
+          setLoading(false);
+          setMessage('¡Plato agregado correctamente!');
+          
+          // Cerrar el modal después de un breve retraso
           setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+            try { 
+              if (onCancel) onCancel(); 
+            } catch(e) { 
+              console.error("Error en callback onCancel:", e); 
+            }
+          }, 1500);
           
         } catch (createError) {
-          console.error("Error creando platillo:", createError);
+          console.error("Error creando plato:", createError);
           setLoading(false);
-          setError(createError.message || "Error al crear el platillo. Inténtelo nuevamente.");
+          setError(createError.message || "Error al crear el plato. Inténtelo nuevamente.");
         }
       }
     } catch (err) {
@@ -315,7 +353,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
               </svg>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#004E71]">
-              {isEditing ? 'Editar Platillo' : 'Agregar Nuevo Platillo'}
+              {isEditing ? 'Editar Plato' : 'Agregar Nuevo Plato'}
             </h2>
           </div>
 
@@ -345,11 +383,11 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
 
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Columna izquierda - Detalles del platillo */}
+              {/* Columna izquierda - Detalles del plato */}
               <div className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                    Nombre del Platillo *
+                    Nombre del Plato *
                     {touched.name && nameError && (
                       <span className="text-red-500 ml-2 text-xs">({nameError})</span>
                     )}
@@ -387,7 +425,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
                     placeholder="Describa los ingredientes y preparación..."
                     disabled={loading}
                   ></textarea>
-                  <p className="mt-1 text-xs text-gray-500">Una buena descripción ayuda a tus clientes a entender mejor el platillo.</p>
+                  <p className="mt-1 text-xs text-gray-500">Una buena descripción ayuda a tus clientes a entender mejor el plato.</p>
                 </div>
 
                 <div>
@@ -452,6 +490,32 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
                   <p className="mt-1 text-xs text-gray-500">Las categorías ayudan a organizar mejor tu menú.</p>
                 </div>
 
+                <div>
+                  <label htmlFor="sectionId" className="block text-sm font-medium text-gray-700 mb-1">
+                    Sección
+                  </label>
+                  <select
+                    id="sectionId"
+                    name="sectionId"
+                    value={formData.sectionId || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] transition-colors bg-white text-sm"
+                    disabled={loading || loadingSections}
+                  >
+                    <option value="">Sin sección</option>
+                    {loadingSections ? (
+                      <option disabled>Cargando secciones...</option>
+                    ) : (
+                      sections.map(section => (
+                        <option key={section.id} value={section.id}>
+                          {section.name}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500">Asigna el plato a una sección específica del menú.</p>
+                </div>
+
                 <div className="flex items-center pt-2">
                   <input
                     type="checkbox"
@@ -472,7 +536,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Imagen del Platillo
+                    Imagen del Plato
                   </label>
                   
                   <div 
@@ -536,7 +600,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
                     <div>
                       <h4 className="text-sm font-medium text-yellow-800 mb-1">Consejo para mejores resultados</h4>
                       <p className="text-sm text-yellow-700">
-                        Las imágenes más atractivas aumentan las ventas. Utiliza fotos profesionales, bien iluminadas y con fondos que destaquen tu platillo.
+                        Las imágenes más atractivas aumentan las ventas. Utiliza fotos profesionales, bien iluminadas y con fondos que destaquen tu plato.
                       </p>
                     </div>
                   </div>
@@ -566,7 +630,7 @@ export default function AddMenuItem({ menuId, onItemAdded, onCancel, existingIte
                     </svg>
                     {isEditing ? 'Actualizando...' : 'Guardando...'}
                   </>
-                ) : (isEditing ? 'Actualizar Platillo' : 'Agregar Platillo')}
+                ) : (isEditing ? 'Actualizar Plato' : 'Agregar Plato')}
               </button>
             </div>
           </form>

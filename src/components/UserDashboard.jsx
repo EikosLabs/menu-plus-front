@@ -36,23 +36,36 @@ export default function UserDashboard() {
     const fetchData = async () => {
       setLoading(true); 
       try {
-          const userDataForState = {
-          id: currentUserId,
-          name: `Usuario (ID: ${currentUserId})`,
-          email: `user_${currentUserId}@example.com`, 
-          role: "Cliente"
-        };
-        setUserData(userDataForState);
-        
         console.log("UserDashboard: Fetching businesses for user ID:", currentUserId);
         
         const userBusinesses = await menuService.getUserBusinesses(currentUserId);
         setBusinesses(userBusinesses);
+        
+        // Usar el nombre del negocio principal o un nombre por defecto
+        const businessName = userBusinesses.length > 0 ? userBusinesses[0].name : "Mi Negocio";
+        
+        const userDataForState = {
+          id: currentUserId,
+          name: businessName,
+          email: `user_${currentUserId}@example.com`, 
+          role: "Owner"
+        };
+        setUserData(userDataForState);
+        
         setError(null);
       } catch (error) {
         console.error("UserDashboard: Error fetching data:", error);
         setError("No se pudieron cargar los datos del dashboard. Por favor, verifique su conexión e intente de nuevo.");
         setBusinesses([]);
+        
+        // En caso de error, usar un nombre por defecto
+        const userDataForState = {
+          id: currentUserId,
+          name: "Mi Negocio",
+          email: `user_${currentUserId}@example.com`, 
+          role: "Owner"
+        };
+        setUserData(userDataForState);
       } finally {
         setLoading(false);
       }
@@ -76,6 +89,11 @@ export default function UserDashboard() {
     try {
       const userBusinesses = await menuService.getUserBusinesses(userData.id);
       setBusinesses(userBusinesses);
+      
+      // Actualizar el nombre del usuario en el header con el nuevo negocio
+      const businessName = userBusinesses.length > 0 ? userBusinesses[0].name : newBusiness.name;
+      setUserData(prev => ({ ...prev, name: businessName }));
+      
       setShowAddBusiness(false);
     } catch (error) {
       console.error("Error al recargar los negocios:", error);
@@ -85,6 +103,11 @@ export default function UserDashboard() {
         ...newBusiness,
         menus: []
       }]);
+      
+      // También actualizar el nombre en caso de error
+      if (newBusiness.name) {
+        setUserData(prev => ({ ...prev, name: newBusiness.name }));
+      }
     }
   };
 
@@ -353,7 +376,7 @@ export default function UserDashboard() {
             </div>
             <p className="text-gray-600 mb-6">Esta función estará disponible próximamente. ¡Mantente atento a las actualizaciones!</p>
             <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400 mb-4">
-              <p className="text-blue-700 text-sm">Aquí podrás ver estadísticas sobre las visitas a tu menú, platillos populares y más.</p>
+              <p className="text-blue-700 text-sm">Aquí podrás ver estadísticas sobre las visitas a tu menú, platos populares y más.</p>
             </div>
           </section>
         )}

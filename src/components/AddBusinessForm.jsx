@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import menuService from '../services/menuService';
+import { useTranslation } from '../i18n/utils';
 
 export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -16,12 +18,16 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [loadingCategories, setLoadingCategories] = useState(true);
-  const [categoryError, setCategoryError] = useState(null);
+  
+  // Estados para manejar la imagen del logo
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
-      setCategoryError(null); 
+      setError(null); // Limpiar errores al comenzar
       setCategories([]); 
       setFormData(prev => ({ ...prev, businessCategoryId: '' })); 
       
@@ -35,15 +41,13 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
             businessCategoryId: backendCategories[0].id.toString() 
           }));
           console.log('Categoría seleccionada automáticamente:', backendCategories[0].name);
-          setCategoryError(null); 
         } else {
-          setCategoryError('No hay categorías de negocio disponibles. Por favor, contacte al administrador para agregarlas.');
+          setError(t('business.noCategoriesAvailable'));
         }
         
       } catch (error) {
         console.error('Error al cargar categorías en AddBusinessForm:', error);
-        const specificMessage = error.message || 'No se pudieron cargar las categorías de negocio.';
-        setCategoryError(`${specificMessage} La creación de negocios no está disponible hasta que se solucionen las categorías. Por favor, contacte al administrador.`);
+        setError(`${t('business.categoryLoadError')}. ${t('business.noCategoriesAvailable')}`);
         setCategories([]); 
       } finally {
         setLoadingCategories(false);
@@ -51,7 +55,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
     };
     
     fetchCategories();
-  }, []);
+  }, [t]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,39 +65,103 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
     }));
   };
 
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validar tipo de archivo
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        setError(t('business.invalidImageFormat'));
+        return;
+      }
+      
+      // Validar tamaño (máximo 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+      if (file.size > maxSize) {
+        setError(t('business.imageSizeError'));
+        return;
+      }
+      
+      setLogoFile(file);
+      setError(null); // Limpiar errores previos
+      
+      // Crear preview de la imagen
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    // Limpiar el input file
+    const fileInput = document.getElementById('logo');
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    if (loadingCategories || categories.length === 0) {
-      setError('No se puede crear un negocio porque no hay categorías cargadas o disponibles. Por favor, contacte al administrador.');
+    if (loadingCategories) {
+      setError(t('business.loadingCategories'));
+      return;
+    }
+
+    if (categories.length === 0) {
+      setError(t('business.noCategoriesAvailable'));
       return;
     }
 
     setLoading(true);
 
     if (!userId) {
-      setError('Error de autenticación: No se pudo obtener el ID del usuario. Por favor, inicie sesión de nuevo.');
+      setError(t('errors.unauthorized'));
       setLoading(false);
       return;
     }
 
     if (!formData.businessCategoryId) {
-      setError('Debe seleccionar una categoría de negocio.');
+      setError(t('business.categoryRequired'));
       setLoading(false);
       return;
     }
 
     try {
+      let imageKey = null;
+      
+      // Subir logo si se seleccionó uno
+      if (logoFile) {
+        setUploadingLogo(true);
+        try {
+          console.log('Subiendo logo del negocio...');
+          imageKey = await menuService.uploadImage(logoFile);
+          console.log('Logo subido exitosamente:', imageKey);
+        } catch (imageError) {
+          console.error('Error al subir el logo:', imageError);
+          setError(t('business.logoUploadError'));
+          setLoading(false);
+          setUploadingLogo(false);
+          return; // Detenemos el proceso si falla la subida del logo
+        } finally {
+          setUploadingLogo(false);
+        }
+      }
+
       const businessData = {
         ...formData,
-        userId: parseInt(userId, 10), // Asegurarse de que el userId sea un número
-        businessCategoryId: parseInt(formData.businessCategoryId)
+        userId: parseInt(userId, 10),
+        businessCategoryId: parseInt(formData.businessCategoryId),
+        imageKey: imageKey
       };
 
-      console.log('Enviando datos de negocio:', businessData);
+      console.log('Enviando datos de negocio:', { ...businessData, imageKey: imageKey ? 'Presente' : 'No subida' });
 
-      // Llamada real al servicio API para crear el negocio
       const newBusiness = await menuService.createFoodBusiness(businessData);
       
       onBusinessAdded(newBusiness);
@@ -102,20 +170,17 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
       
       // Mensaje de error más específico según el tipo de error
       if (err.message && err.message.includes('categoría')) {
-        setError('Error: No se encuentran categorías de negocio en la base de datos. Contacte al administrador.');
+        setError(t('business.categoryLoadError'));
       } else if (err.message && err.message.includes('UserId')) {
-        setError('Error: El ID de usuario no es válido. Por favor, inicie sesión nuevamente.');
+        setError(t('errors.unauthorized'));
       } else if (err.message && (err.message.includes('NetworkError') || err.message.includes('conexión') || err.message.includes('Failed to fetch') || err.message.includes('CORS'))) {
-        setError('Error de conexión: No se pudo conectar al servidor. Verifique que:' +
-                '\n1. El servidor backend esté en funcionamiento' +
-                '\n2. No haya problemas de red' +
-                '\n3. Los puertos 8080/8081 estén abiertos y accesibles' +
-                '\n4. No haya restricciones de CORS (Cross-Origin Resource Sharing)');
+        setError(t('errors.network'));
       } else {
-        setError('Error al crear el negocio. Por favor, intente de nuevo más tarde. Detalles: ' + err.message);
+        setError(`${t('errors.general')} ${err.message}`);
       }
     } finally {
       setLoading(false);
+      setUploadingLogo(false);
     }
   };
 
@@ -130,24 +195,12 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
         </div>
       )}
       
-      {categoryError && (
-        <div className="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-md flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          <div>
-            <p className="font-semibold">Error al cargar categorías</p>
-            <p>{categoryError}</p>
-          </div>
-        </div>
-      )}
-      
       <div className="bg-white p-6 rounded-xl shadow-md border border-slate-100">
         <h3 className="text-lg font-semibold text-[#004E71] mb-5 flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Información Básica
+          {t('business.basicInfo')}
         </h3>
         
         <div className="space-y-4">
@@ -156,7 +209,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
-              Nombre *
+              {t('business.name')} *
             </label>
             <input
               type="text"
@@ -166,7 +219,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               value={formData.name}
               onChange={handleChange}
               className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
-              placeholder="Nombre de tu negocio"
+              placeholder={t('business.namePlaceholder')}
             />
           </div>
           
@@ -175,7 +228,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
               </svg>
-              Descripción
+              {t('business.description')}
             </label>
             <textarea
               id="description"
@@ -184,7 +237,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               onChange={handleChange}
               rows="3"
               className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
-              placeholder="Describe brevemente tu negocio"
+              placeholder={t('business.descriptionPlaceholder')}
             ></textarea>
           </div>
           
@@ -193,7 +246,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
               </svg>
-              Eslogan
+              {t('business.slogan')}
             </label>
             <input
               type="text"
@@ -202,8 +255,88 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               value={formData.slogan}
               onChange={handleChange}
               className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
-              placeholder="Eslogan o frase representativa"
+              placeholder={t('business.sloganPlaceholder')}
             />
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+        <h3 className="text-lg font-semibold text-[#004E71] mb-5 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          {t('business.businessLogo')}
+        </h3>
+        
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="logo" className="block text-sm font-medium text-[#0A3342] mb-2 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {t('business.uploadLogo')}
+            </label>
+            <p className="text-xs text-slate-500 mb-3">
+              {t('business.logoFormats')}
+            </p>
+            
+            {!logoPreview ? (
+              <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-[#E05C33] transition-colors">
+                <input
+                  type="file"
+                  id="logo"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                  onChange={handleLogoChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="logo"
+                  className="cursor-pointer flex flex-col items-center justify-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span className="text-sm text-slate-600 font-medium">{t('business.dragDropImage')}</span>
+                  <span className="text-xs text-slate-500 mt-1">{t('business.dragDropText')}</span>
+                </label>
+              </div>
+            ) : (
+              <div className="relative inline-block">
+                <div className="border-2 border-[#E05C33] rounded-lg p-3 bg-green-50">
+                  <img
+                    src={logoPreview}
+                    alt="Preview del logo"
+                    className="w-32 h-32 object-cover rounded-lg mx-auto"
+                  />
+                  <p className="text-sm text-center text-slate-600 mt-2 font-medium">
+                    {logoFile?.name}
+                  </p>
+                  <p className="text-xs text-center text-slate-500">
+                    {logoFile && (logoFile.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={removeLogo}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            
+            {uploadingLogo && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center">
+                <svg className="animate-spin h-5 w-5 text-blue-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="text-blue-700 text-sm">{t('business.uploadingLogo')}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -214,7 +347,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          Información de Contacto
+          {t('business.contactInfo')}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -224,7 +357,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              Dirección
+              {t('business.address')}
             </label>
             <input
               type="text"
@@ -233,7 +366,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               value={formData.address}
               onChange={handleChange}
               className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
-              placeholder="Dirección física"
+              placeholder={t('business.addressPlaceholder')}
             />
           </div>
           
@@ -242,7 +375,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              Teléfono
+              {t('business.phoneNumber')}
             </label>
             <input
               type="tel"
@@ -251,7 +384,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               value={formData.phoneNumber}
               onChange={handleChange}
               className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
-              placeholder="Número de contacto"
+              placeholder={t('business.phonePlaceholder')}
             />
           </div>
         
@@ -260,7 +393,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              Email
+              {t('business.email')}
             </label>
             <input
               type="email"
@@ -269,7 +402,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
-              placeholder="Correo electrónico"
+              placeholder={t('business.emailPlaceholder')}
             />
           </div>
           
@@ -278,7 +411,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#E05C33]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
-              Categoría *
+              {t('business.category')} *
             </label>
             
             {loadingCategories ? (
@@ -287,7 +420,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span className="text-slate-600">Cargando categorías...</span>
+                <span className="text-slate-600">{t('business.loadingCategories')}</span>
               </div>
             ) : categories.length > 0 ? (
             <select
@@ -306,7 +439,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
             </select>
             ) : (
               <div className="text-red-500 text-sm">
-                No hay categorías disponibles. No se puede crear un negocio.
+                {t('business.noCategoriesAvailable')}
               </div>
             )}
           </div>
@@ -322,11 +455,11 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
-          Cancelar
+          {t('common.cancel')}
         </button>
         <button
           type="submit"
-          disabled={loading || loadingCategories || categories.length === 0}
+          disabled={loading || loadingCategories || categories.length === 0 || uploadingLogo}
           className="px-5 py-2.5 bg-[#E05C33] hover:bg-[#FF9B54] text-white rounded-lg shadow-md transition-colors disabled:bg-slate-400 disabled:shadow-none flex items-center"
         >
           {loading ? (
@@ -335,14 +468,14 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel }) {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Creando...
+              {uploadingLogo ? t('business.uploadingLogo') : t('business.creatingBusiness')}
             </>
           ) : (
             <>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Crear Negocio
+              {t('business.createBusiness')}
             </>
           )}
         </button>

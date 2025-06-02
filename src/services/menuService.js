@@ -372,6 +372,8 @@ class MenuService {
       menuId: menuItemData.menuId,
       isAvailable: menuItemData.isAvailable === undefined ? true : menuItemData.isAvailable,
       menuItemCategoryId: menuItemData.menuItemCategoryId || null,
+      sectionId: menuItemData.sectionId || null,
+      order: menuItemData.order || 0,
       ...(imageKey && { imageKey })
     };
   }
@@ -406,6 +408,8 @@ class MenuService {
       price: parseFloat(menuItemData.price),
       isAvailable: menuItemData.isAvailable === undefined ? true : menuItemData.isAvailable,
       menuItemCategoryId: menuItemData.menuItemCategoryId || null,
+      sectionId: menuItemData.sectionId,
+      order: menuItemData.order,
       ...(menuItemData.imageKey && { imageKey: menuItemData.imageKey })
     };
     
@@ -448,6 +452,65 @@ class MenuService {
       return [];
     }
   }
+  
+  // Métodos de secciones
+  async createSection(menuId, sectionData) {
+    if (!sectionData.name) {
+      throw new Error('El nombre de la sección es requerido');
+    }
+    
+    const sectionPayload = {
+      name: sectionData.name,
+      description: sectionData.description || ''
+    };
+    
+    const response = await this.apiClient.post(`/menus/${menuId}/section`, sectionPayload);
+    
+    if (response.isEmpty) {
+      return { 
+        ...sectionPayload, 
+        id: Date.now(),
+        menuId,
+        order: 0
+      };
+    }
+    
+    return response.data;
+  }
+  
+  async moveSectionUp(menuId, sectionId) {
+    try {
+      const response = await this.apiClient.put(`/menus/${menuId}/section/${sectionId}/move-up`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al mover sección hacia arriba:', error);
+      throw error;
+    }
+  }
+  
+  async moveSectionDown(menuId, sectionId) {
+    try {
+      const response = await this.apiClient.put(`/menus/${menuId}/section/${sectionId}/move-down`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al mover sección hacia abajo:', error);
+      throw error;
+    }
+  }
+  
+  async getSections(menuId) {
+    try {
+      const menuResponse = await this.apiClient.get(`/menus/${menuId}`);
+      if (menuResponse.isEmpty || !menuResponse.data) {
+        return [];
+      }
+      
+      return menuResponse.data.sections || [];
+    } catch (error) {
+      console.error('Error al obtener secciones:', error);
+      return [];
+    }
+  }
 }
 
 // Inicializar servicios
@@ -469,12 +532,18 @@ export default {
   createMenu: (data) => menuService.create(data),
   getMenu: (id) => menuService.getById(id),
   
-  // Platillos
+  // Platos
   createMenuItem: (data) => menuService.createMenuItem(data),
   updateMenuItem: (itemId, data) => menuService.updateMenuItem(itemId, data),
   deleteMenuItem: (itemId) => menuService.deleteMenuItem(itemId),
   getMenuItems: (menuId) => menuService.getMenuItems(menuId),
   getMenuItemCategories: () => menuService.getMenuItemCategories(),
+  
+  // Secciones
+  createSection: (menuId, data) => menuService.createSection(menuId, data),
+  getSections: (menuId) => menuService.getSections(menuId),
+  moveSectionUp: (menuId, sectionId) => menuService.moveSectionUp(menuId, sectionId),
+  moveSectionDown: (menuId, sectionId) => menuService.moveSectionDown(menuId, sectionId),
   
   // Imágenes
   uploadImage: (file) => imageUploader.upload(file),

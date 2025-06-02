@@ -1,0 +1,117 @@
+---
+// Esta es una página temporal para debuggear el login
+---
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login - Debug</title>
+    <script>
+        async function testLogin() {
+            const email = 'test@test.com';
+            const password = 'test123';
+            
+            console.log('Iniciando test de login...');
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include'
+                });
+                
+                console.log('Estado de respuesta:', response.status);
+                console.log('Headers de respuesta:', Object.fromEntries(response.headers.entries()));
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error en login:', errorText);
+                    document.getElementById('result').innerHTML = `
+                        <div style="color: red; padding: 10px; border: 1px solid red;">
+                            <strong>Error ${response.status}:</strong> ${errorText}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const token = await response.text();
+                console.log('Token recibido (primeros 50 chars):', token.substring(0, 50) + '...');
+                
+                // Guardar token
+                localStorage.setItem('token', token);
+                document.cookie = `auth_token=${token}; path=/; max-age=7200; SameSite=Strict`;
+                
+                document.getElementById('result').innerHTML = `
+                    <div style="color: green; padding: 10px; border: 1px solid green;">
+                        <strong>¡Login exitoso!</strong><br>
+                        Token guardado en localStorage y cookies.<br>
+                        <button onclick="window.location.href='/dashboard'">Ir al Dashboard</button>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error de red:', error);
+                document.getElementById('result').innerHTML = `
+                    <div style="color: red; padding: 10px; border: 1px solid red;">
+                        <strong>Error de red:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function checkStoredToken() {
+            const token = localStorage.getItem('token');
+            const cookies = document.cookie;
+            
+            document.getElementById('tokenInfo').innerHTML = `
+                <h3>Información de Token Almacenado:</h3>
+                <p><strong>localStorage token:</strong> ${token ? 'Presente' : 'No encontrado'}</p>
+                <p><strong>Cookies:</strong> ${cookies || 'Vacías'}</p>
+            `;
+        }
+        
+        function clearTokens() {
+            localStorage.removeItem('token');
+            document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            checkStoredToken();
+        }
+    </script>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px;">
+    <h1>Página de Test para Login - Debug</h1>
+    
+    <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px;">
+        <h2>Prueba de Login</h2>
+        <p>Credenciales de prueba: <strong>test@test.com</strong> / <strong>test123</strong></p>
+        <button onclick="testLogin()" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+            Probar Login
+        </button>
+    </div>
+    
+    <div id="result" style="margin: 20px 0;"></div>
+    
+    <div style="background: #f9f9f9; padding: 20px; margin: 20px 0; border-radius: 5px;">
+        <div id="tokenInfo"></div>
+        <button onclick="checkStoredToken()" style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 3px; cursor: pointer; margin-right: 10px;">
+            Verificar Token
+        </button>
+        <button onclick="clearTokens()" style="background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 3px; cursor: pointer;">
+            Limpiar Tokens
+        </button>
+    </div>
+    
+    <div style="background: #e9ecef; padding: 15px; border-radius: 5px;">
+        <h3>Enlaces de Navegación:</h3>
+        <a href="/login" style="color: #007bff; margin-right: 15px;">Página de Login Normal</a>
+        <a href="/dashboard" style="color: #007bff; margin-right: 15px;">Dashboard</a>
+        <a href="/" style="color: #007bff;">Inicio</a>
+    </div>
+    
+    <script>
+        // Cargar información de token al cargar la página
+        window.onload = checkStoredToken;
+    </script>
+</body>
+</html> 
