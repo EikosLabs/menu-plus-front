@@ -50,6 +50,7 @@ const sectionMap = sections.reduce((acc, section) => {
 // Si hay elementos sin sección, los organizamos en una sección especial
 const hasItemsWithoutSection = menuItemsBySection['no-section']?.length > 0;
 
+
 // Nombre de categorías (placeholder - idealmente se obtendrían del backend)
 const categoryNames = {
   0: "Sin categoría",
@@ -140,6 +141,7 @@ const categoryNames = {
               {section.description && (
                 <p class="section-description">{section.description}</p>
               )}
+
               <div class="category-decoration">
                 <span class="line"></span>
                 <span class="icon"></span>
@@ -149,6 +151,7 @@ const categoryNames = {
 
             <div class="items-grid">
               {(menuItemsBySection[section.id] || []).map((item) => (
+
                 <div class={`menu-item ${!item.isAvailable ? 'unavailable' : ''}`} data-aos="fade-up">
                   <div class="item-content">
                     {item.imageUri && (
@@ -253,18 +256,21 @@ const categoryNames = {
           </section>
         )}
 
+
         <!-- Si no hay elementos en el menú -->
         {menu.menuItems && menu.menuItems.length === 0 && (
           <div class="empty-menu" data-aos="fade-in">
             <div class="empty-icon">🍽️</div>
             <h2>Menú en preparación</h2>
             <p>Pronto agregaremos deliciosos platos a este menú.</p>
+
           </div>
         )}
       </main>
     )}
 
     <!-- Modal para detalles de plato -->
+
     <div id="item-modal" class="item-modal">
       <div class="modal-content">
         <span class="close-modal">&times;</span>
@@ -423,6 +429,7 @@ const categoryNames = {
       }
 
       // Modal para detalles de plato
+
       const modal = document.getElementById('item-modal');
       const closeBtn = document.querySelector('.close-modal');
       
@@ -856,6 +863,7 @@ const categoryNames = {
     opacity: 0.8;
   }
   
+
   .category-decoration {
     display: flex;
     align-items: center;

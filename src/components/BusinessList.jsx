@@ -146,7 +146,66 @@ export default function BusinessList({ businesses, onAddMenuClick, setBusinesses
     } catch (error) {
       console.error("Error al actualizar después de añadir sección:", error);
     }
+
   };
+
+  const handleCancelAddMenuItem = (menuId) => {
+    setShowAddMenuItem(prev => ({ ...prev, [menuId]: false }));
+    setError(null);
+  };
+
+  const handleShowEditMenuItem = (menuItem, menuId) => {
+    console.log("Editando platillo:", menuItem, "del menuId:", menuId);
+    setEditingMenuItem({ ...menuItem, menuId }); // Guardamos el platillo y su menuId
+    setShowEditMenuItemModal(true);
+    setShowAddMenuItem({}); // Ocultar formulario de añadir si estuviera abierto
+    setError(null);
+  };
+
+  const handleCancelEditMenuItem = () => {
+    setEditingMenuItem(null);
+    setShowEditMenuItemModal(false);
+    setError(null);
+  };
+
+  const handleItemAdded = async (menuId, newItem) => {
+    console.log("Platillo añadido, actualizando UI:", newItem);
+    
+    // Simplemente cerrar el modal - la recarga se gestionará desde el componente AddMenuItem
+    setShowAddMenuItem(prev => ({ ...prev, [menuId]: false }));
+    
+    // No es necesario hacer nada más aquí, la recarga de página se maneja en AddMenuItem
+  };
+  
+  const handleItemUpdated = async (updatedItem) => {
+    // No podemos usar setBusinesses ya que businesses es una prop, no un estado local
+    // Actualmente esta función no se está usando porque hemos comentado AddMenuItem
+    console.log("Item actualizado:", updatedItem);
+    // Aquí idealmente debería llamarse a una función del componente padre para actualizar el estado
+    // Por ahora, solo limpiar el estado local
+    setEditingMenuItem(null);
+    setShowEditMenuItemModal(false);
+    setError(null);
+  };
+
+  const handleDeleteMenuItem = async (menuId, itemId, itemName, businessId) => {
+    setError(null);
+    if (window.confirm(`¿Estás seguro de que quieres eliminar el platillo "${itemName}"?`)) {
+      try {
+        await menuService.deleteMenuItem(itemId);
+        // No podemos actualizar el estado businesses directamente
+        // Idealmente, deberíamos llamar a una función del componente padre
+        console.log(`Platillo ${itemName} (ID: ${itemId}) eliminado.`);
+        // Podríamos recargar la página o pedir al padre que actualice los datos
+        window.location.reload(); // Solución temporal
+      } catch (err) {
+        console.error("Error al eliminar el platillo:", err);
+        setError(`Error al eliminar "${itemName}": ${err.message}`);
+      }
+    }
+  };
+
+  console.log("BusinessList: Recibiendo businesses:", JSON.parse(JSON.stringify(businesses)));
 
   return (
     <div className="space-y-6">
@@ -254,6 +313,7 @@ export default function BusinessList({ businesses, onAddMenuClick, setBusinesses
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+
                           </svg>
                                 Añadir Plato
                               </button>
@@ -385,6 +445,7 @@ export default function BusinessList({ businesses, onAddMenuClick, setBusinesses
                             </p>
                           </div>
                         </div>
+
                       </div>
                     )
                   )}
@@ -403,6 +464,7 @@ export default function BusinessList({ businesses, onAddMenuClick, setBusinesses
                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
                   >
                     Añadir Menú
+
                   </button>
                 </div>
                 </div>
@@ -457,6 +519,7 @@ export default function BusinessList({ businesses, onAddMenuClick, setBusinesses
           onClose={() => setShowSectionManager(null)}
         />
       )}
+
     </div>
   );
 } 

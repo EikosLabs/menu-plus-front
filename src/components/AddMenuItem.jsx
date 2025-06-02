@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import menuService from '../services/menuService';
 
 export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, existingItem, isEditing }) {
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -10,6 +11,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
     menuItemCategoryId: null,
     menuId: menuId,
     sectionId: sectionId || null,
+
     image: null,
   });
   
@@ -21,6 +23,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [sections, setSections] = useState([]);
   const [loadingSections, setLoadingSections] = useState(false);
+
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
   const [touched, setTouched] = useState({
@@ -92,6 +95,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
     fetchSections();
   }, [menuId]);
 
+
   useEffect(() => {
     if (!isMounted.current) return;
     
@@ -103,6 +107,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
         isAvailable: existingItem.isAvailable !== undefined ? existingItem.isAvailable : true,
         menuItemCategoryId: existingItem.menuItemCategoryId || null,
         sectionId: existingItem.sectionId || sectionId || null,
+
         menuId: existingItem.menuId || menuId,
         image: null,
       });
@@ -116,12 +121,14 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
         isAvailable: true,
         menuItemCategoryId: null,
         sectionId: sectionId || null,
+
         menuId: menuId,
         image: null,
       });
       setImagePreview(null);
     }
   }, [isEditing, existingItem, menuId, sectionId]);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -154,6 +161,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
     switch (name) {
       case 'name':
         return value.trim() ? '' : 'El nombre del plato es obligatorio';
+
       case 'price':
         return value && parseFloat(value) > 0 ? '' : 'El precio debe ser mayor que cero';
       default:
@@ -241,6 +249,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
       };
       
       console.log("Enviando datos para " + (isEditing ? "actualizar" : "crear") + " plato:", dataToSend);
+
       
       // Realizar la operación según sea edición o creación
       if (isEditing && existingItem) {
@@ -255,6 +264,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
         
         await menuService.updateMenuItem(existingItem.id, payload);
         console.log("Plato actualizado con éxito");
+
         
         // Notificar y cerrar
         if (onItemAdded) {
@@ -354,6 +364,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#004E71]">
               {isEditing ? 'Editar Plato' : 'Agregar Nuevo Plato'}
+
             </h2>
           </div>
 
@@ -537,6 +548,7 @@ export default function AddMenuItem({ menuId, sectionId, onItemAdded, onCancel, 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Imagen del Plato
+
                   </label>
                   
                   <div 

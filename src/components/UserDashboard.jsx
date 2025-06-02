@@ -377,6 +377,7 @@ export default function UserDashboard() {
             <p className="text-gray-600 mb-6">Esta función estará disponible próximamente. ¡Mantente atento a las actualizaciones!</p>
             <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400 mb-4">
               <p className="text-blue-700 text-sm">Aquí podrás ver estadísticas sobre las visitas a tu menú, platos populares y más.</p>
+
             </div>
           </section>
         )}
@@ -395,6 +396,7 @@ export default function UserDashboard() {
             <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400 mb-4">
               <p className="text-purple-700 text-sm">Aquí podrás actualizar tus datos personales, cambiar tu contraseña y configurar preferencias.</p>
             </div>
+
           </section>
           )}
       </main>

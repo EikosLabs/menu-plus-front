@@ -172,6 +172,7 @@ export default function QRCodeComponent({ businessId, businessName, qrCodeId, on
               justify-content: center;
               align-items: center;
               min-height: 100vh;
+
               margin: 0;
               background: white;
             }
@@ -226,6 +227,7 @@ export default function QRCodeComponent({ businessId, businessName, qrCodeId, on
               font-size: 16px;
               margin-top: 20px;
               cursor: pointer;
+
             }
           </style>
         </head>
@@ -405,6 +407,7 @@ export default function QRCodeComponent({ businessId, businessName, qrCodeId, on
           </div>
         )}
       </div>
+
     </div>
   );
 } 

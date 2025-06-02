@@ -109,6 +109,7 @@ class ApiClient {
       
       clearTimeout(timeoutId);
       
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
@@ -155,6 +156,7 @@ class StorageHelper {
     }
   }
   
+
   static getBusinessesForUser(userId) {
     return this.getFromLocalStorage(`userBusinesses_${userId}`, []);
   }
@@ -374,6 +376,7 @@ class MenuService {
       menuItemCategoryId: menuItemData.menuItemCategoryId || null,
       sectionId: menuItemData.sectionId || null,
       order: menuItemData.order || 0,
+
       ...(imageKey && { imageKey })
     };
   }
@@ -410,6 +413,7 @@ class MenuService {
       menuItemCategoryId: menuItemData.menuItemCategoryId || null,
       sectionId: menuItemData.sectionId,
       order: menuItemData.order,
+
       ...(menuItemData.imageKey && { imageKey: menuItemData.imageKey })
     };
     
@@ -508,6 +512,7 @@ class MenuService {
       return menuResponse.data.sections || [];
     } catch (error) {
       console.error('Error al obtener secciones:', error);
+
       return [];
     }
   }
@@ -533,6 +538,7 @@ export default {
   getMenu: (id) => menuService.getById(id),
   
   // Platos
+
   createMenuItem: (data) => menuService.createMenuItem(data),
   updateMenuItem: (itemId, data) => menuService.updateMenuItem(itemId, data),
   deleteMenuItem: (itemId) => menuService.deleteMenuItem(itemId),
@@ -545,6 +551,7 @@ export default {
   moveSectionUp: (menuId, sectionId) => menuService.moveSectionUp(menuId, sectionId),
   moveSectionDown: (menuId, sectionId) => menuService.moveSectionDown(menuId, sectionId),
   
+
   // Imágenes
   uploadImage: (file) => imageUploader.upload(file),
   
