@@ -272,13 +272,11 @@ export default function BusinessList({ businesses, onAddMenuClick, setBusinesses
                                       key={item.id} 
                                       className="flex border rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-all duration-300 relative group"
                                     >
-                                      {item.imageUri && (
-                                        <img 
-                                          src={item.imageUri} 
-                                          alt={item.name} 
-                                          className="w-20 h-20 object-cover rounded-lg mr-3 flex-shrink-0"
-                                        />
-                                      )}
+                                      <img 
+                                        src={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'} 
+                                        alt={item.name} 
+                                        className="w-20 h-20 object-cover rounded-lg mr-3 flex-shrink-0"
+                                      />
                                       <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-start">
                                           <h4 className="font-semibold text-[#1A3A54] truncate">{item.name}</h4>
@@ -329,13 +327,11 @@ export default function BusinessList({ businesses, onAddMenuClick, setBusinesses
                             key={item.id} 
                             className="flex border rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-all duration-300 relative group"
                           >
-                            {item.imageUri && (
-                                    <img
-                                      src={item.imageUri}
-                                      alt={item.name}
-                                className="w-20 h-20 object-cover rounded-lg mr-3 flex-shrink-0"
-                              />
-                            )}
+                            <img
+                              src={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'}
+                              alt={item.name}
+                              className="w-20 h-20 object-cover rounded-lg mr-3 flex-shrink-0"
+                            />
                             <div className="flex-1 min-w-0">
                               <div className="flex justify-between items-start">
                                 <h4 className="font-semibold text-[#1A3A54] truncate">{item.name}</h4>

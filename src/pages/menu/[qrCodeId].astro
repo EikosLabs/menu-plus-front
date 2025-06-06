@@ -151,20 +151,18 @@ const categoryNames = {
               {(menuItemsBySection[section.id] || []).map((item) => (
                 <div class={`menu-item ${!item.isAvailable ? 'unavailable' : ''}`} data-aos="fade-up">
                   <div class="item-content">
-                    {item.imageUri && (
-                      <div class="item-image-container">
-                        <img 
-                          src={item.imageUri} 
-                          alt={item.name}
-                          loading="lazy"
-                          class="item-image"
-                          style={`view-transition-name: item-image-${item.id}`}
-                        />
-                        {!item.isAvailable && (
-                          <div class="unavailable-tag">No disponible</div>
-                        )}
-                      </div>
-                    )}
+                    <div class="item-image-container">
+                      <img 
+                        src={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'} 
+                        alt={item.name}
+                        loading="lazy"
+                        class="item-image"
+                        style={`view-transition-name: item-image-${item.id}`}
+                      />
+                      {!item.isAvailable && (
+                        <div class="unavailable-tag">No disponible</div>
+                      )}
+                    </div>
                     <div class="item-details">
                       <div class="item-header">
                         <h3 class="item-name" style={`view-transition-name: item-name-${item.id}`}>{item.name}</h3>
@@ -179,7 +177,7 @@ const categoryNames = {
                         data-name={item.name}
                         data-price={item.price}
                         data-description={item.description || ''}
-                        data-image={item.imageUri || ''}
+                        data-image={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'}
                         data-available={item.isAvailable ? 'true' : 'false'}
                         onclick="openModalFromButton(this)"
                       >
@@ -211,20 +209,18 @@ const categoryNames = {
               {menuItemsBySection['no-section'].map((item) => (
                 <div class={`menu-item ${!item.isAvailable ? 'unavailable' : ''}`} data-aos="fade-up">
                   <div class="item-content">
-                    {item.imageUri && (
-                      <div class="item-image-container">
-                        <img 
-                          src={item.imageUri} 
-                          alt={item.name}
-                          loading="lazy"
-                          class="item-image"
-                          style={`view-transition-name: item-image-${item.id}`}
-                        />
-                        {!item.isAvailable && (
-                          <div class="unavailable-tag">No disponible</div>
-                        )}
-                      </div>
-                    )}
+                    <div class="item-image-container">
+                      <img 
+                        src={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'} 
+                        alt={item.name}
+                        loading="lazy"
+                        class="item-image"
+                        style={`view-transition-name: item-image-${item.id}`}
+                      />
+                      {!item.isAvailable && (
+                        <div class="unavailable-tag">No disponible</div>
+                      )}
+                    </div>
                     <div class="item-details">
                       <div class="item-header">
                         <h3 class="item-name" style={`view-transition-name: item-name-${item.id}`}>{item.name}</h3>
@@ -239,7 +235,7 @@ const categoryNames = {
                         data-name={item.name}
                         data-price={item.price}
                         data-description={item.description || ''}
-                        data-image={item.imageUri || ''}
+                        data-image={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'}
                         data-available={item.isAvailable ? 'true' : 'false'}
                         onclick="openModalFromButton(this)"
                       >
@@ -484,13 +480,9 @@ const categoryNames = {
         // Definir transiciones con View Transition API para elementos específicos
         startViewTransition(() => {
           // Rellenar datos del modal
-          if (item.imageUri) {
-            modalImage.src = item.imageUri;
-            modalImage.alt = item.name;
-            modalImage.style.display = 'block';
-          } else {
-            modalImage.style.display = 'none';
-          }
+          modalImage.src = item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg';
+          modalImage.alt = item.name;
+          modalImage.style.display = 'block';
           
           modalName.textContent = item.name;
           modalPrice.textContent = `$${parseFloat(item.price).toFixed(2)}`;
