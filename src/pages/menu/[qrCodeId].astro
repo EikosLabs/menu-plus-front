@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from "../../layouts/Layout.astro";
 
 export const prerender = false;
 
@@ -13,50 +13,55 @@ let businessName = "Restaurante";
 let loading = true;
 
 try {
-  // Llamada a la API para obtener el menú por QR sin autenticación
-  const response = await fetch(`http://localhost:5000/api/menus/qr-code/${qrCodeId}`);
-  
-  if (!response.ok) {
-    // Si la respuesta no es OK, manejamos el error
-    throw new Error(`Error al cargar el menú: ${response.status} ${response.statusText}`);
-  }
-  
-  // Convertimos la respuesta a JSON
-  menu = await response.json();
-  loading = false;
-  
+	// Llamada a la API para obtener el menú por QR sin autenticación
+	const response = await fetch(
+		`http://localhost:5000/api/menus/qr-code/${qrCodeId}`,
+	);
+
+	if (!response.ok) {
+		// Si la respuesta no es OK, manejamos el error
+		throw new Error(
+			`Error al cargar el menú: ${response.status} ${response.statusText}`,
+		);
+	}
+
+	// Convertimos la respuesta a JSON
+	menu = await response.json();
+	loading = false;
 } catch (err) {
-  console.error('Error cargando el menú:', err);
-  error = err.message || 'Error al cargar el menú. Por favor, intente más tarde.';
-  loading = false;
+	console.error("Error cargando el menú:", err);
+	error =
+		err.message || "Error al cargar el menú. Por favor, intente más tarde.";
+	loading = false;
 }
 
 // Organizamos los elementos del menú por sección
-const menuItemsBySection = menu?.menuItems?.reduce((acc, item) => {
-  const sectionId = item.sectionId || 'no-section';
-  (acc[sectionId] ||= []).push(item);
-  return acc;
-}, {}) ?? {};
+const menuItemsBySection =
+	menu?.menuItems?.reduce((acc, item) => {
+		const sectionId = item.sectionId || "no-section";
+		(acc[sectionId] ||= []).push(item);
+		return acc;
+	}, {}) ?? {};
 
 // Obtenemos las secciones del menú
 const sections = menu?.sections || [];
 
 // Creamos un mapa de secciones para facilitar el acceso
 const sectionMap = sections.reduce((acc, section) => {
-  acc[section.id] = section;
-  return acc;
+	acc[section.id] = section;
+	return acc;
 }, {});
 
 // Si hay elementos sin sección, los organizamos en una sección especial
-const hasItemsWithoutSection = menuItemsBySection['no-section']?.length > 0;
+const hasItemsWithoutSection = menuItemsBySection["no-section"]?.length > 0;
 
 // Nombre de categorías (placeholder - idealmente se obtendrían del backend)
 const categoryNames = {
-  0: "Sin categoría",
-  1: "Entradas",
-  2: "Platos Principales",
-  3: "Postres",
-  4: "Bebidas"
+	0: "Sin categoría",
+	1: "Entradas",
+	2: "Platos Principales",
+	3: "Postres",
+	4: "Bebidas",
 };
 ---
 
@@ -153,7 +158,7 @@ const categoryNames = {
                   <div class="item-content">
                     <div class="item-image-container">
                       <img 
-                        src={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'} 
+                        src={item.imageUri || 'https://ooni.com/cdn/shop/articles/20220211142347-margherita-9920_ba86be55-674e-4f35-8094-2067ab41a671.jpg?v=1737104576&width=1080'} 
                         alt={item.name}
                         loading="lazy"
                         class="item-image"
@@ -177,7 +182,7 @@ const categoryNames = {
                         data-name={item.name}
                         data-price={item.price}
                         data-description={item.description || ''}
-                        data-image={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'}
+                        data-image={item.imageUri || 'https://ooni.com/cdn/shop/articles/20220211142347-margherita-9920_ba86be55-674e-4f35-8094-2067ab41a671.jpg?v=1737104576&width=1080'}
                         data-available={item.isAvailable ? 'true' : 'false'}
                         onclick="openModalFromButton(this)"
                       >
@@ -211,7 +216,7 @@ const categoryNames = {
                   <div class="item-content">
                     <div class="item-image-container">
                       <img 
-                        src={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'} 
+                        src={item.imageUri || 'https://ooni.com/cdn/shop/articles/20220211142347-margherita-9920_ba86be55-674e-4f35-8094-2067ab41a671.jpg?v=1737104576&width=1080'} 
                         alt={item.name}
                         loading="lazy"
                         class="item-image"
@@ -235,7 +240,7 @@ const categoryNames = {
                         data-name={item.name}
                         data-price={item.price}
                         data-description={item.description || ''}
-                        data-image={item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg'}
+                        data-image={item.imageUri || 'https://ooni.com/cdn/shop/articles/20220211142347-margherita-9920_ba86be55-674e-4f35-8094-2067ab41a671.jpg?v=1737104576&width=1080'}
                         data-available={item.isAvailable ? 'true' : 'false'}
                         onclick="openModalFromButton(this)"
                       >
@@ -480,7 +485,7 @@ const categoryNames = {
         // Definir transiciones con View Transition API para elementos específicos
         startViewTransition(() => {
           // Rellenar datos del modal
-          modalImage.src = item.imageUri || 'https://www.sortirambnens.com/wp-content/uploads/2019/02/pizza-de-peperoni.jpg';
+          modalImage.src = item.imageUri || 'https://ooni.com/cdn/shop/articles/20220211142347-margherita-9920_ba86be55-674e-4f35-8094-2067ab41a671.jpg?v=1737104576&width=1080';
           modalImage.alt = item.name;
           modalImage.style.display = 'block';
           
@@ -517,8 +522,8 @@ const categoryNames = {
   /* Variables CSS */
   :root {
     --primary-color: #003A57;
-    --secondary-color: #E05C33;
-    --accent-color: #FF9B54;
+    --secondary-color: #1a1a1a;
+    --accent-color: #333333;
     --text-primary: #333333;
     --text-secondary: #666666;
     --background-primary: #F9F9F9;

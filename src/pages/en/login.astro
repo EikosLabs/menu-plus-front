@@ -1,8 +1,8 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { t } from '../../i18n/utils';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { t } from "../../i18n/utils";
 
-const lang = 'en';
+const lang = "en";
 ---
 
 <BaseLayout 
@@ -14,7 +14,7 @@ const lang = 'en';
     <div class="max-w-md w-full space-y-8">
       <!-- Header -->
       <div class="text-center">
-        <div class="w-16 h-16 bg-gradient-to-br from-[#E05C33] to-[#FF9B54] rounded-lg flex items-center justify-center mx-auto mb-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-[#1a1a1a] to-[#333333] rounded-lg flex items-center justify-center mx-auto mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
@@ -22,7 +22,7 @@ const lang = 'en';
         <h2 class="text-3xl font-bold text-[#004E71]">{t('auth.login', lang)}</h2>
         <p class="mt-2 text-sm text-slate-600">
           {t('auth.dontHaveAccount', lang)}
-          <a href="/en/register" class="font-medium text-[#E05C33] hover:text-[#FF9B54] transition-colors">
+          <a href="/en/register" class="font-medium text-[#1a1a1a] hover:text-[#333333] transition-colors">
             {t('auth.register', lang)}
           </a>
         </p>
@@ -40,7 +40,7 @@ const lang = 'en';
               name="email"
               type="email"
               required
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
+              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-[#1a1a1a] focus:border-[#1a1a1a] focus:outline-none transition-colors"
               placeholder="john@example.com"
             />
           </div>
@@ -54,7 +54,7 @@ const lang = 'en';
               name="password"
               type="password"
               required
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-[#E05C33] focus:border-[#E05C33] focus:outline-none transition-colors"
+              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-[#1a1a1a] focus:border-[#1a1a1a] focus:outline-none transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -65,13 +65,13 @@ const lang = 'en';
                 id="remember"
                 name="remember"
                 type="checkbox"
-                class="h-4 w-4 text-[#E05C33] focus:ring-[#E05C33] border-slate-300 rounded"
+                class="h-4 w-4 text-[#1a1a1a] focus:ring-[#1a1a1a] border-slate-300 rounded"
               />
               <label for="remember" class="ml-2 block text-sm text-slate-600">
                 Remember me
               </label>
             </div>
-            <a href="/en/forgot-password" class="text-sm text-[#E05C33] hover:text-[#FF9B54] transition-colors">
+            <a href="/en/forgot-password" class="text-sm text-[#1a1a1a] hover:text-[#333333] transition-colors">
               {t('auth.forgotPassword', lang)}
             </a>
           </div>
@@ -88,7 +88,7 @@ const lang = 'en';
           <button
             type="submit"
             id="loginButton"
-            class="w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[#E05C33] hover:bg-[#FF9B54] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E05C33] transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
+            class="w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[#1a1a1a] hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1a1a1a] transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
           >
             <span id="loginButtonText">{t('auth.loginButton', lang)}</span>
             <svg id="loginSpinner" class="hidden animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

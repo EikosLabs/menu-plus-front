@@ -1,0 +1,20 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.0",
+	"organizeImports": true,
+	"javascript": {
+		"formatter": {
+			"indentStyle": "space",
+			"indentWidth": 2,
+			"lineWidth": 100
+		},
+		"lint": {
+			"rules": {
+				"recommended": true,
+				"style": {
+					"noConsole": "error",
+					"useConst": "error"
+				}
+			}
+		}
+	}
+}
