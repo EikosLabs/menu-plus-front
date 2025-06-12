@@ -1,8 +1,8 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { t } from '../../i18n/utils';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { t } from "../../i18n/utils";
 
-const lang = 'en';
+const lang = "en";
 ---
 
 <BaseLayout 
@@ -17,7 +17,7 @@ const lang = 'en';
         <div class="text-center">
           <h1 class="text-4xl md:text-6xl font-bold text-[#004E71] mb-6">
             {t('dashboard.welcome', lang)}
-            <span class="block text-[#E05C33]">MenuPlus</span>
+            <span class="block text-[#1a1a1a]">MenuPlus</span>
           </h1>
           <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
             Create and manage digital menus for your business. Share QR codes and attract more customers with our professional platform.
@@ -26,7 +26,7 @@ const lang = 'en';
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
               href="/en/register" 
-              class="inline-flex items-center px-8 py-3 bg-[#E05C33] hover:bg-[#FF9B54] text-white font-medium rounded-lg shadow-lg transition-colors"
+              class="inline-flex items-center px-8 py-3 bg-[#1a1a1a] hover:bg-[#333333] text-white font-medium rounded-lg shadow-lg transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -48,7 +48,7 @@ const lang = 'en';
       
       <!-- Background decoration -->
       <div class="absolute inset-0 -z-10">
-        <div class="absolute top-20 left-10 w-72 h-72 bg-[#E05C33] opacity-10 rounded-full blur-3xl"></div>
+        <div class="absolute top-20 left-10 w-72 h-72 bg-[#1a1a1a] opacity-10 rounded-full blur-3xl"></div>
         <div class="absolute bottom-20 right-10 w-96 h-96 bg-[#004E71] opacity-10 rounded-full blur-3xl"></div>
       </div>
     </section>
@@ -68,7 +68,7 @@ const lang = 'en';
         <div class="grid md:grid-cols-3 gap-8">
           <!-- Feature 1 -->
           <div class="text-center p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-shadow">
-            <div class="w-16 h-16 bg-gradient-to-br from-[#E05C33] to-[#FF9B54] rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-[#1a1a1a] to-[#333333] rounded-lg flex items-center justify-center mx-auto mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -79,7 +79,7 @@ const lang = 'en';
           
           <!-- Feature 2 -->
           <div class="text-center p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-shadow">
-            <div class="w-16 h-16 bg-gradient-to-br from-[#E05C33] to-[#FF9B54] rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-[#1a1a1a] to-[#333333] rounded-lg flex items-center justify-center mx-auto mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
@@ -90,7 +90,7 @@ const lang = 'en';
           
           <!-- Feature 3 -->
           <div class="text-center p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-shadow">
-            <div class="w-16 h-16 bg-gradient-to-br from-[#E05C33] to-[#FF9B54] rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-[#1a1a1a] to-[#333333] rounded-lg flex items-center justify-center mx-auto mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -113,7 +113,7 @@ const lang = 'en';
         </p>
         <a 
           href="/en/register" 
-          class="inline-flex items-center px-8 py-4 bg-[#E05C33] hover:bg-[#FF9B54] text-white font-medium rounded-lg shadow-lg transition-colors text-lg"
+          class="inline-flex items-center px-8 py-4 bg-[#1a1a1a] hover:bg-[#333333] text-white font-medium rounded-lg shadow-lg transition-colors text-lg"
         >
           {t('auth.registerButton', lang)}
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

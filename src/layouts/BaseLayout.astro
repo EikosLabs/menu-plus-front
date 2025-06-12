@@ -1,35 +1,35 @@
 ---
-import LanguageSwitcher from '../components/LanguageSwitcher.jsx';
-import { t } from '../i18n/utils';
+import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
+import { t } from "../i18n/utils";
 
 export interface Props {
-  title?: string;
-  description?: string;
-  lang?: string;
+	title?: string;
+	description?: string;
+	lang?: string;
 }
 
 const { title, description, lang } = Astro.props;
 
 // Obtener idioma desde la URL o usar el idioma proporcionado
 function getCurrentLangSSR() {
-  if (lang) return lang;
-  
-  const pathname = Astro.url.pathname;
-  const langFromPath = pathname.split('/')[1];
-  
-  // Verificar si es un idioma válido
-  if (['es', 'en'].includes(langFromPath)) {
-    return langFromPath;
-  }
-  
-  return 'es'; // idioma por defecto
+	if (lang) return lang;
+
+	const pathname = Astro.url.pathname;
+	const langFromPath = pathname.split("/")[1];
+
+	// Verificar si es un idioma válido
+	if (["es", "en"].includes(langFromPath)) {
+		return langFromPath;
+	}
+
+	return "es"; // idioma por defecto
 }
 
 const currentLang = getCurrentLangSSR();
 
 // Textos localizados para el layout
-const layoutTitle = title || t('navigation.home', currentLang);
-const layoutDescription = description || t('dashboard.welcome', currentLang);
+const layoutTitle = title || t("navigation.home", currentLang);
+const layoutDescription = description || t("dashboard.welcome", currentLang);
 ---
 
 <!DOCTYPE html>
@@ -103,7 +103,7 @@ const layoutDescription = description || t('dashboard.welcome', currentLang);
         <div class="flex justify-between items-center h-16">
           <!-- Logo y título -->
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-[#E05C33] to-[#FF9B54] rounded-lg flex items-center justify-center">
+            <div class="w-8 h-8 bg-gradient-to-br from-[#1a1a1a] to-[#333333] rounded-lg flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
@@ -133,13 +133,13 @@ const layoutDescription = description || t('dashboard.welcome', currentLang);
           </div>
           
           <div class="flex items-center space-x-6 text-sm text-slate-600">
-            <a href={currentLang === 'es' ? '/ayuda' : '/en/help'} class="hover:text-[#E05C33] transition-colors">
+            <a href={currentLang === 'es' ? '/ayuda' : '/en/help'} class="hover:text-[#1a1a1a] transition-colors">
               {currentLang === 'es' ? 'Ayuda' : 'Help'}
             </a>
-            <a href={currentLang === 'es' ? '/privacidad' : '/en/privacy'} class="hover:text-[#E05C33] transition-colors">
+            <a href={currentLang === 'es' ? '/privacidad' : '/en/privacy'} class="hover:text-[#1a1a1a] transition-colors">
               {currentLang === 'es' ? 'Privacidad' : 'Privacy'}
             </a>
-            <a href={currentLang === 'es' ? '/terminos' : '/en/terms'} class="hover:text-[#E05C33] transition-colors">
+            <a href={currentLang === 'es' ? '/terminos' : '/en/terms'} class="hover:text-[#1a1a1a] transition-colors">
               {currentLang === 'es' ? 'Términos' : 'Terms'}
             </a>
           </div>
