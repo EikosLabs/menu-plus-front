@@ -172,7 +172,7 @@ export const authService = {
 			const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
 			const payload = JSON.parse(window.atob(base64));
 
-			const userIdFromToken = payload.userId || payload.sub || payload.nameid;
+			const userIdFromToken = payload.userId || payload.sub || payload["UserId"];
 
 			if (userIdFromToken) {
 				const numericUserId = Number.parseInt(userIdFromToken, 10);
