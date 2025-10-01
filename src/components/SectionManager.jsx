@@ -24,6 +24,7 @@ export default function SectionManager({
 			setError(null);
 			const fetchedSections = await menuService.getSections(menuId);
 			setSections(fetchedSections || []);
+			console.log(fetchedSections);
 		} catch (error) {
 			setError(`Error al cargar las secciones: ${error.message}`);
 		} finally {
@@ -64,6 +65,16 @@ export default function SectionManager({
 	};
 
 	const handleMoveUp = async (sectionId) => {
+		// Encontrar la sección actual en el array ordenado
+		const sortedSections = sections.sort((a, b) => a.order - b.order);
+		const currentIndex = sortedSections.findIndex(section => section.id === sectionId);
+		
+		// Verificar si ya está en la primera posición
+		if (currentIndex <= 0) {
+			console.log('No se puede mover hacia arriba: la sección ya está en la primera posición');
+			return;
+		}
+
 		try {
 			setIsLoading(true);
 			setError(null);
@@ -72,7 +83,11 @@ export default function SectionManager({
 			if (onSectionMoved) {
 				onSectionMoved(updatedSection);
 			}
+			
+			// Recargar las secciones para obtener el orden actualizado
+			await loadSections();
 		} catch (error) {
+			console.error('Error al mover sección hacia arriba:', error);
 			setError(`Error al mover la sección: ${error.message}`);
 		} finally {
 			setIsLoading(false);
@@ -80,18 +95,29 @@ export default function SectionManager({
 	};
 
 	const handleMoveDown = async (sectionId) => {
+		// Encontrar la sección actual en el array ordenado
+		const sortedSections = sections.sort((a, b) => a.order - b.order);
+		const currentIndex = sortedSections.findIndex(section => section.id === sectionId);
+		
+		// Verificar si ya está en la última posición
+		if (currentIndex >= sortedSections.length - 1 || currentIndex === -1) {
+			console.log('No se puede mover hacia abajo: la sección ya está en la última posición');
+			return;
+		}
+
 		try {
 			setIsLoading(true);
 			setError(null);
-			const updatedSection = await menuService.moveSectionDown(
-				menuId,
-				sectionId,
-			);
+			const updatedSection = await menuService.moveSectionDown(menuId, sectionId);
 
 			if (onSectionMoved) {
 				onSectionMoved(updatedSection);
 			}
+			
+			// Recargar las secciones para obtener el orden actualizado
+			await loadSections();
 		} catch (error) {
+			console.error('Error al mover sección hacia abajo:', error);
 			setError(`Error al mover la sección: ${error.message}`);
 		} finally {
 			setIsLoading(false);
@@ -276,7 +302,7 @@ export default function SectionManager({
 							<div className="max-h-[300px] space-y-2 overflow-y-auto pr-1">
 								{sections
 									.sort((a, b) => a.order - b.order)
-									.map((section) => (
+									.map((section, index) => (
 										<div
 											key={section.id}
 											className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-shadow hover:shadow-sm"
@@ -294,9 +320,17 @@ export default function SectionManager({
 											<div className="flex space-x-2">
 												<button
 													onClick={() => handleMoveUp(section.id)}
-													disabled={isLoading || section.order === 0}
-													className="rounded p-1.5 text-blue-600 transition-colors hover:bg-gray-100 hover:text-blue-800 disabled:opacity-50"
-													title="Mover hacia arriba"
+													disabled={isLoading}
+													className={`rounded p-1.5 transition-colors ${
+														index === 0
+															? "text-gray-400 cursor-not-allowed opacity-50"
+															: "text-blue-600 hover:bg-gray-100 hover:text-blue-800 cursor-pointer"
+													}`}
+													title={
+														index === 0
+															? "No se puede mover hacia arriba (ya está en la primera posición)"
+															: "Mover hacia arriba"
+													}
 												>
 													<svg
 														className="h-5 w-5"
@@ -314,11 +348,17 @@ export default function SectionManager({
 												</button>
 												<button
 													onClick={() => handleMoveDown(section.id)}
-													disabled={
-														isLoading || section.order === sections.length - 1
+													disabled={isLoading}
+													className={`rounded p-1.5 transition-colors ${
+														index === sections.length - 1
+															? "text-gray-400 cursor-not-allowed opacity-50"
+															: "text-blue-600 hover:bg-gray-100 hover:text-blue-800 cursor-pointer"
+													}`}
+													title={
+														index === sections.length - 1
+															? "No se puede mover hacia abajo (ya está en la última posición)"
+															: "Mover hacia abajo"
 													}
-													className="rounded p-1.5 text-blue-600 transition-colors hover:bg-gray-100 hover:text-blue-800 disabled:opacity-50"
-													title="Mover hacia abajo"
 												>
 													<svg
 														className="h-5 w-5"

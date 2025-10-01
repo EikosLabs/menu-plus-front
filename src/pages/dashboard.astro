@@ -8,6 +8,7 @@ export const prerender = false;
 <Layout title="Panel de Control - Menu Plus Platform">
   <div class="min-h-screen flex flex-col">
     <!-- Navbar con información de usuario y botón de logout se manejará dentro del componente UserDashboard -->
-    <UserDashboard client:load />
+    <!-- client:only optimiza la carga solo en cliente sin SSR del componente -->
+    <UserDashboard client:only="react" />
   </div>
 </Layout> 

@@ -274,13 +274,20 @@ export default function AddMenuItem({
 					isAvailable: dataToSend.isAvailable,
 					menuItemCategoryId: dataToSend.menuItemCategoryId,
 					sectionId: dataToSend.sectionId,
+					order: existingItem.order || 0,
 				};
 
-				await menuService.updateMenuItem(existingItem.id, payload);
+				const updatedItem = await menuService.updateMenuItem(existingItem.id, payload);
 
 				if (onItemAdded) {
 					try {
-						onItemAdded({ ...existingItem, ...payload });
+						// Usar el resultado de la API o combinar con el existingItem
+						onItemAdded({
+							...existingItem,
+							...payload,
+							id: existingItem.id,
+							menuId: existingItem.menuId,
+						});
 					} catch (_e) {}
 				}
 

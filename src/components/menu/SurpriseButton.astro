@@ -1,0 +1,481 @@
+---
+interface Props {
+  sections: any[];
+  menuItems: any[];
+}
+
+const { sections, menuItems } = Astro.props;
+---
+
+<button
+  id="surprise-btn"
+  class="surprise-button"
+  aria-label="Sorpréndeme con un plato aleatorio"
+>
+  <span class="surprise-icon">✨</span>
+  <span class="surprise-text">¡Sorpréndeme!</span>
+</button>
+
+<!-- Modal de Sorpresa -->
+<div id="surprise-modal" class="surprise-modal hidden">
+  <div class="surprise-overlay"></div>
+  <div class="surprise-content">
+    <button id="close-surprise" class="surprise-close" aria-label="Cerrar">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <div class="surprise-animation">
+      <div class="surprise-sparkles">
+        <span class="sparkle">✨</span>
+        <span class="sparkle">⭐</span>
+        <span class="sparkle">💫</span>
+        <span class="sparkle">🌟</span>
+      </div>
+    </div>
+
+    <div id="surprise-item" class="surprise-item hidden">
+      <div class="surprise-badge">¡Tu elección de hoy! 🎉</div>
+      <img id="surprise-img" src="" alt="" class="surprise-image" />
+      <h3 id="surprise-name" class="surprise-name"></h3>
+      <p id="surprise-description" class="surprise-description"></p>
+      <div class="surprise-price-container">
+        <span class="surprise-price-label">Precio:</span>
+        <span id="surprise-price" class="surprise-price"></span>
+      </div>
+      <button id="show-more" class="surprise-action-btn">
+        Ver detalles completos
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .surprise-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #6bcf7f 100%);
+    background-size: 200% 200%;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    animation: gradientShift 3s ease infinite, float 3s ease-in-out infinite;
+  }
+
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .surprise-button:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 12px 30px rgba(255, 107, 107, 0.6);
+  }
+
+  .surprise-button:active {
+    transform: scale(0.95);
+  }
+
+  .surprise-icon {
+    font-size: 1.5rem;
+    animation: rotate 2s linear infinite;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .surprise-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .surprise-modal.hidden {
+    display: none;
+  }
+
+  .surprise-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .surprise-content {
+    position: relative;
+    background: white;
+    border-radius: 24px;
+    max-width: 500px;
+    width: 100%;
+    padding: 2rem;
+    animation: slideUp 0.5s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .surprise-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #f1f5f9;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .surprise-close:hover {
+    background: #e2e8f0;
+    transform: rotate(90deg);
+  }
+
+  .surprise-animation {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+    min-height: 150px;
+  }
+
+  .surprise-sparkles {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sparkle {
+    position: absolute;
+    font-size: 2rem;
+    animation: sparkleFloat 1.5s ease-in-out infinite;
+  }
+
+  .sparkle:nth-child(1) {
+    top: 0;
+    left: 0;
+    animation-delay: 0s;
+  }
+
+  .sparkle:nth-child(2) {
+    top: 0;
+    right: 0;
+    animation-delay: 0.3s;
+  }
+
+  .sparkle:nth-child(3) {
+    bottom: 0;
+    left: 0;
+    animation-delay: 0.6s;
+  }
+
+  .sparkle:nth-child(4) {
+    bottom: 0;
+    right: 0;
+    animation-delay: 0.9s;
+  }
+
+  @keyframes sparkleFloat {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-20px) scale(1.2);
+      opacity: 0.7;
+    }
+  }
+
+  .surprise-item {
+    text-align: center;
+    animation: itemReveal 0.6s ease;
+  }
+
+  .surprise-item.hidden {
+    display: none;
+  }
+
+  @keyframes itemReveal {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .surprise-badge {
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  }
+
+  .surprise-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .surprise-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 1rem;
+  }
+
+  .surprise-description {
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .surprise-price-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .surprise-price-label {
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+
+  .surprise-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-dark, #1a202c);
+  }
+
+  .surprise-action-btn {
+    background: var(--primary-dark, #1a202c);
+    color: white;
+    border: none;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+  }
+
+  .surprise-action-btn:hover {
+    background: var(--accent-gold, #d4a574);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .surprise-button {
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.875rem 1.5rem;
+      font-size: 1rem;
+    }
+
+    .surprise-content {
+      padding: 1.5rem;
+    }
+
+    .surprise-image {
+      height: 200px;
+    }
+
+    .surprise-name {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<script define:vars={{ sections, menuItems }}>
+  // Obtener todos los items disponibles
+  function getAllAvailableItems() {
+    const allItems = [];
+
+    // Items de las secciones
+    if (sections && Array.isArray(sections)) {
+      sections.forEach(section => {
+        if (section.menuItems && Array.isArray(section.menuItems)) {
+          section.menuItems.forEach(item => {
+            if (item.isAvailable !== false) {
+              allItems.push(item);
+            }
+          });
+        }
+      });
+    }
+
+    // Items sin sección
+    if (menuItems && Array.isArray(menuItems)) {
+      menuItems.forEach(item => {
+        if (item.isAvailable !== false) {
+          allItems.push(item);
+        }
+      });
+    }
+
+    return allItems;
+  }
+
+  // Obtener item aleatorio
+  function getRandomItem(items) {
+    if (items.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * items.length);
+    return items[randomIndex];
+  }
+
+  // Mostrar modal con animación
+  function showSurprise() {
+    const modal = document.getElementById('surprise-modal');
+    const surpriseItem = document.getElementById('surprise-item');
+
+    modal.classList.remove('hidden');
+    surpriseItem.classList.add('hidden');
+
+    // Simular tiempo de "búsqueda" con animación
+    setTimeout(() => {
+      const items = getAllAvailableItems();
+      const randomItem = getRandomItem(items);
+
+      if (randomItem) {
+        displayItem(randomItem);
+      }
+    }, 2000);
+  }
+
+  // Mostrar el item seleccionado
+  function displayItem(item) {
+    const surpriseItem = document.getElementById('surprise-item');
+    const img = document.getElementById('surprise-img');
+    const name = document.getElementById('surprise-name');
+    const description = document.getElementById('surprise-description');
+    const price = document.getElementById('surprise-price');
+
+    img.src = item.imageUri || 'https://ooni.com/cdn/shop/articles/20220211142347-margherita-9920_ba86be55-674e-4f35-8094-2067ab41a671.jpg?v=1737104576&width=1080';
+    img.alt = item.name;
+    name.textContent = item.name;
+    description.textContent = item.description || 'Un delicioso platillo que te encantará';
+    price.textContent = `$${item.price.toFixed(2)}`;
+
+    surpriseItem.classList.remove('hidden');
+
+    // Configurar botón "Ver detalles"
+    const showMoreBtn = document.getElementById('show-more');
+    showMoreBtn.onclick = () => {
+      closeModal();
+      // Hacer scroll al item en el menú
+      const itemElement = document.querySelector(`[data-item-id="${item.id}"]`);
+      if (itemElement) {
+        itemElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        itemElement.classList.add('highlight-pulse');
+        setTimeout(() => itemElement.classList.remove('highlight-pulse'), 2000);
+      }
+    };
+  }
+
+  // Cerrar modal
+  function closeModal() {
+    const modal = document.getElementById('surprise-modal');
+    modal.classList.add('hidden');
+  }
+
+  // Event listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    const surpriseBtn = document.getElementById('surprise-btn');
+    const closeBtn = document.getElementById('close-surprise');
+    const overlay = document.querySelector('.surprise-overlay');
+
+    if (surpriseBtn) {
+      surpriseBtn.addEventListener('click', showSurprise);
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal);
+    }
+
+    if (overlay) {
+      overlay.addEventListener('click', closeModal);
+    }
+
+    // Cerrar con ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+  });
+</script>
+
+<style is:global>
+  .highlight-pulse {
+    animation: highlightPulse 2s ease;
+  }
+
+  @keyframes highlightPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+    }
+    50% {
+      box-shadow: 0 0 0 20px rgba(255, 215, 0, 0.4);
+      transform: scale(1.02);
+    }
+  }
+</style>

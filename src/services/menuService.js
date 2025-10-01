@@ -101,6 +101,14 @@ class ApiClient {
 		});
 	}
 
+	async patch(endpoint, data, options = {}) {
+		return this.makeRequest(endpoint, {
+			...options,
+			method: "PATCH",
+			body: data,
+		});
+	}
+
 	async delete(endpoint, options = {}) {
 		return this.makeRequest(endpoint, { ...options, method: "DELETE" });
 	}
@@ -254,6 +262,24 @@ class BusinessService {
 		return response.data;
 	}
 
+	async update(businessId, businessData) {
+		const businessPayload = {
+			...businessData,
+			businessCategoryId: businessData.businessCategoryId || 1,
+		};
+
+		const response = await this.apiClient.patch(
+			`/food-businesses/${businessId}`,
+			businessPayload,
+		);
+
+		if (response.isEmpty) {
+			return { ...businessPayload, id: businessId };
+		}
+
+		return response.data;
+	}
+
 	async getById(id) {
 		const response = await this.apiClient.get(`/food-businesses/${id}`);
 
@@ -310,7 +336,7 @@ class BusinessService {
 					if (!(menuData.menuItems && Array.isArray(menuData.menuItems))) {
 						try {
 							const menuItemsResponse = await this.apiClient.get(
-								`/menu-items?menuId=${menuData.id}`,
+								`/menu-item/${menuData.id}`,
 							);
 							menuData.menuItems =
 								!menuItemsResponse.isEmpty &&
@@ -492,7 +518,7 @@ class MenuService {
 
 	async getMenuItemCategories() {
 		try {
-			const response = await this.apiClient.get("/menu-item-categories");
+			const response = await this.apiClient.get("/menu-item-category");
 			return response.isEmpty ? [] : response.data;
 		} catch (_error) {
 			return [];
@@ -561,6 +587,7 @@ const menuService = new MenuService(apiClient, imageUploader);
 
 export default {
 	createFoodBusiness: (data) => businessService.create(data),
+	updateFoodBusiness: (id, data) => businessService.update(id, data),
 	getFoodBusiness: (id) => businessService.getById(id),
 	getUserBusinesses: (userId) => businessService.getByUserId(userId),
 	getBusinessCategories: () => businessService.getCategories(),
