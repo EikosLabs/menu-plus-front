@@ -15,9 +15,14 @@ let menu = null;
 let error = null;
 let business = null;
 
+// API URL - usa la URL interna de Docker cuando se ejecuta en el servidor
+const API_URL = typeof window === 'undefined' 
+  ? 'http://back:8080/api' 
+  : '/api';
+
 // Fetch menu data
 try {
-  const response = await fetch(`http://localhost:5000/api/menus/qr-code/${qrCodeId}`);
+  const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`);
 
   if (!response.ok) {
     throw new Error(`Unable to load menu (${response.status})`);
