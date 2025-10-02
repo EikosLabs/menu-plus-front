@@ -1,0 +1,42 @@
+ name: Deploy Frontend to Production
+
+     on:
+       push:
+         branches:
+           - prod
+       workflow_dispatch:
+
+     jobs:
+       deploy:
+         name: Deploy to VPS
+         runs-on: ubuntu-latest
+
+         steps:
+           - name: Checkout code
+             uses: actions/checkout@v4
+
+           - name: Deploy to server
+             uses: appleboy/ssh-action@v1.0.0
+             with:
+               host: ${{ secrets.SSH_HOST }}
+               username: ${{ secrets.SSH_USERNAME }}
+               key: ${{ secrets.SSH_KEY }}
+               port: ${{ secrets.SSH_PORT }}
+               script: |
+                 cd /home/ubuntu/menu-plus-front
+                 git fetch --all
+                 git checkout prod
+                 git pull origin prod
+
+                 sudo docker stop ubuntu-front-1 || true
+                 sudo docker rm ubuntu-front-1 || true
+                 sudo docker rmi menu-plus-front:latest || true
+
+                 sudo docker build --no-cache -t menu-plus-front:latest .
+
+                 cd /home/ubuntu
+                 sudo docker compose up -d front
+                 sudo docker image prune -f
+
+                 echo "✅ Frontend deployed successfully!"
+                 sudo docker logs ubuntu-front-1 --tail 20
