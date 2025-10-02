@@ -1,4 +1,4 @@
-const API_URL = "/api";
+const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
 
 export const authService = {
 	async login(email, password) {
