@@ -1,26 +1,26 @@
 import { defineMiddleware } from "astro:middleware";
 
 export const onRequest = defineMiddleware(async (context, next) => {
-	const publicRoutes = ["/login", "/register"];
-
 	const currentPath = context.url.pathname;
-
-	const isPublicRoute = publicRoutes.some(
-		(route) => currentPath === route || currentPath.startsWith(`${route}/`),
-	);
+	
+	// Rutas públicas que no requieren autenticación
+	const isPublicRoute = 
+		currentPath === "/login" ||
+		currentPath === "/register" ||
+		currentPath.startsWith("/login/") ||
+		currentPath.startsWith("/register/") ||
+		currentPath.startsWith("/menu/");
 
 	const token = context.cookies.get("auth_token")?.value;
 
-	if (!(isPublicRoute || token)) {
+	// Si no es ruta pública y no tiene token, redirigir a login
+	if (!isPublicRoute && !token) {
 		return context.redirect("/login");
 	}
 
+	// Si está en la raíz y tiene token, ir al dashboard
 	if (currentPath === "/" && token) {
 		return context.redirect("/dashboard");
-	}
-
-	if (isPublicRoute && token) {
-		return next();
 	}
 
 	return next();
