@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MenuOnboardingFlow from '../components/onboarding/menu/MenuOnboardingFlow';
+import '../styles/onboarding.css';
+
+// Verificar autenticación
+const token = Astro.cookies.get('auth_token')?.value || Astro.cookies.get('token')?.value;
+if (!token) {
+  return Astro.redirect('/login');
+}
+---
+
+<Layout title="Crea tu Menú">
+  <MenuOnboardingFlow client:only="react" businessId={null} businessName="" onComplete={null} />
+</Layout>
+
+<script>
+  // El componente obtendrá el businessId y businessName del localStorage o API
+</script>

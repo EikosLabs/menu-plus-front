@@ -78,13 +78,13 @@ export default function LoginForm() {
 				</a>
 			</div>
 			<div>
-				<button
-					type="submit"
-					disabled={loading}
-					className="w-full rounded-lg bg-[#1a1a1a] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:ring-opacity-50 disabled:cursor-not-allowed disabled:opacity-70"
-				>
-					{loading ? "Procesando..." : "Ingresar"}
-				</button>
+		<button
+			type="submit"
+			disabled={loading}
+			className="w-full rounded-lg bg-[#004E71] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#003A57] focus:outline-none focus:ring-2 focus:ring-[#004E71] focus:ring-opacity-50 disabled:cursor-not-allowed disabled:opacity-70"
+		>
+			{loading ? "Procesando..." : "Ingresar"}
+		</button>
 			</div>
 		</form>
 	);
