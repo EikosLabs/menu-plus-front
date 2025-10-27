@@ -38,7 +38,27 @@ try {
 
   const data = await response.json();
   menu = sanitizeMenuData(data);
-  business = menu.business;
+  
+  // Si el backend no incluye business en la respuesta, lo obtenemos por separado
+  if (!menu.business && menu.foodBusinessId) {
+    try {
+      const businessResponse = await fetch(`${API_URL}/food-businesses/${menu.foodBusinessId}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (businessResponse.ok) {
+        business = await businessResponse.json();
+        menu.business = business;
+      }
+    } catch (err) {
+      console.error('Error loading business:', err);
+    }
+  } else {
+    business = menu.business;
+  }
 
   // Extraer colores personalizados del negocio
   if (business) {
