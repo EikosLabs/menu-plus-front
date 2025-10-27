@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useBusinesses } from "../hooks/useBusinesses";
 import Navigation from "./ui/Navigation";
@@ -19,6 +19,35 @@ export default function UserDashboard() {
 	const [selectedBusinessId, setSelectedBusinessId] = useState(null);
 	const [showMobileMenu, setShowMobileMenu] = useState(false);
 	const [activeSection, setActiveSection] = useState("negocios");
+
+	// Verificar si el usuario necesita completar el onboarding
+	useEffect(() => {
+		if (businessLoading) return; // Esperar a que carguen los negocios
+		
+		const needsOnboarding = localStorage.getItem('needs_onboarding');
+		const hasBusinesses = businesses && businesses.length > 0;
+		
+		// 1. Si no tiene negocios, redirigir a onboarding del negocio
+		if (needsOnboarding === 'true' && !hasBusinesses) {
+			window.location.href = '/onboarding';
+			return;
+		}
+		
+		// 2. Si tiene negocio pero no tiene menú, redirigir a onboarding del menú
+		if (hasBusinesses) {
+			const business = businesses[0];
+			const hasMenu = business.menus && business.menus.length > 0;
+			
+			if (!hasMenu) {
+				// No tiene menú, activar onboarding del menú
+				localStorage.setItem('needs_menu_onboarding', 'true');
+				window.location.href = '/menu-onboarding';
+			} else {
+				// Ya tiene menú, limpiar el flag si existe
+				localStorage.removeItem('needs_menu_onboarding');
+			}
+		}
+	}, [businesses, businessLoading]);
 
 	const handleBusinessAdded = async (newBusiness) => {
 		try {

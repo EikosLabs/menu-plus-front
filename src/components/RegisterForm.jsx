@@ -31,16 +31,27 @@ export default function RegisterForm() {
 				userName: formData.userName || formData.email.split("@")[0],
 			};
 
-			await authService.register(
+			// 1. Registrar el usuario
+			const registeredUser = await authService.register(
 				userData.fullName,
 				userData.email,
 				userData.userName,
 				userData.password,
 			);
 
+			// 2. Hacer login automáticamente después del registro
+			await authService.login(userData.email, userData.password);
+
+			// 3. Establecer flag de que el usuario necesita onboarding
+			localStorage.setItem('needs_onboarding', 'true');
+			if (registeredUser && registeredUser.id) {
+				localStorage.setItem('user_id', registeredUser.id.toString());
+			}
+
 			setSuccess(true);
 			setTimeout(() => {
-				window.location.href = "/login";
+				// Redirigir a onboarding
+				window.location.href = "/onboarding";
 			}, 2000);
 		} catch (_err) {
 			setError(
@@ -54,7 +65,7 @@ export default function RegisterForm() {
 	if (success) {
 		return (
 			<div className="rounded border border-green-400 bg-green-100 p-4 text-green-700">
-				¡Registro exitoso! Serás redirigido a la página de inicio de sesión en
+				¡Registro exitoso! Serás redirigido a configurar tu negocio en
 				unos momentos...
 			</div>
 		);
@@ -142,7 +153,7 @@ export default function RegisterForm() {
 				<button
 					type="submit"
 					disabled={loading}
-					className="w-full rounded-lg bg-[#1a1a1a] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:ring-opacity-50 disabled:cursor-not-allowed disabled:opacity-70"
+					className="w-full rounded-lg bg-[#004E71] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#003A57] focus:outline-none focus:ring-2 focus:ring-[#004E71] focus:ring-opacity-50 disabled:cursor-not-allowed disabled:opacity-70"
 				>
 					{loading ? "Procesando..." : "Registrarme"}
 				</button>

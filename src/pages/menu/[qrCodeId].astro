@@ -14,15 +14,19 @@ const { qrCodeId } = Astro.params;
 let menu = null;
 let error = null;
 let business = null;
+let customColors = null;
 
-// API URL - usa la URL interna de Docker cuando se ejecuta en el servidor
-const API_URL = typeof window === 'undefined' 
-  ? 'http://back:8080/api' 
-  : '/api';
+// API URL - usa la variable de entorno o fallback
+const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
 
 // Fetch menu data
 try {
-  const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`);
+  const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`, {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  });
 
   if (!response.ok) {
     throw new Error(`Unable to load menu (${response.status})`);
@@ -31,6 +35,15 @@ try {
   const data = await response.json();
   menu = sanitizeMenuData(data);
   business = menu.business;
+
+  // Extraer colores personalizados del negocio
+  if (business) {
+    customColors = {
+      primary: business.primaryColor || null,
+      secondary: business.secondaryColor || null,
+      accent: business.accentColor || null
+    };
+  }
 } catch (e) {
   error = e.message;
   console.error('Error loading menu:', e);
@@ -53,6 +66,16 @@ if (menu) {
 
 <Layout title={business?.name || 'Menu'}>
   <link rel="stylesheet" href="/src/styles/menu-variables.css" />
+
+  {customColors && (customColors.primary || customColors.secondary || customColors.accent) && (
+    <style is:inline set:html={`
+      :root {
+        ${customColors.primary ? `--primary-dark: ${customColors.primary};` : ''}
+        ${customColors.secondary ? `--secondary-dark: ${customColors.secondary};` : ''}
+        ${customColors.accent ? `--accent-gold: ${customColors.accent};` : ''}
+      }
+    `} />
+  )}
 
   <main class="menu-page">
     {error && (

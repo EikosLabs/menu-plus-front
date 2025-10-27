@@ -68,7 +68,9 @@ export const authService = {
 		token = token.trim();
 
 		localStorage.setItem("token", token);
-		document.cookie = `auth_token=${token}; path=/; max-age=7200; SameSite=Strict`;
+		// Guardar en ambas cookies para compatibilidad
+		document.cookie = `auth_token=${token}; path=/; max-age=7200; SameSite=Lax`;
+		document.cookie = `token=${token}; path=/; max-age=7200; SameSite=Lax`;
 
 		return { success: true, token };
 	},
@@ -133,6 +135,8 @@ export const authService = {
 		localStorage.removeItem("token");
 		document.cookie =
 			"auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		document.cookie =
+			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 	},
 
 	getToken() {
