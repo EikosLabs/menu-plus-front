@@ -17,7 +17,10 @@ let business = null;
 let customColors = null;
 
 // API URL - usa la variable de entorno o fallback
-const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
+// En el servidor (SSR), usamos localhost directo; en cliente usamos /api
+const API_URL = import.meta.env.SSR 
+  ? 'http://localhost:8080/api'
+  : (import.meta.env.PUBLIC_API_URL || '/api');
 
 // Fetch menu data
 try {
