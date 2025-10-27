@@ -43,6 +43,7 @@ FROM base AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PUBLIC_API_URL=/api
 
 # Copy node_modules and source code into runtime layer
 COPY --from=deps /app/node_modules ./node_modules
