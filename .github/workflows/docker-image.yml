@@ -27,12 +27,12 @@ jobs:
             git fetch --all
             git checkout prod
             git pull origin prod
-            sudo docker stop ubuntu-front-1 || true
-            sudo docker rm ubuntu-front-1 || true
+            sudo docker stop menusesqr-front || true
+            sudo docker rm menusesqr-front || true
             sudo docker rmi menu-plus-front:latest || true
             sudo docker build --no-cache -t menu-plus-front:latest .
             cd /home/ubuntu
             sudo docker compose up -d front
             sudo docker image prune -f
             echo "✅ Frontend deployed successfully!"
-            sudo docker logs ubuntu-front-1 --tail 20
+            sudo docker logs menusesqr-front --tail 20
