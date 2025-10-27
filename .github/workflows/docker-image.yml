@@ -23,7 +23,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /home/ubuntu/menu-plus-front
+            cd /home/ubuntu/menu-plus/menu-plus-front
             git fetch --all
             git checkout prod
             git pull origin prod
