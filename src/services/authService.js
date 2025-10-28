@@ -68,9 +68,9 @@ export const authService = {
 		token = token.trim();
 
 		localStorage.setItem("token", token);
-		// Guardar en ambas cookies para compatibilidad
-		document.cookie = `auth_token=${token}; path=/; max-age=7200; SameSite=Lax`;
-		document.cookie = `token=${token}; path=/; max-age=7200; SameSite=Lax`;
+		// Guardar en cookies con flags de seguridad
+		document.cookie = `auth_token=${token}; path=/; max-age=7200; SameSite=Strict; Secure`;
+		document.cookie = `token=${token}; path=/; max-age=7200; SameSite=Strict; Secure`;
 
 		return { success: true, token };
 	},
