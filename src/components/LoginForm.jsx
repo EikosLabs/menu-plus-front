@@ -30,16 +30,16 @@ export default function LoginForm() {
 	};
 
 	return (
-		<form className="space-y-6" onSubmit={handleSubmit}>
+		<form className="space-y-4" onSubmit={handleSubmit}>
 			{error && (
-				<div className="rounded border border-red-400 bg-red-100 p-3 text-red-700">
+				<div className="neo-alert neo-alert-error">
 					{error}
 				</div>
 			)}
 			<div>
 				<label
 					htmlFor="email"
-					className="mb-1 block font-medium text-[#0A3342] text-sm"
+					className="neo-text-bold block mb-2"
 				>
 					Correo Electrónico
 				</label>
@@ -48,7 +48,7 @@ export default function LoginForm() {
 					name="email"
 					id="email"
 					required={true}
-					className="w-full rounded-lg border border-slate-300 px-4 py-2.5 placeholder-slate-400 focus:border-[#1a1a1a] focus:ring-[#1a1a1a]"
+					className="neo-input"
 					placeholder="tu@correo.com"
 					value={email}
 					onChange={(e) => setEmail(e.target.value)}
@@ -57,7 +57,7 @@ export default function LoginForm() {
 			<div>
 				<label
 					htmlFor="password"
-					className="mb-1 block font-medium text-[#0A3342] text-sm"
+					className="neo-text-bold block mb-2"
 				>
 					Contraseña
 				</label>
@@ -66,14 +66,14 @@ export default function LoginForm() {
 					name="password"
 					id="password"
 					required={true}
-					className="w-full rounded-lg border border-slate-300 px-4 py-2.5 placeholder-slate-400 focus:border-[#1a1a1a] focus:ring-[#1a1a1a]"
+					className="neo-input"
 					placeholder="••••••••"
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
 				/>
 			</div>
 			<div className="text-right">
-				<a href="#" className="text-[#1a1a1a] text-sm hover:underline">
+				<a href="#" className="neo-text text-neo-flame hover:underline neo-text-bold">
 					¿Olvidaste tu contraseña?
 				</a>
 			</div>
@@ -81,7 +81,7 @@ export default function LoginForm() {
 				<button
 					type="submit"
 					disabled={loading}
-					className="w-full rounded-lg bg-[#1a1a1a] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:ring-opacity-50 disabled:cursor-not-allowed disabled:opacity-70"
+					className="neo-btn neo-btn-primary w-full"
 				>
 					{loading ? "Procesando..." : "Ingresar"}
 				</button>

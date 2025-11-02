@@ -3,20 +3,57 @@ import Layout from "../layouts/Layout.astro";
 import RegisterForm from "../components/RegisterForm.jsx";
 ---
 <Layout title="Crear Cuenta - Menu Plus Platform">
-  <main class="min-h-screen flex flex-col items-center justify-center p-6 animate-fade-in">
-    <div class="bg-white text-[#0A3342] p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md">
-      <img src="/favicon.svg" alt="Menu Plus Platform Logo" class="w-32 mx-auto mb-8" />
-      <h1 class="text-4xl font-bold text-center text-[#004E71] mb-2">Crea tu Cuenta Gratis</h1>
-      <p class="text-center text-slate-600 mb-10">Únete y empieza a mostrar tu menú al mundo.</p>
-      
-      <RegisterForm client:load />
+  <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
+    <!-- Animated Background Pattern -->
+    <div class="absolute inset-0 neo-bg-grid-colorful opacity-15 pointer-events-none"></div>
 
-      <div class="mt-8 text-center">
-        <p class="text-sm text-slate-600">
-          ¿Ya tienes una cuenta? 
-          <a href="/login" class="font-medium text-[#1a1a1a] hover:underline">Inicia Sesión</a>
+    <!-- Decorative Shapes -->
+    <div class="absolute top-10 right-10 neo-shape-circle opacity-15 hidden lg:block" style="background-color: var(--neo-sunset); width: 60px; height: 60px;"></div>
+    <div class="absolute bottom-10 left-10 neo-shape-square opacity-15 hidden lg:block" style="width: 60px; height: 60px;"></div>
+
+    <div class="relative z-10 w-full max-w-md">
+      <!-- Register Card 3D -->
+      <div class="neo-card-3d-sunset p-6 md:p-8 neo-corner-accent">
+        <!-- Logo -->
+        <div class="text-center mb-4">
+          <img src="/favicon.svg" alt="Menu Plus Platform Logo" class="w-16 mx-auto mb-3" />
+
+          <!-- Badge -->
+          <div class="inline-block neo-sticker mb-2 text-sm" style="background-color: white; color: var(--neo-black);">
+            ✨ REGISTRO GRATIS
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="neo-heading neo-h3 text-center mb-1">
+          Crea tu Cuenta Gratis
+        </h1>
+        <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
+          Únete y empieza a mostrar tu menú al mundo.
         </p>
+
+        <!-- Register Form -->
+        <RegisterForm client:load />
+
+        <!-- Divider -->
+        <div class="neo-divider my-5"></div>
+
+        <!-- Login Link -->
+        <div class="text-center">
+          <p class="neo-text mb-3 text-sm" style="color: var(--neo-black);">
+            ¿Ya tienes una cuenta?
+          </p>
+          <a
+            href="/login"
+            class="neo-btn neo-btn-primary w-full inline-flex items-center justify-center"
+          >
+            Inicia Sesión
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   </main>
-</Layout> 
+</Layout>

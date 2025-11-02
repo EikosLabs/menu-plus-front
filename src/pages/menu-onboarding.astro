@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MenuOnboardingFlow from '../components/onboarding/menu/MenuOnboardingFlow';
+import '../styles/onboarding.css';
+
+// Verificar autenticación
+const token = Astro.cookies.get('auth_token')?.value || Astro.cookies.get('token')?.value;
+if (!token) {
+  return Astro.redirect('/login');
+}
+---
+
+<Layout title="Crea tu Menú">
+  <div class="min-h-screen bg-neo-lavender relative overflow-hidden">
+    <!-- Animated Background Pattern -->
+    <div class="absolute inset-0 neo-bg-dots-colorful opacity-20 pointer-events-none"></div>
+
+    <div class="relative z-10">
+      <MenuOnboardingFlow client:only="react" businessId={null} businessName="" onComplete={null} />
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // El componente obtendrá el businessId y businessName del localStorage o API
+</script>

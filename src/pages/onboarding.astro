@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import OnboardingFlow from '../components/onboarding/OnboardingFlow';
+import '../styles/onboarding.css';
+
+// Verificar autenticación - buscar en ambas cookies posibles
+const token = Astro.cookies.get('auth_token')?.value || Astro.cookies.get('token')?.value;
+if (!token) {
+  return Astro.redirect('/login');
+}
+---
+
+<Layout title="Configuración de Negocio">
+  <div class="min-h-screen bg-neo-lavender relative overflow-hidden">
+    <!-- Animated Background Pattern -->
+    <div class="absolute inset-0 neo-bg-gradient-sunset-lavender opacity-50 pointer-events-none"></div>
+
+    <div class="relative z-10">
+      <OnboardingFlow client:only="react" userId={null} onComplete={null} />
+    </div>
+  </div>
+</Layout>

@@ -1,21 +1,13 @@
+/* Neobrutalist Design System - DEBE IR PRIMERO */
+@import './neobrutalist.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
 	:root {
-		/* --color-primary: #1a1a1a; */
-		/* --color-secondary: #004E71; */
-		/* --color-accent: #333333; */
-		/* --color-background: #E6F4F8; */
-		/* --color-text: #0A3342; */
-
-		/* --color-slate-800: #1e293b; */
-		/* --color-slate-900: #0f172a; */
-		/* --color-sky-400: #38bdf8; */
-		/* --color-sky-500: #0ea5e9; */
-
-		--font-sans: "Poppins", sans-serif; /* Mantenemos la definición de la fuente */
+		--font-sans: "Poppins", sans-serif;
 	}
 }
 

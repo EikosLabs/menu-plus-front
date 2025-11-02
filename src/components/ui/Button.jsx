@@ -1,34 +1,36 @@
 import React from "react";
 
-const Button = ({ 
-	children, 
-	onClick, 
-	type = "button", 
-	variant = "primary", 
-	size = "md", 
-	disabled = false, 
+const Button = ({
+	children,
+	onClick,
+	type = "button",
+	variant = "primary",
+	size = "md",
+	disabled = false,
 	loading = false,
 	className = "",
-	...props 
+	...props
 }) => {
-	const baseClasses = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2";
-	
+	// Ultra Aesthetic Neobrutalist styles
+	const baseClasses = "neo-btn";
+
 	const variants = {
-		primary: "bg-gradient-to-r from-[#1a1a1a] to-[#404040] text-white hover:brightness-110 focus:ring-gray-500",
-		secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500",
-		danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-		success: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
-		outline: "border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500"
+		primary: "neo-btn-primary",
+		secondary: "neo-btn-secondary",
+		danger: "bg-red-500 text-white neo-border neo-shadow-md hover:bg-red-600 active:shadow-none active:translate-x-[6px] active:translate-y-[6px]",
+		success: "bg-green-500 text-white neo-border neo-shadow-md hover:bg-green-600 active:shadow-none active:translate-x-[6px] active:translate-y-[6px]",
+		outline: "neo-btn-outline",
+		white: "neo-btn-white"
 	};
 
 	const sizes = {
-		sm: "px-3 py-2 text-sm",
-		md: "px-4 py-2 text-base",
-		lg: "px-6 py-3 text-lg"
+		sm: "neo-btn-sm",
+		md: "",
+		lg: "neo-btn-lg"
 	};
 
 	const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${
-		disabled || loading ? "opacity-50 cursor-not-allowed" : "hover:scale-105 hover:shadow-lg"
+		disabled || loading ? "opacity-50 cursor-not-allowed" : ""
 	} ${className}`;
 
 	return (

@@ -14,6 +14,14 @@ const { qrCodeId } = Astro.params;
 let menu = null;
 let error = null;
 let business = null;
+let customColors = null;
+
+// API URL - usa la variable de entorno o fallback
+// En el servidor (SSR), usamos el nombre del contenedor backend en Docker
+// En cliente usamos /api (nginx hace el proxy)
+const API_URL = import.meta.env.SSR 
+  ? 'http://menusesqr-back:8080/api'
+  : (import.meta.env.PUBLIC_API_URL || '/api');
 
 // API URL - usa la URL interna de Docker cuando se ejecuta en el servidor
 const API_URL = typeof window === 'undefined' 
@@ -31,6 +39,15 @@ try {
   const data = await response.json();
   menu = sanitizeMenuData(data);
   business = menu.business;
+
+  // Extraer colores personalizados del negocio
+  if (business) {
+    customColors = {
+      primary: business.primaryColor || null,
+      secondary: business.secondaryColor || null,
+      accent: business.accentColor || null
+    };
+  }
 } catch (e) {
   error = e.message;
   console.error('Error loading menu:', e);
@@ -54,13 +71,26 @@ if (menu) {
 <Layout title={business?.name || 'Menu'}>
   <link rel="stylesheet" href="/src/styles/menu-variables.css" />
 
-  <main class="menu-page">
+  {customColors && (customColors.primary || customColors.secondary || customColors.accent) && (
+    <style is:inline set:html={`
+      :root {
+        ${customColors.primary ? `--primary-dark: ${customColors.primary};` : ''}
+        ${customColors.secondary ? `--secondary-dark: ${customColors.secondary};` : ''}
+        ${customColors.accent ? `--accent-gold: ${customColors.accent};` : ''}
+      }
+    `} />
+  )}
+
+  <main class="menu-page bg-neo-lavender relative">
+    <!-- Decorative Background Pattern -->
+    <div class="absolute inset-0 neo-bg-dots opacity-5 pointer-events-none"></div>
+
     {error && (
-      <div class="error-state">
+      <div class="error-state neo-card-3d relative z-10">
         <div class="error-state__icon">!</div>
-        <h2 class="error-state__title">Unable to Load Menu</h2>
-        <p class="error-state__message">{error}</p>
-        <button class="error-state__button" onclick="window.location.reload()">
+        <h2 class="error-state__title neo-heading neo-h3">Unable to Load Menu</h2>
+        <p class="error-state__message neo-text">{error}</p>
+        <button class="error-state__button neo-btn neo-btn-primary" onclick="window.location.reload()">
           Try Again
         </button>
       </div>
@@ -102,10 +132,10 @@ if (menu) {
           )}
 
           {Object.keys(itemsBySection).length === 0 && (
-            <div class="empty-state">
+            <div class="empty-state neo-card-3d-sunset">
               <div class="empty-state__icon">🍽️</div>
-              <h2 class="empty-state__title">Our menu is being prepared</h2>
-              <p class="empty-state__message">Please check back soon for our delicious offerings.</p>
+              <h2 class="empty-state__title neo-heading neo-h3">Our menu is being prepared</h2>
+              <p class="empty-state__message neo-text">Please check back soon for our delicious offerings.</p>
             </div>
           )}
         </div>
