@@ -23,14 +23,14 @@ const API_URL = import.meta.env.SSR
   ? 'http://menusesqr-back:8080/api'
   : (import.meta.env.PUBLIC_API_URL || '/api');
 
+// API URL - usa la URL interna de Docker cuando se ejecuta en el servidor
+const API_URL = typeof window === 'undefined' 
+  ? 'http://back:8080/api' 
+  : '/api';
+
 // Fetch menu data
 try {
-  const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`, {
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
-  });
+  const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`);
 
   if (!response.ok) {
     throw new Error(`Unable to load menu (${response.status})`);
