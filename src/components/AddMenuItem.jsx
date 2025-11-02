@@ -379,10 +379,10 @@ export default function AddMenuItem({
 
 					<div className="mb-6 flex items-center">
 						<div
-							className={`${isEditing ? "bg-blue-500" : "bg-[#004E71]"} mr-4 flex-shrink-0 rounded-lg bg-opacity-10 p-3.5`}
+							className={`${isEditing ? "bg-neo-sunset" : "bg-neo-flame"} mr-4 flex-shrink-0 rounded-lg bg-opacity-10 p-3.5`}
 						>
 							<svg
-								className={`h-7 w-7 ${isEditing ? "text-blue-600" : "text-[#004E71]"}`}
+								className={`h-7 w-7 ${isEditing ? "text-neo-sunset" : "text-neo-flame"}`}
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -404,13 +404,13 @@ export default function AddMenuItem({
 								)}
 							</svg>
 						</div>
-						<h2 className="font-bold text-2xl text-[#004E71] sm:text-3xl">
+						<h2 className="neo-heading neo-h3">
 							{isEditing ? "Editar Plato" : "Agregar Nuevo Plato"}
 						</h2>
 					</div>
 
 					{error && (
-						<div className="mb-6 animate-fadeIn rounded-md border-red-500 border-l-4 bg-red-50 p-3.5 text-red-700">
+						<div className="mb-6 neo-alert neo-alert-error animate-fadeIn">
 							<div className="flex items-center">
 								<svg
 									className="mr-2 h-5 w-5 flex-shrink-0"
@@ -432,7 +432,7 @@ export default function AddMenuItem({
 					)}
 
 					{message && (
-						<div className="mb-6 animate-fadeIn rounded-md border-green-500 border-l-4 bg-green-50 p-3.5 text-green-700">
+						<div className="mb-6 neo-alert neo-alert-success animate-fadeIn">
 							<div className="flex items-center">
 								<svg
 									className="mr-2 h-5 w-5 flex-shrink-0"
@@ -712,7 +712,7 @@ export default function AddMenuItem({
 							</button>
 							<button
 								type="submit"
-								className="w-full rounded-lg bg-[#004E71] px-6 py-2.5 font-medium text-white transition-colors hover:bg-[#003A57] focus:outline-none focus:ring-2 focus:ring-[#004E71] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+								className="neo-btn neo-btn-primary w-full sm:w-auto"
 								disabled={loading || !!nameError || !!priceError}
 							>
 								{loading ? (

@@ -64,7 +64,7 @@ export default function RegisterForm() {
 
 	if (success) {
 		return (
-			<div className="rounded border border-green-400 bg-green-100 p-4 text-green-700">
+			<div className="neo-alert neo-alert-success">
 				¡Registro exitoso! Serás redirigido a configurar tu negocio en
 				unos momentos...
 			</div>
@@ -72,16 +72,16 @@ export default function RegisterForm() {
 	}
 
 	return (
-		<form className="space-y-6" onSubmit={handleSubmit}>
+		<form className="space-y-4" onSubmit={handleSubmit}>
 			{error && (
-				<div className="rounded border border-red-400 bg-red-100 p-3 text-red-700">
+				<div className="neo-alert neo-alert-error">
 					{error}
 				</div>
 			)}
 			<div>
 				<label
 					htmlFor="fullName"
-					className="mb-1 block font-medium text-[#0A3342] text-sm"
+					className="neo-text-bold block mb-2"
 				>
 					Nombre Completo
 				</label>
@@ -90,7 +90,7 @@ export default function RegisterForm() {
 					name="fullName"
 					id="fullName"
 					required={true}
-					className="w-full rounded-lg border border-slate-300 px-4 py-2.5 placeholder-slate-400 focus:border-[#1a1a1a] focus:ring-[#1a1a1a]"
+					className="neo-input"
 					placeholder="Tu Nombre Completo"
 					value={formData.fullName}
 					onChange={handleChange}
@@ -99,7 +99,7 @@ export default function RegisterForm() {
 			<div>
 				<label
 					htmlFor="email"
-					className="mb-1 block font-medium text-[#0A3342] text-sm"
+					className="neo-text-bold block mb-2"
 				>
 					Correo Electrónico
 				</label>
@@ -108,7 +108,7 @@ export default function RegisterForm() {
 					name="email"
 					id="email"
 					required={true}
-					className="w-full rounded-lg border border-slate-300 px-4 py-2.5 placeholder-slate-400 focus:border-[#1a1a1a] focus:ring-[#1a1a1a]"
+					className="neo-input"
 					placeholder="tu@correo.com"
 					value={formData.email}
 					onChange={handleChange}
@@ -117,7 +117,7 @@ export default function RegisterForm() {
 			<div>
 				<label
 					htmlFor="userName"
-					className="mb-1 block font-medium text-[#0A3342] text-sm"
+					className="neo-text-bold block mb-2"
 				>
 					Nombre de Usuario (opcional)
 				</label>
@@ -125,7 +125,7 @@ export default function RegisterForm() {
 					type="text"
 					name="userName"
 					id="userName"
-					className="w-full rounded-lg border border-slate-300 px-4 py-2.5 placeholder-slate-400 focus:border-[#1a1a1a] focus:ring-[#1a1a1a]"
+					className="neo-input"
 					placeholder="Si no lo ingresas, usaremos tu email"
 					value={formData.userName}
 					onChange={handleChange}
@@ -134,7 +134,7 @@ export default function RegisterForm() {
 			<div>
 				<label
 					htmlFor="password"
-					className="mb-1 block font-medium text-[#0A3342] text-sm"
+					className="neo-text-bold block mb-2"
 				>
 					Contraseña
 				</label>
@@ -143,7 +143,7 @@ export default function RegisterForm() {
 					name="password"
 					id="password"
 					required={true}
-					className="w-full rounded-lg border border-slate-300 px-4 py-2.5 placeholder-slate-400 focus:border-[#1a1a1a] focus:ring-[#1a1a1a]"
+					className="neo-input"
 					placeholder="Crea una contraseña segura"
 					value={formData.password}
 					onChange={handleChange}
@@ -153,7 +153,7 @@ export default function RegisterForm() {
 				<button
 					type="submit"
 					disabled={loading}
-					className="w-full rounded-lg bg-[#004E71] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#003A57] focus:outline-none focus:ring-2 focus:ring-[#004E71] focus:ring-opacity-50 disabled:cursor-not-allowed disabled:opacity-70"
+					className="neo-btn neo-btn-primary w-full"
 				>
 					{loading ? "Procesando..." : "Registrarme"}
 				</button>

@@ -69,7 +69,10 @@ export default function UserDashboard() {
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col bg-gradient-to-br from-[#F8FAFC] to-[#EEF6FB] transition-all duration-300">
+		<div className="flex min-h-screen flex-col bg-neo-lavender relative">
+			{/* Animated Background Pattern */}
+			<div className="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none"></div>
+
 			<Navigation
 				userData={userData}
 				showMobileMenu={showMobileMenu}
@@ -89,7 +92,7 @@ export default function UserDashboard() {
 				/>
 			)}
 
-			<main className="container mx-auto flex-grow px-4 py-6 md:px-6 md:py-8 lg:px-8">
+			<main className="container mx-auto flex-grow px-4 py-6 md:px-6 md:py-8 lg:px-8 relative z-10">
 				<DashboardHeader activeSection={activeSection} />
 				<ErrorAlert error={error} onClose={() => setError(null)} />
 
@@ -113,9 +116,9 @@ export default function UserDashboard() {
 				{activeSection === "perfil" && <ProfileSection />}
 			</main>
 
-			<footer className="mt-auto border-gray-200 border-t bg-white py-4">
-				<div className="container mx-auto px-4 text-center text-gray-600 text-sm">
-					<p>© {new Date().getFullYear()} Menu Plus. Todos los derechos reservados.</p>
+			<footer className="mt-auto bg-neo-black text-white border-t-neo-thick border-neo-flame py-6 relative z-10">
+				<div className="container mx-auto px-4 text-center">
+					<p className="neo-text text-white/80">© {new Date().getFullYear()} Menu Plus. Todos los derechos reservados.</p>
 				</div>
 			</footer>
 

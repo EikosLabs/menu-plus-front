@@ -81,13 +81,16 @@ if (menu) {
     `} />
   )}
 
-  <main class="menu-page">
+  <main class="menu-page bg-neo-lavender relative">
+    <!-- Decorative Background Pattern -->
+    <div class="absolute inset-0 neo-bg-dots opacity-5 pointer-events-none"></div>
+
     {error && (
-      <div class="error-state">
+      <div class="error-state neo-card-3d relative z-10">
         <div class="error-state__icon">!</div>
-        <h2 class="error-state__title">Unable to Load Menu</h2>
-        <p class="error-state__message">{error}</p>
-        <button class="error-state__button" onclick="window.location.reload()">
+        <h2 class="error-state__title neo-heading neo-h3">Unable to Load Menu</h2>
+        <p class="error-state__message neo-text">{error}</p>
+        <button class="error-state__button neo-btn neo-btn-primary" onclick="window.location.reload()">
           Try Again
         </button>
       </div>
@@ -129,10 +132,10 @@ if (menu) {
           )}
 
           {Object.keys(itemsBySection).length === 0 && (
-            <div class="empty-state">
+            <div class="empty-state neo-card-3d-sunset">
               <div class="empty-state__icon">🍽️</div>
-              <h2 class="empty-state__title">Our menu is being prepared</h2>
-              <p class="empty-state__message">Please check back soon for our delicious offerings.</p>
+              <h2 class="empty-state__title neo-heading neo-h3">Our menu is being prepared</h2>
+              <p class="empty-state__message neo-text">Please check back soon for our delicious offerings.</p>
             </div>
           )}
         </div>

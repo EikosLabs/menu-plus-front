@@ -6,9 +6,14 @@ import UserDashboard from "../components/UserDashboard.jsx";
 export const prerender = false;
 ---
 <Layout title="Panel de Control - Menu Plus Platform">
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col bg-neo-lavender relative overflow-hidden">
+    <!-- Animated Background Pattern -->
+    <div class="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none"></div>
+
     <!-- Navbar con información de usuario y botón de logout se manejará dentro del componente UserDashboard -->
     <!-- client:only optimiza la carga solo en cliente sin SSR del componente -->
-    <UserDashboard client:only="react" />
+    <div class="relative z-10">
+      <UserDashboard client:only="react" />
+    </div>
   </div>
-</Layout> 
+</Layout>

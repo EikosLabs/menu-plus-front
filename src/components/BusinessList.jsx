@@ -200,13 +200,13 @@ export default function BusinessList({
 			{businesses.map((business) => (
 				<div
 					key={business.id}
-					className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100 transform transition-all duration-300 hover:shadow-xl"
+					className="neo-card-3d overflow-hidden transform transition-all duration-300"
 				>
-					<div className="relative bg-gradient-to-r from-[#003A57] to-[#004E71] p-6 text-white">
+					<div className="relative bg-neo-flame border-b-neo-thick border-neo-black p-6 text-white">
 						<div className="flex justify-between items-start">
 							<div>
 								<h2 className="text-2xl font-bold mb-1">{business.name}</h2>
-								<p className="text-blue-100 text-sm">
+								<p className="text-white text-opacity-90 text-sm">
 									Categoría:{" "}
 									{business.businessCategory?.name || "Sin categoría"}
 								</p>
