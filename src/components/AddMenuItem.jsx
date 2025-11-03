@@ -50,6 +50,14 @@ export default function AddMenuItem({
 		};
 	}, [loading, onCancel]);
 
+	// Bloquear scroll cuando el modal está abierto
+	useEffect(() => {
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = 'unset';
+		};
+	}, []);
+
 	useEffect(() => {
 		async function fetchCategories() {
 			if (!isMounted.current) {
@@ -348,7 +356,7 @@ export default function AddMenuItem({
 			onClick={onCancel}
 		>
 			<div
-				className="m-4 max-h-[90vh] w-full max-w-2xl transform animate-fadeInUp overflow-y-auto rounded-xl bg-white shadow-2xl transition-all duration-300"
+				className="m-4 max-h-[90vh] w-full max-w-2xl transform animate-fadeInUp overflow-y-auto neo-surface neo-border neo-shadow-lg transition-all duration-300"
 				onClick={handleModalClick}
 			>
 				<div className="relative p-6 md:p-8">
@@ -358,7 +366,7 @@ export default function AddMenuItem({
 								onCancel();
 							}
 						}}
-						className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						className="absolute top-4 right-4 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
 						aria-label="Cerrar modal"
 						disabled={loading}
 					>
@@ -705,7 +713,7 @@ export default function AddMenuItem({
 							<button
 								type="button"
 								onClick={onCancel}
-								className="w-full rounded-lg border border-gray-300 bg-white px-6 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+								className="neo-btn neo-btn-white w-full sm:w-auto"
 								disabled={loading}
 							>
 								Cancelar

@@ -23,6 +23,14 @@ export default function QRCodeComponent({
 			: "";
 	}, [businessQrCodeId]);
 
+	// Bloquear scroll cuando el modal está abierto
+	useEffect(() => {
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = 'unset';
+		};
+	}, []);
+
 	useEffect(() => {
 		let isMounted = true;
 		let timeoutId = null;
@@ -256,11 +264,11 @@ export default function QRCodeComponent({
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
-			<div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-auto overflow-hidden">
+			<div className="relative neo-surface neo-border neo-shadow-lg max-w-lg w-full mx-auto overflow-hidden">
 				<div className="p-6">
 					<button
 						onClick={onClose}
-						className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+						className="absolute top-4 right-4 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
 					>
 						<svg
 							className="w-6 h-6"
@@ -323,10 +331,10 @@ export default function QRCodeComponent({
 									</div>
 									<button
 										onClick={handleCopyUrl}
-										className={`ml-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+										className={`ml-3 neo-btn neo-btn-sm ${
 											copied
-												? "bg-green-100 text-green-700 scale-95"
-												: "bg-slate-200 text-slate-700 hover:bg-slate-300"
+												? "bg-green-400 text-neo-black"
+												: "neo-btn-secondary"
 										}`}
 									>
 										{copied ? (
@@ -384,7 +392,7 @@ export default function QRCodeComponent({
 							<div className="grid grid-cols-2 gap-3">
 								<button
 									onClick={() => window.open(menuUrl, "_blank")}
-									className="flex items-center justify-center px-4 py-3 bg-[#E05C33] text-white rounded-lg hover:bg-[#d14a26] transition-colors font-medium"
+									className="neo-btn neo-btn-primary flex items-center justify-center"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -404,7 +412,7 @@ export default function QRCodeComponent({
 
 								<button
 									onClick={handleDownloadQr}
-									className="flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+									className="neo-btn neo-btn-secondary flex items-center justify-center"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -426,7 +434,7 @@ export default function QRCodeComponent({
 							<div className="grid grid-cols-2 gap-3">
 								<button
 									onClick={handlePrintQr}
-									className="flex items-center justify-center px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
+									className="neo-btn bg-green-400 neo-border neo-shadow-md text-neo-black hover:bg-green-500 flex items-center justify-center"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -446,7 +454,7 @@ export default function QRCodeComponent({
 
 								<button
 									onClick={() => setShowShareMenu(!showShareMenu)}
-									className="flex items-center justify-center px-4 py-3 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors font-medium"
+									className="neo-btn neo-btn-outline flex items-center justify-center"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -487,10 +495,10 @@ export default function QRCodeComponent({
 					)}
 				</div>
 
-				<div className="bg-slate-50 px-6 py-4 flex justify-end">
+				<div className="bg-neo-lavender px-6 py-4 flex justify-end neo-border-t">
 					<button
 						onClick={onClose}
-						className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+						className="neo-btn neo-btn-white"
 					>
 						Cerrar
 					</button>
