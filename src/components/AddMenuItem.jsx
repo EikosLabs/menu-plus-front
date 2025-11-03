@@ -356,22 +356,22 @@ export default function AddMenuItem({
 			onClick={onCancel}
 		>
 			<div
-				className="w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] transform animate-fadeInUp overflow-y-auto neo-surface neo-border neo-shadow-lg transition-all duration-300"
+				className="w-full max-w-xl max-h-[95vh] sm:max-h-[90vh] transform animate-fadeInUp overflow-y-auto bg-white neo-border neo-shadow-2xl transition-all duration-300"
 				onClick={handleModalClick}
 			>
-				<div className="relative p-4 sm:p-6 md:p-8">
+				<div className="relative p-4 sm:p-5">
 					<button
 						onClick={() => {
 							if (!loading) {
 								onCancel();
 							}
 						}}
-						className="absolute top-4 right-4 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
+						className="absolute top-3 right-3 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
 						aria-label="Cerrar modal"
 						disabled={loading}
 					>
 						<svg
-							className="h-6 w-6"
+							className="h-5 w-5"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -385,12 +385,12 @@ export default function AddMenuItem({
 						</svg>
 					</button>
 
-					<div className="mb-6 flex items-center">
+					<div className="mb-4 flex items-center">
 						<div
-							className={`${isEditing ? "bg-neo-sunset" : "bg-neo-flame"} mr-4 flex-shrink-0 rounded-lg bg-opacity-10 p-3.5`}
+							className={`${isEditing ? "bg-neo-sunset" : "bg-neo-flame"} mr-3 flex-shrink-0 rounded-lg bg-opacity-10 p-2.5`}
 						>
 							<svg
-								className={`h-7 w-7 ${isEditing ? "text-neo-sunset" : "text-neo-flame"}`}
+								className={`h-6 w-6 ${isEditing ? "text-neo-sunset" : "text-neo-flame"}`}
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -412,13 +412,13 @@ export default function AddMenuItem({
 								)}
 							</svg>
 						</div>
-						<h2 className="neo-heading neo-h3">
+						<h2 className="neo-heading neo-h4 text-lg sm:text-xl">
 							{isEditing ? "Editar Plato" : "Agregar Nuevo Plato"}
 						</h2>
 					</div>
 
 					{error && (
-						<div className="mb-6 neo-alert neo-alert-error animate-fadeIn">
+						<div className="mb-4 neo-alert neo-alert-error animate-fadeIn">
 							<div className="flex items-center">
 								<svg
 									className="mr-2 h-5 w-5 flex-shrink-0"
@@ -440,7 +440,7 @@ export default function AddMenuItem({
 					)}
 
 					{message && (
-						<div className="mb-6 neo-alert neo-alert-success animate-fadeIn">
+						<div className="mb-4 neo-alert neo-alert-success animate-fadeIn">
 							<div className="flex items-center">
 								<svg
 									className="mr-2 h-5 w-5 flex-shrink-0"
@@ -464,10 +464,10 @@ export default function AddMenuItem({
 					<form
 						ref={formRef}
 						onSubmit={handleSubmit}
-						className="space-y-4 sm:space-y-5 md:space-y-6"
+						className="space-y-3 sm:space-y-4"
 					>
-						<div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-							<div className="space-y-4">
+						<div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+							<div className="space-y-3">
 								<div>
 									<label className="mb-1 block font-medium text-gray-700 text-sm">
 										Imagen del Plato
@@ -558,11 +558,11 @@ export default function AddMenuItem({
 								</div>
 							</div>
 
-							<div className="space-y-4">
+							<div className="space-y-3">
 								<div>
 									<label
 										htmlFor="name"
-										className="mb-1 block font-medium text-gray-700 text-sm"
+										className="mb-1 block neo-text neo-text-bold"
 									>
 										Nombre del Plato *
 									</label>

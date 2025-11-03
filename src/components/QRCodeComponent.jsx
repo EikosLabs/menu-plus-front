@@ -264,14 +264,14 @@ export default function QRCodeComponent({
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
-			<div className="relative neo-surface neo-border neo-shadow-lg max-w-lg w-full mx-auto overflow-hidden">
-				<div className="p-4 sm:p-6">
+			<div className="relative bg-white neo-border neo-shadow-2xl max-w-md w-full mx-auto overflow-hidden">
+				<div className="p-4 sm:p-5">
 					<button
 						onClick={onClose}
-						className="absolute top-4 right-4 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
+						className="absolute top-3 right-3 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
 					>
 						<svg
-							className="w-6 h-6"
+							className="w-5 h-5"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"

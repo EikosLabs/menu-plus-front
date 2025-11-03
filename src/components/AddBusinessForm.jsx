@@ -192,11 +192,11 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="animate-fadeIn space-y-6">
+		<form onSubmit={handleSubmit} className="animate-fadeIn space-y-4 sm:space-y-6">
 			{error && (
-				<div className="neo-alert neo-alert-error flex items-center">
+				<div className="neo-alert neo-alert-error flex items-center text-sm sm:text-base">
 					<svg
-						className="mr-2 h-5 w-5 flex-shrink-0"
+						className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -212,10 +212,10 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				</div>
 			)}
 
-			<div className="neo-surface neo-border neo-shadow-md p-6">
-				<h3 className="mb-5 flex items-center neo-heading neo-h4">
+			<div className="neo-surface neo-border neo-shadow-md p-4 sm:p-5 md:p-6">
+				<h3 className="mb-4 sm:mb-5 flex items-center neo-heading neo-h4 text-base sm:text-lg">
 					<svg
-						className="mr-2 h-5 w-5 text-neo-flame"
+						className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 text-neo-flame flex-shrink-0"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -230,14 +230,14 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 					{isEditing ? "Editar Información del Negocio" : t("business.basicInfo")}
 				</h3>
 
-				<div className="space-y-4">
+				<div className="space-y-3 sm:space-y-4">
 					<div>
 						<label
 							htmlFor="name"
-							className="mb-1 block flex items-center font-medium text-[#0A3342] text-sm"
+							className="mb-1 block flex items-center neo-text neo-text-bold text-sm"
 						>
 							<svg
-								className="mr-1 h-4 w-4 text-[#1a1a1a]"
+								className="mr-1 h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#1a1a1a] flex-shrink-0"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -888,14 +888,14 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				</div>
 			</div>
 
-			<div className="flex justify-end space-x-3 pt-4">
+			<div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
 				<button
 					type="button"
 					onClick={onCancel}
-					className="neo-btn neo-btn-white flex items-center"
+					className="neo-btn neo-btn-white flex items-center justify-center text-sm sm:text-base"
 				>
 					<svg
-						className="mr-1 h-5 w-5"
+						className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -917,7 +917,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 						categories.length === 0 ||
 						uploadingLogo
 					}
-					className="neo-btn neo-btn-primary flex items-center"
+					className="neo-btn neo-btn-primary flex items-center justify-center text-sm sm:text-base"
 				>
 					{loading ? (
 						<>
