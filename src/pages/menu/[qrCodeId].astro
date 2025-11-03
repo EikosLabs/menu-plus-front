@@ -8,6 +8,7 @@ import MenuSection from '../../components/menu/MenuSection.astro';
 import ItemModal from '../../components/menu/ItemModal.astro';
 import SurpriseButton from '../../components/menu/SurpriseButton.astro';
 import { sanitizeMenuData } from '../../utils/security.js';
+import '../../styles/menu-variables.css';
 
 const { qrCodeId } = Astro.params;
 
@@ -69,8 +70,6 @@ if (menu) {
 ---
 
 <Layout title={business?.name || 'Menu'}>
-  <link rel="stylesheet" href="/src/styles/menu-variables.css" />
-
   {customColors && (customColors.primary || customColors.secondary || customColors.accent) && (
     <style is:inline set:html={`
       :root {

@@ -143,10 +143,10 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
   // Mostrar loading mientras se obtiene el userId
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-neo-lavender neo-bg-dots">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-neo-flame mx-auto mb-4"></div>
+          <p className="neo-text text-neo-black">Cargando...</p>
         </div>
       </div>
     );
@@ -163,7 +163,7 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-neo-lavender neo-bg-dots">
       {/* Progress Indicator */}
       <OnboardingProgress
         currentStep={currentStep}
@@ -175,13 +175,13 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
       {/* Error Alert */}
       {submitError && (
         <div className="max-w-2xl mx-auto mt-4 px-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-            <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="neo-alert neo-alert-error flex items-start gap-3">
+            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="flex-1">
-              <h3 className="text-sm font-medium text-red-800 mb-1">Error al crear negocio</h3>
-              <p className="text-sm text-red-700">{submitError}</p>
+              <h3 className="neo-text neo-text-bold mb-1">Error al crear negocio</h3>
+              <p className="neo-text">{submitError}</p>
             </div>
             <button
               onClick={() => setSubmitError(null)}

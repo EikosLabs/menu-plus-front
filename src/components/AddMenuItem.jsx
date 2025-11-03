@@ -352,14 +352,14 @@ export default function AddMenuItem({
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50 backdrop-blur-sm transition-all duration-300"
+			className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-neo-black transition-all duration-300 p-2 sm:p-4"
 			onClick={onCancel}
 		>
 			<div
-				className="m-4 max-h-[90vh] w-full max-w-2xl transform animate-fadeInUp overflow-y-auto neo-surface neo-border neo-shadow-lg transition-all duration-300"
+				className="w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] transform animate-fadeInUp overflow-y-auto neo-surface neo-border neo-shadow-lg transition-all duration-300"
 				onClick={handleModalClick}
 			>
-				<div className="relative p-6 md:p-8">
+				<div className="relative p-4 sm:p-6 md:p-8">
 					<button
 						onClick={() => {
 							if (!loading) {
@@ -464,9 +464,9 @@ export default function AddMenuItem({
 					<form
 						ref={formRef}
 						onSubmit={handleSubmit}
-						className="space-y-5 sm:space-y-6"
+						className="space-y-4 sm:space-y-5 md:space-y-6"
 					>
-						<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+						<div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
 							<div className="space-y-4">
 								<div>
 									<label className="mb-1 block font-medium text-gray-700 text-sm">
@@ -709,7 +709,7 @@ export default function AddMenuItem({
 							/>
 						</div>
 
-						<div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
+						<div className="flex flex-col-reverse gap-3 pt-2 sm:pt-4 sm:flex-row sm:justify-end">
 							<button
 								type="button"
 								onClick={onCancel}

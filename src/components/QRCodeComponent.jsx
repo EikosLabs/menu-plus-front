@@ -263,9 +263,9 @@ export default function QRCodeComponent({
 	};
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black p-2 sm:p-4">
 			<div className="relative neo-surface neo-border neo-shadow-lg max-w-lg w-full mx-auto overflow-hidden">
-				<div className="p-6">
+				<div className="p-4 sm:p-6">
 					<button
 						onClick={onClose}
 						className="absolute top-4 right-4 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
@@ -320,8 +320,8 @@ export default function QRCodeComponent({
 					)}
 
 					{!loading && !error && qrUrl && (
-						<div className="space-y-6">
-							<div className="bg-slate-50 rounded-lg p-4">
+						<div className="space-y-4 sm:space-y-6">
+							<div className="bg-slate-50 rounded-lg p-3 sm:p-4">
 								<div className="flex items-center justify-between">
 									<div className="flex-1 min-w-0">
 										<p className="text-xs text-slate-500 mb-1">URL del menú:</p>
@@ -377,22 +377,22 @@ export default function QRCodeComponent({
 							</div>
 
 							<div className="text-center">
-								<div className="bg-white p-6 rounded-xl border-2 border-slate-200 inline-block">
+								<div className="bg-white p-4 sm:p-6 rounded-xl border-2 border-slate-200 inline-block">
 									<img
 										src={qrUrl}
 										alt="Código QR del menú"
-										className="w-48 h-48 mx-auto"
+										className="w-40 h-40 sm:w-48 sm:h-48 mx-auto"
 									/>
 								</div>
-								<p className="text-slate-600 text-sm mt-4">
+								<p className="text-slate-600 text-xs sm:text-sm mt-3 sm:mt-4 px-2">
 									Escanea este código QR para acceder al menú digital
 								</p>
 							</div>
 
-							<div className="grid grid-cols-2 gap-3">
+							<div className="grid grid-cols-2 gap-2 sm:gap-3">
 								<button
 									onClick={() => window.open(menuUrl, "_blank")}
-									className="neo-btn neo-btn-primary flex items-center justify-center"
+									className="neo-btn neo-btn-primary flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -412,7 +412,7 @@ export default function QRCodeComponent({
 
 								<button
 									onClick={handleDownloadQr}
-									className="neo-btn neo-btn-secondary flex items-center justify-center"
+									className="neo-btn neo-btn-secondary flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -431,10 +431,10 @@ export default function QRCodeComponent({
 								</button>
 							</div>
 
-							<div className="grid grid-cols-2 gap-3">
+							<div className="grid grid-cols-2 gap-2 sm:gap-3">
 								<button
 									onClick={handlePrintQr}
-									className="neo-btn bg-green-400 neo-border neo-shadow-md text-neo-black hover:bg-green-500 flex items-center justify-center"
+									className="neo-btn bg-green-400 neo-border neo-shadow-md text-neo-black hover:bg-green-500 flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -454,7 +454,7 @@ export default function QRCodeComponent({
 
 								<button
 									onClick={() => setShowShareMenu(!showShareMenu)}
-									className="neo-btn neo-btn-outline flex items-center justify-center"
+									className="neo-btn neo-btn-outline flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -495,7 +495,7 @@ export default function QRCodeComponent({
 					)}
 				</div>
 
-				<div className="bg-neo-lavender px-6 py-4 flex justify-end neo-border-t">
+				<div className="bg-neo-lavender px-4 py-3 sm:px-6 sm:py-4 flex justify-end neo-border-t">
 					<button
 						onClick={onClose}
 						className="neo-btn neo-btn-white"

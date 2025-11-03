@@ -111,10 +111,10 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="menu-form animate-fadeIn space-y-6"
+			className="menu-form animate-fadeIn neo-space-lg"
 		>
 			{error && (
-				<div className="flex items-center rounded-md border-red-500 border-l-4 bg-red-100 p-4 text-red-700">
+				<div className="neo-alert neo-alert-error flex items-center">
 					<svg
 						className="mr-2 h-5 w-5 flex-shrink-0"
 						fill="none"
@@ -133,7 +133,7 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 			)}
 
 			{status && !error && (
-				<div className="flex items-center rounded-md border-blue-500 border-l-4 bg-blue-100 p-4 text-blue-700">
+				<div className="neo-alert neo-alert-info flex items-center">
 					<svg
 						className="mr-2 h-5 w-5 flex-shrink-0"
 						fill="none"
@@ -151,11 +151,11 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 				</div>
 			)}
 
-			<div className="rounded-xl border border-slate-100 bg-white p-6 shadow-md">
+			<div className="neo-card neo-shadow-lg bg-white p-6">
 				<div className="mb-6 flex items-center">
-					<div className="mr-3 rounded-lg bg-[#004E71] bg-opacity-10 p-2.5">
+					<div className="mr-3 rounded-lg bg-neo-lavender p-2.5">
 						<svg
-							className="h-6 w-6 text-[#004E71]"
+							className="h-6 w-6 text-neo-black"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -168,19 +168,19 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							/>
 						</svg>
 					</div>
-					<h3 className="font-semibold text-[#004E71] text-xl">
+					<h3 className="neo-heading neo-h3">
 						Crear Nuevo Menú
 					</h3>
 				</div>
 
-				<div className="space-y-4">
+				<div className="neo-space-md">
 					<div>
 						<label
 							htmlFor="name"
-							className="mb-1 block flex items-center font-medium text-[#0A3342] text-sm"
+							className="neo-text neo-text-bold mb-2 block flex items-center"
 						>
 							<svg
-								className="mr-1 h-4 w-4 text-[#1a1a1a]"
+								className="mr-1 h-4 w-4 text-neo-black"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -201,7 +201,7 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							required={true}
 							value={formData.name}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input w-full"
 							placeholder="Ej. Menú de Desayunos, Carta Principal, etc."
 						/>
 					</div>
@@ -209,10 +209,10 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 					<div>
 						<label
 							htmlFor="description"
-							className="mb-1 block flex items-center font-medium text-[#0A3342] text-sm"
+							className="neo-text neo-text-bold mb-2 block flex items-center"
 						>
 							<svg
-								className="mr-1 h-4 w-4 text-[#1a1a1a]"
+								className="mr-1 h-4 w-4 text-neo-black"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -232,17 +232,17 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							value={formData.description}
 							onChange={handleChange}
 							rows="4"
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-textarea w-full"
 							placeholder="Describe brevemente este menú"
 						/>
 					</div>
 				</div>
 
-				<div className="mt-8 border-slate-200 border-t pt-6">
+				<div className="mt-8 neo-border-top pt-6">
 					<div className="flex flex-col items-center justify-between md:flex-row">
-						<p className="mb-4 text-slate-600 text-sm md:mb-0">
+						<p className="neo-text text-sm mb-4 md:mb-0 opacity-70">
 							<svg
-								className="mr-1 inline h-4 w-4 text-[#004E71]"
+								className="mr-1 inline h-4 w-4 text-neo-black"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -257,11 +257,11 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							Después de crear el menú, podrás añadir platos y categorías.
 						</p>
 
-						<div className="flex space-x-3">
+						<div className="flex neo-space-sm">
 							<button
 								type="button"
 								onClick={onCancel}
-								className="flex items-center rounded-lg border border-slate-300 px-5 py-2.5 text-slate-700 transition-colors hover:bg-slate-50"
+								className="neo-btn neo-btn-outline flex items-center"
 							>
 								<svg
 									className="mr-1 h-5 w-5"
@@ -281,7 +281,7 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							<button
 								type="submit"
 								disabled={loading}
-								className="flex items-center rounded-lg bg-[#1a1a1a] px-5 py-2.5 text-white shadow-md transition-colors hover:bg-[#333333] disabled:bg-slate-400 disabled:shadow-none"
+								className="neo-btn neo-btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{loading ? (
 									<>

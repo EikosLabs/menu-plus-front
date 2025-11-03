@@ -30,7 +30,7 @@ export default function LoginForm() {
 	};
 
 	return (
-		<form className="space-y-4" onSubmit={handleSubmit}>
+		<form className="neo-space-md" onSubmit={handleSubmit}>
 			{error && (
 				<div className="neo-alert neo-alert-error">
 					{error}
