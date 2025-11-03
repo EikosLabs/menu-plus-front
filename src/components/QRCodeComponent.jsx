@@ -263,7 +263,7 @@ export default function QRCodeComponent({
 	};
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black p-2 sm:p-4">
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
 			<div className="relative neo-surface neo-border neo-shadow-lg max-w-lg w-full mx-auto overflow-hidden">
 				<div className="p-4 sm:p-6">
 					<button
