@@ -264,8 +264,8 @@ export default function QRCodeComponent({
 	};
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
-			<div className="relative bg-white neo-border neo-shadow-2xl max-w-md w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+			<div className="relative bg-white neo-border neo-shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto">
 				{/* Header con título y botón cerrar */}
 				<div className="relative border-b neo-border px-4 py-3 sm:px-5 sm:py-4 bg-neo-lavender">
 					<h3 className="neo-heading neo-h4 text-base sm:text-lg text-center pr-8">
