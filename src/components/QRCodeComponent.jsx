@@ -117,6 +117,7 @@ export default function QRCodeComponent({
 			const padding = 60;
 			const qrSize = 400;
 			const totalWidth = qrSize + padding * 2;
+			const totalHeight = qrSize + padding * 2 + 130; // QR + padding + espacio para textos
 
 			canvas.width = totalWidth;
 			canvas.height = totalHeight;
@@ -265,10 +266,14 @@ export default function QRCodeComponent({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
 			<div className="relative bg-white neo-border neo-shadow-2xl max-w-md w-full mx-auto overflow-hidden">
-				<div className="p-4 sm:p-5">
+				{/* Header con título y botón cerrar */}
+				<div className="relative border-b neo-border px-4 py-3 sm:px-5 sm:py-4 bg-neo-lavender">
+					<h3 className="neo-heading neo-h4 text-base sm:text-lg text-center pr-8">
+						Código QR del Menú
+					</h3>
 					<button
 						onClick={onClose}
-						className="absolute top-3 right-3 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
+						className="absolute top-2 right-2 sm:top-3 sm:right-3 neo-btn neo-btn-sm bg-white hover:bg-gray-100"
 					>
 						<svg
 							className="w-5 h-5"
@@ -284,7 +289,9 @@ export default function QRCodeComponent({
 							/>
 						</svg>
 					</button>
+				</div>
 
+				<div className="p-4 sm:p-5">
 					{loading && (
 						<div className="flex flex-col items-center justify-center py-12">
 							<div className="animate-spin rounded-full h-12 w-12 border-4 border-[#1a1a1a] border-t-transparent mb-4"></div>
