@@ -333,7 +333,7 @@ export default function BusinessList({
 							<div className="flex gap-2">
 								<button
 									onClick={() => onEditBusinessClick(business)}
-									className="bg-white text-[#003A57] px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 font-medium text-sm flex items-center transition-all duration-300 transform hover:scale-105"
+									className="neo-btn neo-btn-white text-sm flex items-center"
 								>
 									<svg
 										className="h-4 w-4 mr-1.5"
@@ -352,7 +352,7 @@ export default function BusinessList({
 								</button>
 								<button
 									onClick={() => setShowQr(business.id)}
-									className="bg-white text-[#003A57] px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 font-medium text-sm flex items-center transition-all duration-300 transform hover:scale-105"
+									className="neo-btn neo-btn-white text-sm flex items-center"
 								>
 									<svg
 										className="h-4 w-4 mr-1.5"
@@ -397,7 +397,7 @@ export default function BusinessList({
 										<div className="flex space-x-2">
 											<button
 												onClick={() => handleManageSections(menu.id)}
-												className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 font-medium text-sm flex items-center transition-all duration-300"
+												className="neo-btn neo-btn-secondary text-sm flex items-center"
 											>
 												<svg
 													className="h-4 w-4 mr-1.5"
@@ -419,7 +419,7 @@ export default function BusinessList({
 													setSelectedSection(null);
 													handleShowAddMenuItem(menu.id);
 												}}
-												className="bg-[#1a1a1a] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#404040] font-medium text-sm flex items-center transition-all duration-300"
+												className="neo-btn neo-btn-primary text-sm flex items-center"
 											>
 												<svg
 													className="h-4 w-4 mr-1.5"
@@ -471,7 +471,7 @@ export default function BusinessList({
 																	setSelectedSection(section.id);
 																	handleShowAddMenuItem(menu.id, section.id);
 																}}
-																className="bg-[#1a1a1a] text-white px-3 py-1.5 rounded-lg shadow-md hover:bg-[#404040] font-medium text-xs flex items-center transition-all duration-300"
+																className="neo-btn neo-btn-primary neo-btn-sm flex items-center"
 															>
 																<svg
 																	className="h-3.5 w-3.5 mr-1"
