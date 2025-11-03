@@ -194,7 +194,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 	return (
 		<form onSubmit={handleSubmit} className="animate-fadeIn space-y-6">
 			{error && (
-				<div className="flex items-center rounded-md border-red-500 border-l-4 bg-red-100 p-4 text-red-700">
+				<div className="neo-alert neo-alert-error flex items-center">
 					<svg
 						className="mr-2 h-5 w-5 flex-shrink-0"
 						fill="none"
@@ -212,10 +212,10 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				</div>
 			)}
 
-			<div className="rounded-xl border border-slate-100 bg-white p-6 shadow-md">
-				<h3 className="mb-5 flex items-center font-semibold text-[#004E71] text-lg">
+			<div className="neo-surface neo-border neo-shadow-md p-6">
+				<h3 className="mb-5 flex items-center neo-heading neo-h4">
 					<svg
-						className="mr-2 h-5 w-5 text-[#1a1a1a]"
+						className="mr-2 h-5 w-5 text-neo-flame"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -258,7 +258,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							required={true}
 							value={formData.name}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder={t("business.namePlaceholder")}
 						/>
 					</div>
@@ -289,7 +289,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							value={formData.description}
 							onChange={handleChange}
 							rows="3"
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input neo-textarea"
 							placeholder={t("business.descriptionPlaceholder")}
 						/>
 					</div>
@@ -320,17 +320,17 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="slogan"
 							value={formData.slogan}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder={t("business.sloganPlaceholder")}
 						/>
 					</div>
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-slate-100 bg-white p-6 shadow-md">
-				<h3 className="mb-5 flex items-center font-semibold text-[#004E71] text-lg">
+			<div className="neo-surface neo-border neo-shadow-md p-6">
+				<h3 className="mb-5 flex items-center neo-heading neo-h4">
 					<svg
-						className="mr-2 h-5 w-5 text-[#1a1a1a]"
+						className="mr-2 h-5 w-5 text-neo-flame"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -471,10 +471,10 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-slate-100 bg-white p-6 shadow-md">
-				<h3 className="mb-5 flex items-center font-semibold text-[#004E71] text-lg">
+			<div className="neo-surface neo-border neo-shadow-md p-6">
+				<h3 className="mb-5 flex items-center neo-heading neo-h4">
 					<svg
-						className="mr-2 h-5 w-5 text-[#1a1a1a]"
+						className="mr-2 h-5 w-5 text-neo-flame"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -510,7 +510,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="facebookUrl"
 							value={formData.facebookUrl}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder="https://facebook.com/tu-negocio"
 						/>
 					</div>
@@ -535,7 +535,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="instagramUrl"
 							value={formData.instagramUrl}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder="https://instagram.com/tu-negocio"
 						/>
 					</div>
@@ -560,7 +560,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="twitterUrl"
 							value={formData.twitterUrl}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder="https://twitter.com/tu-negocio"
 						/>
 					</div>
@@ -585,17 +585,17 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="whatsAppNumber"
 							value={formData.whatsAppNumber}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder="+1234567890"
 						/>
 					</div>
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-slate-100 bg-white p-6 shadow-md">
-				<h3 className="mb-5 flex items-center font-semibold text-[#004E71] text-lg">
+			<div className="neo-surface neo-border neo-shadow-md p-6">
+				<h3 className="mb-5 flex items-center neo-heading neo-h4">
 					<svg
-						className="mr-2 h-5 w-5 text-[#1a1a1a]"
+						className="mr-2 h-5 w-5 text-neo-flame"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -631,7 +631,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 								type="text"
 								value={formData.primaryColor}
 								onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
-								className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-[#1a1a1a] focus:outline-none"
+								className="flex-1 neo-input text-sm"
 								placeholder="#1a1a1a"
 							/>
 						</div>
@@ -657,7 +657,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 								type="text"
 								value={formData.secondaryColor}
 								onChange={(e) => setFormData(prev => ({ ...prev, secondaryColor: e.target.value }))}
-								className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-[#1a1a1a] focus:outline-none"
+								className="flex-1 neo-input text-sm"
 								placeholder="#004E71"
 							/>
 						</div>
@@ -683,7 +683,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 								type="text"
 								value={formData.accentColor}
 								onChange={(e) => setFormData(prev => ({ ...prev, accentColor: e.target.value }))}
-								className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm transition-colors focus:border-[#1a1a1a] focus:outline-none"
+								className="flex-1 neo-input text-sm"
 								placeholder="#0A3342"
 							/>
 						</div>
@@ -691,10 +691,10 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-slate-100 bg-white p-6 shadow-md">
-				<h3 className="mb-5 flex items-center font-semibold text-[#004E71] text-lg">
+			<div className="neo-surface neo-border neo-shadow-md p-6">
+				<h3 className="mb-5 flex items-center neo-heading neo-h4">
 					<svg
-						className="mr-2 h-5 w-5 text-[#1a1a1a]"
+						className="mr-2 h-5 w-5 text-neo-flame"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -748,7 +748,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="address"
 							value={formData.address}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder={t("business.addressPlaceholder")}
 						/>
 					</div>
@@ -779,7 +779,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="phoneNumber"
 							value={formData.phoneNumber}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder={t("business.phonePlaceholder")}
 						/>
 					</div>
@@ -810,7 +810,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="email"
 							value={formData.email}
 							onChange={handleChange}
-							className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+							className="neo-input"
 							placeholder={t("business.emailPlaceholder")}
 						/>
 					</div>
@@ -868,7 +868,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 								required={true}
 								value={formData.businessCategoryId}
 								onChange={handleChange}
-								className="w-full rounded-lg border border-slate-300 px-4 py-2.5 transition-colors focus:border-[#1a1a1a] focus:outline-none focus:ring-[#1a1a1a]"
+								className="neo-input neo-select"
 							>
 								{categories.map((category) => (
 									<option key={category.id} value={category.id}>
@@ -892,7 +892,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				<button
 					type="button"
 					onClick={onCancel}
-					className="flex items-center rounded-lg border border-slate-300 px-5 py-2.5 text-slate-700 transition-colors hover:bg-slate-50"
+					className="neo-btn neo-btn-white flex items-center"
 				>
 					<svg
 						className="mr-1 h-5 w-5"
@@ -917,7 +917,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 						categories.length === 0 ||
 						uploadingLogo
 					}
-					className="flex items-center rounded-lg bg-[#1a1a1a] px-5 py-2.5 text-white shadow-md transition-colors hover:bg-[#333333] disabled:bg-slate-400 disabled:shadow-none"
+					className="neo-btn neo-btn-primary flex items-center"
 				>
 					{loading ? (
 						<>

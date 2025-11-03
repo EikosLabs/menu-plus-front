@@ -573,10 +573,10 @@ export default function AddMenuItem({
 										value={formData.name}
 										onChange={handleChange}
 										onBlur={handleBlur}
-										className={`w-full rounded-lg border px-4 py-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+										className={`neo-input ${
 											nameError
-												? "border-red-300 focus:border-red-500 focus:ring-red-500"
-												: "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+												? "border-red-500"
+												: ""
 										}`}
 										placeholder="Ej: Pizza Margherita"
 										disabled={loading}
@@ -607,10 +607,10 @@ export default function AddMenuItem({
 											onBlur={handleBlur}
 											step="0.01"
 											min="0"
-											className={`w-full rounded-lg border py-2.5 pl-8 pr-4 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+											className={`neo-input pl-8 ${
 												priceError
-													? "border-red-300 focus:border-red-500 focus:ring-red-500"
-													: "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+													? "border-red-500"
+													: ""
 											}`}
 											placeholder="0.00"
 											disabled={loading}
@@ -634,7 +634,7 @@ export default function AddMenuItem({
 										name="menuItemCategoryId"
 										value={formData.menuItemCategoryId || ""}
 										onChange={handleChange}
-										className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+										className="neo-input neo-select"
 										disabled={loading || loadingCategories}
 									>
 										<option value="">Sin categoría</option>
@@ -658,7 +658,7 @@ export default function AddMenuItem({
 										name="sectionId"
 										value={formData.sectionId || ""}
 										onChange={handleChange}
-										className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+										className="neo-input neo-select"
 										disabled={loading || loadingSections}
 									>
 										<option value="">Sin sección</option>
@@ -703,7 +703,7 @@ export default function AddMenuItem({
 								value={formData.description}
 								onChange={handleChange}
 								rows={3}
-								className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+								className="neo-input neo-textarea"
 								placeholder="Describe los ingredientes y características del plato..."
 								disabled={loading}
 							/>
