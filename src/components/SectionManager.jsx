@@ -151,7 +151,7 @@ export default function SectionManager({
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50 transition-all duration-300 p-2 sm:p-4"
+			className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-all duration-300 p-2 sm:p-4"
 			onClick={onClose}
 		>
 			<div
