@@ -174,9 +174,9 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
 
       {/* Error Alert */}
       {submitError && (
-        <div className="max-w-2xl mx-auto mt-4 px-4">
-          <div className="neo-alert neo-alert-error flex items-start gap-3">
-            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="max-w-2xl mx-auto mt-3 px-3">
+          <div className="neo-alert neo-alert-error flex items-start gap-2 sm:gap-3 text-sm sm:text-base">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="flex-1">
@@ -188,7 +188,7 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
               className="text-red-600 hover:text-red-800"
               aria-label="Cerrar alerta"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -197,7 +197,7 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
       )}
 
       {/* Step Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 py-4 sm:py-6">
         <StepBasicInfo
           formData={formData}
           updateFormData={updateFormData}
@@ -241,7 +241,7 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
         />
 
         {/* Navigation */}
-        <div className="max-w-2xl mx-auto px-4">
+        <div className="max-w-2xl mx-auto px-3">
           <OnboardingNavigation
             currentStep={currentStep}
             totalSteps={totalSteps}

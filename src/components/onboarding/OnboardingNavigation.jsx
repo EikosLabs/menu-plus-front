@@ -18,18 +18,18 @@ export default function OnboardingNavigation({
   const isLastStep = currentStep === totalSteps;
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3 sm:justify-between mt-8">
+    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-between mt-6">
       {/* Botón Atrás */}
       {!isFirstStep && (
         <button
           type="button"
           onClick={onPrev}
           disabled={isSaving}
-          className="neo-btn neo-btn-outline flex items-center justify-center gap-2"
+          className="neo-btn neo-btn-outline flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base"
           aria-label="Volver al paso anterior"
         >
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 sm:w-5 sm:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -54,12 +54,12 @@ export default function OnboardingNavigation({
           type="button"
           onClick={onSkip}
           disabled={isSaving}
-          className="neo-btn neo-btn-secondary flex items-center justify-center gap-2"
+          className="neo-btn neo-btn-secondary flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base"
           aria-label="Omitir este paso"
         >
           <span>Omitir</span>
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 sm:w-5 sm:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -79,14 +79,14 @@ export default function OnboardingNavigation({
         type="button"
         onClick={onNext}
         disabled={!isValid || isSaving}
-        className="neo-btn neo-btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="neo-btn neo-btn-primary flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label={isLastStep ? 'Finalizar y crear negocio' : 'Continuar al siguiente paso'}
       >
         {!isSaving && (
           <>
             <span>{isLastStep ? 'Crear mi negocio' : 'Siguiente'}</span>
             <svg
-              className="w-5 h-5"
+              className="w-4 h-4 sm:w-5 sm:h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
