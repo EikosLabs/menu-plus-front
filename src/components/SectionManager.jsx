@@ -128,6 +128,14 @@ export default function SectionManager({
 		e.stopPropagation();
 	};
 
+	// Bloquear scroll cuando el modal está abierto
+	useEffect(() => {
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = 'unset';
+		};
+	}, []);
+
 	useEffect(() => {
 		const handleEscapeKey = (e) => {
 			if (e.key === "Escape" && !isLoading && onClose) {
@@ -143,22 +151,22 @@ export default function SectionManager({
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50 backdrop-blur-sm transition-all duration-300"
+			className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-all duration-300 p-4"
 			onClick={onClose}
 		>
 			<div
-				className="m-4 max-h-[90vh] w-full max-w-2xl transform animate-fadeInUp overflow-y-auto rounded-xl bg-white shadow-2xl transition-all duration-300"
+				className="w-full max-w-xl max-h-[85vh] transform animate-fadeInUp overflow-y-auto bg-white neo-border neo-shadow-2xl transition-all duration-300"
 				onClick={handleModalClick}
 			>
-				<div className="relative p-6 md:p-8">
+				<div className="relative p-4 sm:p-5">
 					<button
 						onClick={onClose}
-						className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						className="absolute top-3 right-3 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
 						aria-label="Cerrar modal"
 						disabled={isLoading}
 					>
 						<svg
-							className="h-6 w-6"
+							className="h-5 w-5"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -172,10 +180,10 @@ export default function SectionManager({
 						</svg>
 					</button>
 
-					<div className="mb-6 flex items-center">
-						<div className="mr-4 flex-shrink-0 rounded-lg bg-blue-500 bg-opacity-10 p-3.5">
+					<div className="mb-4 flex items-center">
+						<div className="mr-3 flex-shrink-0 rounded-lg bg-neo-sunset bg-opacity-10 p-2.5">
 							<svg
-								className="h-7 w-7 text-blue-600"
+								className="h-6 w-6 text-neo-sunset"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -188,13 +196,13 @@ export default function SectionManager({
 								/>
 							</svg>
 						</div>
-						<h2 className="font-bold text-2xl text-gray-800 sm:text-3xl">
+						<h2 className="neo-heading neo-h4 text-lg sm:text-xl">
 							Gestionar Secciones
 						</h2>
 					</div>
 
 					{error && (
-						<div className="mb-6 animate-fadeIn rounded-md border-red-500 border-l-4 bg-red-50 p-3.5 text-red-700">
+						<div className="mb-4 neo-alert neo-alert-error animate-fadeIn">
 							<div className="flex items-center">
 								<svg
 									className="mr-2 h-5 w-5 flex-shrink-0"
@@ -215,8 +223,8 @@ export default function SectionManager({
 						</div>
 					)}
 
-					<form onSubmit={handleAddSection}>
-						<div className="mb-4">
+					<form onSubmit={handleAddSection} className="space-y-3 sm:space-y-4">
+						<div>
 							<label
 								htmlFor="name"
 								className="mb-1 block font-medium text-gray-700 text-sm"
@@ -229,14 +237,14 @@ export default function SectionManager({
 								name="name"
 								value={newSection.name}
 								onChange={handleInputChange}
-								className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:ring-blue-500"
+								className="neo-input w-full"
 								placeholder="Ej: Entradas, Platos Principales, Postres..."
 								required={true}
 								disabled={isLoading}
 							/>
 						</div>
 
-						<div className="mb-4">
+						<div>
 							<label
 								htmlFor="description"
 								className="mb-1 block font-medium text-gray-700 text-sm"
@@ -248,7 +256,7 @@ export default function SectionManager({
 								name="description"
 								value={newSection.description}
 								onChange={handleInputChange}
-								className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:ring-blue-500"
+								className="neo-input neo-textarea w-full"
 								placeholder="Descripción breve de la sección..."
 								rows={3}
 								disabled={isLoading}
@@ -258,7 +266,7 @@ export default function SectionManager({
 						<button
 							type="submit"
 							disabled={isLoading}
-							className="mb-6 w-full rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+							className="neo-btn neo-btn-primary w-full"
 						>
 							{isLoading ? (
 								<div className="flex items-center justify-center">
@@ -289,42 +297,42 @@ export default function SectionManager({
 						</button>
 					</form>
 
-					<div>
-						<h4 className="mb-2 font-medium text-base text-gray-800">
+					<div className="mt-6">
+						<h4 className="mb-3 neo-heading neo-h4">
 							Secciones actuales
 						</h4>
 
 						{sections.length === 0 ? (
-							<p className="rounded-lg bg-gray-50 py-4 text-center text-gray-500">
-								No hay secciones creadas
-							</p>
+							<div className="neo-surface neo-border rounded-lg py-6 text-center">
+								<p className="neo-text text-gray-500">No hay secciones creadas</p>
+							</div>
 						) : (
-							<div className="max-h-[300px] space-y-2 overflow-y-auto pr-1">
+							<div className="max-h-[300px] space-y-3 overflow-y-auto pr-1">
 								{sections
 									.sort((a, b) => a.order - b.order)
 									.map((section, index) => (
 										<div
 											key={section.id}
-											className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-shadow hover:shadow-sm"
+											className="flex items-center justify-between neo-surface neo-border rounded-lg p-3 sm:p-4 transition-shadow hover:neo-shadow-md"
 										>
-											<div>
-												<p className="font-medium text-gray-800">
+											<div className="flex-1 min-w-0 mr-3">
+												<p className="neo-heading neo-h5 truncate">
 													{section.name}
 												</p>
 												{section.description && (
-													<p className="mt-1 text-gray-600 text-sm">
+													<p className="mt-1 neo-text text-gray-600 text-xs sm:text-sm truncate">
 														{section.description}
 													</p>
 												)}
 											</div>
-											<div className="flex space-x-2">
+											<div className="flex space-x-1 sm:space-x-2 flex-shrink-0">
 												<button
 													onClick={() => handleMoveUp(section.id)}
-													disabled={isLoading}
-													className={`rounded p-1.5 transition-colors ${
+													disabled={isLoading || index === 0}
+													className={`neo-btn neo-btn-sm p-1.5 sm:p-2 ${
 														index === 0
-															? "text-gray-400 cursor-not-allowed opacity-50"
-															: "text-blue-600 hover:bg-gray-100 hover:text-blue-800 cursor-pointer"
+															? "opacity-50 cursor-not-allowed bg-gray-200"
+															: "bg-neo-sky hover:bg-neo-sky-dark"
 													}`}
 													title={
 														index === 0
@@ -333,7 +341,7 @@ export default function SectionManager({
 													}
 												>
 													<svg
-														className="h-5 w-5"
+														className="h-4 w-4 sm:h-5 sm:w-5"
 														fill="none"
 														viewBox="0 0 24 24"
 														stroke="currentColor"
@@ -348,11 +356,11 @@ export default function SectionManager({
 												</button>
 												<button
 													onClick={() => handleMoveDown(section.id)}
-													disabled={isLoading}
-													className={`rounded p-1.5 transition-colors ${
+													disabled={isLoading || index === sections.length - 1}
+													className={`neo-btn neo-btn-sm p-1.5 sm:p-2 ${
 														index === sections.length - 1
-															? "text-gray-400 cursor-not-allowed opacity-50"
-															: "text-blue-600 hover:bg-gray-100 hover:text-blue-800 cursor-pointer"
+															? "opacity-50 cursor-not-allowed bg-gray-200"
+															: "bg-neo-sky hover:bg-neo-sky-dark"
 													}`}
 													title={
 														index === sections.length - 1
@@ -361,7 +369,7 @@ export default function SectionManager({
 													}
 												>
 													<svg
-														className="h-5 w-5"
+														className="h-4 w-4 sm:h-5 sm:w-5"
 														fill="none"
 														viewBox="0 0 24 24"
 														stroke="currentColor"

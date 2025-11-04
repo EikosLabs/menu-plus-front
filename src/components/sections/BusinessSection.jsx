@@ -37,11 +37,11 @@ const BusinessSection = ({
 	};
 
 	return (
-		<section className="mb-6 animate-fadeIn">
-			<div className="mb-6 flex items-center justify-between">
-				<h2 className="flex items-center neo-heading neo-h3">
+		<section className="mb-4 sm:mb-6 animate-fadeIn">
+			<div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+				<h2 className="flex items-center neo-heading neo-h3 text-xl sm:text-2xl">
 					<svg
-						className="mr-2 h-6 w-6 text-neo-flame md:mr-3 md:h-7 md:w-7"
+						className="mr-1.5 h-5 w-5 text-neo-flame sm:mr-2 sm:h-6 sm:w-6 md:mr-3 md:h-7 md:w-7 flex-shrink-0"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -58,10 +58,10 @@ const BusinessSection = ({
 				{businesses.length === 0 && (
 					<button
 						onClick={handleAddBusinessClick}
-						className="neo-btn neo-btn-primary flex items-center"
+						className="neo-btn neo-btn-primary flex items-center text-sm sm:text-base w-full sm:w-auto"
 					>
 						<svg
-							className="mr-2 h-5 w-5"
+							className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -74,10 +74,10 @@ const BusinessSection = ({
 			</div>
 
 			{businesses.length > 0 && (
-				<div className="mb-6 neo-card-3d-sunset p-4">
+				<div className="mb-4 sm:mb-6 neo-card-3d-sunset p-3 sm:p-4">
 					<div className="flex items-start">
 						<svg
-							className="mr-3 h-6 w-6 flex-shrink-0"
+							className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -89,9 +89,9 @@ const BusinessSection = ({
 								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
 							/>
 						</svg>
-						<div>
-							<p className="neo-text-bold mb-1">ℹ️ Información</p>
-							<p className="neo-text text-sm">
+						<div className="min-w-0">
+							<p className="neo-text-bold mb-1 text-sm sm:text-base">ℹ️ Información</p>
+							<p className="neo-text text-xs sm:text-sm">
 								Cada usuario solo puede tener un negocio registrado en la plataforma y cada negocio solo puede tener un menú.
 							</p>
 						</div>
@@ -100,7 +100,7 @@ const BusinessSection = ({
 			)}
 
 			{showAddBusiness && (
-				<div className="mb-6 animate-fadeInUp">
+				<div className="mb-4 sm:mb-6 animate-fadeInUp">
 					<AddBusinessForm
 						userId={userData?.id}
 						onBusinessAdded={onBusinessAdded}
@@ -124,7 +124,7 @@ const BusinessSection = ({
 			)}
 
 			{showAddMenu && (
-				<div className="mb-6 animate-fadeInUp">
+				<div className="mb-4 sm:mb-6 animate-fadeInUp">
 					<AddMenuForm
 						businessId={selectedBusinessId}
 						onMenuAdded={onMenuAdded}

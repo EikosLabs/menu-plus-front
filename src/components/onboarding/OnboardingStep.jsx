@@ -16,20 +16,20 @@ export default function OnboardingStep({
   }
 
   return (
-    <div className="step-container" role="region" aria-label={title}>
-      <div className="step-header">
+    <div className="max-w-2xl mx-auto px-3 py-4 sm:py-6 animate-fadeIn" role="region" aria-label={title}>
+      <div className="text-center mb-4">
         {icon && (
-          <div className="step-icon" aria-hidden="true">
+          <div className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 text-neo-flame" aria-hidden="true">
             {icon}
           </div>
         )}
-        <h2 className="onboarding-title">{title}</h2>
+        <h2 className="neo-heading neo-h3 text-neo-black text-xl sm:text-2xl">{title}</h2>
         {description && (
-          <p className="onboarding-subtitle mt-2">{description}</p>
+          <p className="neo-text mt-1.5 sm:mt-2 text-sm sm:text-base text-neo-black opacity-70">{description}</p>
         )}
       </div>
-      
-      <div className="step-content">
+
+      <div className="neo-card neo-shadow-md bg-white p-4 sm:p-5 md:p-6">
         {children}
       </div>
     </div>

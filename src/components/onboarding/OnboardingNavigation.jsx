@@ -18,26 +18,26 @@ export default function OnboardingNavigation({
   const isLastStep = currentStep === totalSteps;
 
   return (
-    <div className="navigation-container">
+    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-between mt-6">
       {/* Botón Atrás */}
       {!isFirstStep && (
         <button
           type="button"
           onClick={onPrev}
           disabled={isSaving}
-          className="btn btn-secondary"
+          className="neo-btn neo-btn-outline flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base"
           aria-label="Volver al paso anterior"
         >
-          <svg 
-            className="w-5 h-5" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-4 h-4 sm:w-5 sm:h-5"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M15 19l-7-7 7-7"
             />
           </svg>
@@ -54,20 +54,20 @@ export default function OnboardingNavigation({
           type="button"
           onClick={onSkip}
           disabled={isSaving}
-          className="btn btn-secondary"
+          className="neo-btn neo-btn-secondary flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base"
           aria-label="Omitir este paso"
         >
           <span>Omitir</span>
-          <svg 
-            className="w-5 h-5" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-4 h-4 sm:w-5 sm:h-5"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M13 5l7 7-7 7M5 5l7 7-7 7"
             />
           </svg>
@@ -79,22 +79,22 @@ export default function OnboardingNavigation({
         type="button"
         onClick={onNext}
         disabled={!isValid || isSaving}
-        className={`btn btn-primary ${isSaving ? 'btn-loading' : ''}`}
+        className="neo-btn neo-btn-primary flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label={isLastStep ? 'Finalizar y crear negocio' : 'Continuar al siguiente paso'}
       >
         {!isSaving && (
           <>
             <span>{isLastStep ? 'Crear mi negocio' : 'Siguiente'}</span>
-            <svg 
-              className="w-5 h-5" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d={isLastStep ? 'M5 13l4 4L19 7' : 'M9 5l7 7-7 7'}
               />
             </svg>

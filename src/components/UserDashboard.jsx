@@ -92,7 +92,7 @@ export default function UserDashboard() {
 				/>
 			)}
 
-			<main className="container mx-auto flex-grow px-4 py-6 md:px-6 md:py-8 lg:px-8 relative z-10">
+			<main className="container mx-auto flex-grow px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8 relative z-10">
 				<DashboardHeader activeSection={activeSection} />
 				<ErrorAlert error={error} onClose={() => setError(null)} />
 
