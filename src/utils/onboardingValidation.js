@@ -1,142 +1,27 @@
 /**
  * Utilidades de validación para el formulario de onboarding
+ * Usa validadores consolidados de utils/validators.js
  */
 
-/**
- * Valida formato de email
- */
-export const validateEmail = (email) => {
-  if (!email) return { isValid: true, error: null }; // Email es opcional
-  
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const isValid = emailRegex.test(email);
-  
-  return {
-    isValid,
-    error: isValid ? null : 'Por favor ingresa un email válido'
-  };
-};
+import {
+  validateEmail,
+  validateUrl,
+  validatePhone,
+  validateImageFile,
+  validateLength,
+  validateRequired,
+  validateHexColor
+} from './validators.js';
 
-/**
- * Valida formato de URL
- */
-export const validateUrl = (url) => {
-  if (!url) return { isValid: true, error: null }; // URL es opcional
-  
-  try {
-    const urlObj = new URL(url);
-    const isValid = urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
-    
-    return {
-      isValid,
-      error: isValid ? null : 'Por favor ingresa una URL válida (https://...)'
-    };
-  } catch {
-    return {
-      isValid: false,
-      error: 'Por favor ingresa una URL válida (https://...)'
-    };
-  }
-};
-
-/**
- * Valida formato de número de teléfono
- * Acepta formatos internacionales básicos
- */
-export const validatePhone = (phone) => {
-  if (!phone) return { isValid: true, error: null }; // Teléfono es opcional
-  
-  // Permitir números con o sin código de país, espacios, guiones y paréntesis
-  const phoneRegex = /^[\d\s\-\+\(\)]{8,20}$/;
-  const isValid = phoneRegex.test(phone);
-  
-  return {
-    isValid,
-    error: isValid ? null : 'Por favor ingresa un número de teléfono válido'
-  };
-};
-
-/**
- * Valida archivo de imagen
- */
-export const validateImageFile = (file) => {
-  if (!file) return { isValid: true, error: null }; // Imagen es opcional
-  
-  const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  const maxSize = 1024 * 1024; // 1MB
-  
-  if (!validTypes.includes(file.type)) {
-    return {
-      isValid: false,
-      error: 'Formato de archivo no válido (solo JPEG, PNG, GIF, WebP)'
-    };
-  }
-  
-  if (file.size > maxSize) {
-    return {
-      isValid: false,
-      error: 'El archivo es demasiado grande (máximo 1MB)'
-    };
-  }
-  
-  return { isValid: true, error: null };
-};
-
-/**
- * Valida longitud de texto
- */
-export const validateLength = (text, min, max) => {
-  if (!text) {
-    return {
-      isValid: min === 0,
-      error: min > 0 ? 'Este campo es requerido' : null
-    };
-  }
-  
-  const length = text.trim().length;
-  
-  if (length < min) {
-    return {
-      isValid: false,
-      error: `Debe tener al menos ${min} caracteres`
-    };
-  }
-  
-  if (max && length > max) {
-    return {
-      isValid: false,
-      error: `No puede exceder ${max} caracteres`
-    };
-  }
-  
-  return { isValid: true, error: null };
-};
-
-/**
- * Valida campo requerido
- */
-export const validateRequired = (value, fieldName = 'Este campo') => {
-  const isValid = value !== null && value !== undefined && value !== '';
-  
-  return {
-    isValid,
-    error: isValid ? null : `${fieldName} es requerido`
-  };
-};
-
-/**
- * Valida formato de color hexadecimal
- */
-export const validateHexColor = (color) => {
-  if (!color) return { isValid: false, error: 'Color es requerido' };
-  
-  const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-  const isValid = hexRegex.test(color);
-  
-  return {
-    isValid,
-    error: isValid ? null : 'Por favor ingresa un color hexadecimal válido (ej: #1a1a1a)'
-  };
+// Re-exportar validadores para mantener compatibilidad
+export {
+  validateEmail,
+  validateUrl,
+  validatePhone,
+  validateImageFile,
+  validateLength,
+  validateRequired,
+  validateHexColor
 };
 
 /**

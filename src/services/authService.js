@@ -1,4 +1,34 @@
+/**
+ * Servicio de autenticación refactorizado
+ * Usa validadores consolidados y manejo de errores HTTP centralizado
+ */
+
+import { validateEmail } from '../utils/validators.js';
+import { parseResponse, extractErrorMessage } from '../utils/httpHelpers.js';
+
 const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
+
+/**
+ * Maneja errores de respuesta HTTP con formato consistente
+ */
+const handleAuthError = async (response, defaultMessage) => {
+	let errorMessage = defaultMessage;
+
+	try {
+		const responseText = await response.text();
+		const errorData = JSON.parse(responseText);
+		errorMessage = errorData.message || errorData.error || errorData.title || errorMessage;
+
+		if (errorData.errors) {
+			const validationErrors = Object.values(errorData.errors).flat();
+			errorMessage = validationErrors.join(", ");
+		}
+	} catch {
+		errorMessage = defaultMessage;
+	}
+
+	throw new Error(`${defaultMessage} (${response.status}): ${errorMessage}`);
+};
 
 export const authService = {
 	async login(email, password) {
@@ -6,46 +36,22 @@ export const authService = {
 			throw new Error("Email y contraseña son requeridos");
 		}
 
-		if (!email.includes("@")) {
-			throw new Error("Formato de email inválido");
+		const emailValidation = validateEmail(email);
+		if (!emailValidation.isValid) {
+			throw new Error(emailValidation.error);
 		}
 
 		const requestBody = { email: email.trim(), password };
 
 		const response = await fetch(`${API_URL}/auth/login`, {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
+			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(requestBody),
 			credentials: "include",
 		});
 
 		if (!response.ok) {
-			let errorMessage = "Error en la autenticación";
-			let responseText = "";
-
-			try {
-				responseText = await response.text();
-
-				const errorData = JSON.parse(responseText);
-				errorMessage =
-					errorData.message ||
-					errorData.error ||
-					errorData.title ||
-					errorMessage;
-
-				if (errorData.errors) {
-					const validationErrors = Object.values(errorData.errors).flat();
-					errorMessage = validationErrors.join(", ");
-				}
-			} catch (_parseError) {
-				errorMessage = responseText || errorMessage;
-			}
-
-			throw new Error(
-				`Error de autenticación (${response.status}): ${errorMessage}`,
-			);
+			await handleAuthError(response, "Error en la autenticación");
 		}
 
 		const contentType = response.headers.get("content-type");
@@ -80,8 +86,9 @@ export const authService = {
 			throw new Error("Nombre completo, email y contraseña son requeridos");
 		}
 
-		if (!email.includes("@")) {
-			throw new Error("Formato de email inválido");
+		const emailValidation = validateEmail(email);
+		if (!emailValidation.isValid) {
+			throw new Error(emailValidation.error);
 		}
 
 		const requestBody = {
@@ -93,38 +100,13 @@ export const authService = {
 
 		const response = await fetch(`${API_URL}/users/owner`, {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
+			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(requestBody),
 			credentials: "include",
 		});
 
 		if (!response.ok) {
-			let errorMessage = "Error en el registro";
-			let responseText = "";
-
-			try {
-				responseText = await response.text();
-
-				const errorData = JSON.parse(responseText);
-				errorMessage =
-					errorData.message ||
-					errorData.error ||
-					errorData.title ||
-					errorMessage;
-
-				if (errorData.errors) {
-					const validationErrors = Object.values(errorData.errors).flat();
-					errorMessage = validationErrors.join(", ");
-				}
-			} catch (_parseError) {
-				errorMessage = responseText || errorMessage;
-			}
-
-			throw new Error(
-				`Error de registro (${response.status}): ${errorMessage}`,
-			);
+			await handleAuthError(response, "Error en el registro");
 		}
 
 		const userData = await response.json();
