@@ -1,5 +1,20 @@
 import React from "react";
+import PropTypes from "prop-types";
 
+/**
+ * Button Component
+ * Reusable button with Neobrutalist styling and multiple variants
+ *
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Button content
+ * @param {Function} props.onClick - Click handler
+ * @param {string} props.type - Button type (button, submit, reset)
+ * @param {string} props.variant - Visual variant (primary, secondary, danger, success, outline, white)
+ * @param {string} props.size - Button size (sm, md, lg)
+ * @param {boolean} props.disabled - Disabled state
+ * @param {boolean} props.loading - Loading state with spinner
+ * @param {string} props.className - Additional CSS classes
+ */
 const Button = ({
 	children,
 	onClick,
@@ -50,6 +65,17 @@ const Button = ({
 			{children}
 		</button>
 	);
+};
+
+Button.propTypes = {
+	children: PropTypes.node.isRequired,
+	onClick: PropTypes.func,
+	type: PropTypes.oneOf(["button", "submit", "reset"]),
+	variant: PropTypes.oneOf(["primary", "secondary", "danger", "success", "outline", "white"]),
+	size: PropTypes.oneOf(["sm", "md", "lg"]),
+	disabled: PropTypes.bool,
+	loading: PropTypes.bool,
+	className: PropTypes.string,
 };
 
 export default Button;

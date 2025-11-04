@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "../i18n/utils";
 import menuService from "../services/menuService";
+import { COLORS, FILE_SIZE } from "../constants";
 
 export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, existingBusiness = null, isEditing = false }) {
 	const { t } = useTranslation();
@@ -15,9 +16,9 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 		instagramUrl: existingBusiness?.instagramUrl || "",
 		twitterUrl: existingBusiness?.twitterUrl || "",
 		whatsAppNumber: existingBusiness?.whatsAppNumber || "",
-		primaryColor: existingBusiness?.primaryColor || "#1a1a1a",
-		secondaryColor: existingBusiness?.secondaryColor || "#004E71",
-		accentColor: existingBusiness?.accentColor || "#0A3342",
+		primaryColor: existingBusiness?.primaryColor || COLORS.PRIMARY,
+		secondaryColor: existingBusiness?.secondaryColor || COLORS.SECONDARY,
+		accentColor: existingBusiness?.accentColor || COLORS.ACCENT,
 		businessCategoryId: existingBusiness?.businessCategoryId?.toString() || "",
 	});
 
@@ -70,7 +71,6 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 	};
 
 	const handleLogoChange = (e) => {
-		let maxSize = 2097152 / 2;
 		const file = e.target.files[0];
 		if (file) {
 			const validTypes = [
@@ -84,7 +84,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				setError(t("business.invalidImageFormat"));
 				return;
 			}
-			if (file.size > maxSize) {
+			if (file.size > FILE_SIZE.LOGO_MAX) {
 				setError(t("business.imageSizeError"));
 				return;
 			}

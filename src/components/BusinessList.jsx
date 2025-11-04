@@ -67,7 +67,9 @@ export default function BusinessList({
 					),
 				})),
 			);
-		} catch (error) {}
+		} catch (error) {
+			console.error("Error adding menu item:", error);
+		}
 	};
 
 	const handleItemUpdated = async (updatedItem) => {
@@ -192,7 +194,9 @@ export default function BusinessList({
 					),
 				})),
 			);
-		} catch (error) {}
+		} catch (error) {
+			console.error("Error adding section:", error);
+		}
 	};
 
 	return (

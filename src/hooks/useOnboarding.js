@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { COLORS, TIMEOUTS } from '../constants';
 
 /**
  * Custom hook para gestionar el flujo de onboarding
@@ -20,9 +21,9 @@ export const useOnboarding = (userId, totalSteps = 5) => {
     instagramUrl: '',
     twitterUrl: '',
     whatsAppNumber: '',
-    primaryColor: '#1a1a1a',
-    secondaryColor: '#004E71',
-    accentColor: '#0A3342',
+    primaryColor: COLORS.PRIMARY,
+    secondaryColor: COLORS.SECONDARY,
+    accentColor: COLORS.ACCENT,
     userId: userId
   });
   const [errors, setErrors] = useState({});
@@ -42,7 +43,7 @@ export const useOnboarding = (userId, totalSteps = 5) => {
     if (userId && currentStep > 0) {
       const autoSaveInterval = setInterval(() => {
         saveProgress();
-      }, 30000);
+      }, TIMEOUTS.AUTO_SAVE);
 
       return () => clearInterval(autoSaveInterval);
     }
