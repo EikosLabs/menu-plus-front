@@ -2,21 +2,21 @@ import React from "react";
 import PropTypes from "prop-types";
 
 /**
- * ErrorAlert Component
- * Displays error messages with consistent styling and optional close button
+ * SuccessAlert Component
+ * Displays success messages with consistent styling and optional close button
  *
  * @param {Object} props
- * @param {string} props.error - Error message to display
+ * @param {string} props.message - Success message to display
  * @param {Function} props.onClose - Optional callback for close button
  */
-const ErrorAlert = ({ error, onClose }) => {
-	if (!error) return null;
+const SuccessAlert = ({ message, onClose }) => {
+	if (!message) return null;
 
 	return (
 		<div
-			className="mb-5 neo-alert neo-alert-error flex animate-fadeIn items-center"
+			className="mb-5 neo-alert neo-alert-success flex animate-fadeIn items-center bg-green-50 border-l-4 border-green-500 text-green-700 p-4"
 			role="alert"
-			aria-live="assertive"
+			aria-live="polite"
 		>
 			<svg
 				className="mr-3 h-6 w-6 flex-shrink-0"
@@ -29,15 +29,15 @@ const ErrorAlert = ({ error, onClose }) => {
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					strokeWidth={2.5}
-					d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+					d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
 				/>
 			</svg>
-			<span className="neo-text-bold flex-1">{error}</span>
+			<span className="neo-text-bold flex-1">{message}</span>
 			{onClose && (
 				<button
 					onClick={onClose}
 					className="ml-auto hover:opacity-70 transition-opacity"
-					aria-label="Cerrar mensaje de error"
+					aria-label="Cerrar mensaje de éxito"
 					type="button"
 				>
 					<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,9 +49,9 @@ const ErrorAlert = ({ error, onClose }) => {
 	);
 };
 
-ErrorAlert.propTypes = {
-	error: PropTypes.string,
+SuccessAlert.propTypes = {
+	message: PropTypes.string,
 	onClose: PropTypes.func,
 };
 
-export default ErrorAlert;
+export default SuccessAlert;

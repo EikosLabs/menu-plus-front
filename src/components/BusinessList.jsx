@@ -3,6 +3,14 @@ import menuService from "../services/menuService";
 import AddMenuItem from "./AddMenuItem";
 import QRCodeComponent from "./QRCodeComponent";
 import SectionManager from "./SectionManager";
+import {
+  addItemToMenu,
+  updateItemInMenu,
+  removeItemFromMenu,
+  addSectionToMenu,
+  updateSectionInMenu,
+  removeSectionFromMenu,
+} from "../utils/stateHelpers";
 
 export default function BusinessList({
 	businesses,
@@ -46,95 +54,15 @@ export default function BusinessList({
 
 	const handleItemAdded = async (menuId, newItem) => {
 		try {
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) =>
-						menu.id === menuId
-							? {
-									...menu,
-									menuItems: [...(menu.menuItems || []), newItem],
-									sections: menu.sections?.map((section) =>
-										section.id === newItem.sectionId
-											? {
-													...section,
-													menuItems: [...(section.menuItems || []), newItem],
-												}
-											: section,
-									),
-								}
-							: menu,
-					),
-				})),
-			);
-		} catch (error) {}
+			setBusinesses(prev => addItemToMenu(prev, menuId, newItem));
+		} catch (error) {
+			console.error("Error adding menu item:", error);
+		}
 	};
 
 	const handleItemUpdated = async (updatedItem) => {
 		try {
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) => {
-						// Encontrar el item actual y ver si cambió de sección
-						let oldSectionId = null;
-						menu.sections?.forEach((section) => {
-							const found = section.menuItems?.find(item => item.id === updatedItem.id);
-							if (found) {
-								oldSectionId = section.id;
-							}
-						});
-
-						// Normalizar IDs para comparación (pueden ser strings o numbers)
-						const normalizedOldSectionId = oldSectionId ? Number(oldSectionId) : null;
-						const normalizedNewSectionId = updatedItem.sectionId ? Number(updatedItem.sectionId) : null;
-						const changedSection = normalizedOldSectionId !== normalizedNewSectionId;
-
-						return {
-							...menu,
-							menuItems: menu.menuItems?.map((item) =>
-								item.id === updatedItem.id ? { ...item, ...updatedItem } : item,
-							),
-							sections: menu.sections?.map((section) => {
-								const sectionIdNum = Number(section.id);
-
-								// Si cambió de sección
-								if (changedSection) {
-									// Eliminar de la sección anterior
-									if (sectionIdNum === normalizedOldSectionId) {
-										return {
-											...section,
-											menuItems: section.menuItems?.filter((item) => item.id !== updatedItem.id) || [],
-										};
-									}
-									// Agregar a la nueva sección
-									if (sectionIdNum === normalizedNewSectionId) {
-										return {
-											...section,
-											menuItems: [...(section.menuItems || []), updatedItem],
-										};
-									}
-									// Otras secciones: sin cambios
-									return section;
-								}
-
-								// Si NO cambió de sección, solo actualizar en su sección actual
-								if (sectionIdNum === normalizedOldSectionId) {
-									return {
-										...section,
-										menuItems: section.menuItems?.map((item) =>
-											item.id === updatedItem.id ? { ...item, ...updatedItem } : item,
-										),
-									};
-								}
-
-								// Otras secciones: sin cambios
-								return section;
-							}),
-						};
-					}),
-				})),
-			);
+			setBusinesses(prev => updateItemInMenu(prev, updatedItem));
 		} catch (error) {
 			console.error('Error updating item:', error);
 		}
@@ -147,23 +75,7 @@ export default function BusinessList({
 
 		try {
 			await menuService.deleteMenuItem(itemId);
-
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) => ({
-						...menu,
-						menuItems: menu.menuItems?.filter((item) => item.id !== itemId),
-						sections: menu.sections?.map((section) => ({
-							...section,
-							menuItems: section.menuItems?.filter(
-								(item) => item.id !== itemId,
-							),
-						})),
-					})),
-				})),
-			);
-
+			setBusinesses(prev => removeItemFromMenu(prev, itemId));
 			alert(`Plato "${itemName}" eliminado correctamente.`);
 		} catch (error) {
 			alert(`Error al eliminar el plato: ${error.message}`);
@@ -176,23 +88,10 @@ export default function BusinessList({
 
 	const handleSectionAdded = async (newSection) => {
 		try {
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) =>
-						menu.id === newSection.menuId
-							? {
-									...menu,
-									sections: [
-										...(menu.sections || []),
-										{ ...newSection, menuItems: [] },
-									],
-								}
-							: menu,
-					),
-				})),
-			);
-		} catch (error) {}
+			setBusinesses(prev => addSectionToMenu(prev, newSection));
+		} catch (error) {
+			console.error("Error adding section:", error);
+		}
 	};
 
 	return (
