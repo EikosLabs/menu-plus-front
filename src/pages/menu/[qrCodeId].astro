@@ -17,15 +17,9 @@ let business = null;
 let customColors = null;
 
 // API URL - usa la variable de entorno o fallback
-// En el servidor (SSR), usamos el nombre del contenedor backend en Docker
-// En cliente usamos /api (nginx hace el proxy)
-const API_URL = import.meta.env.SSR 
-  ? 'http://menusesqr-back:8080/api'
-  : (import.meta.env.PUBLIC_API_URL || '/api');
-
 // API URL - usa la URL interna de Docker cuando se ejecuta en el servidor
-const API_URL = typeof window === 'undefined' 
-  ? 'http://back:8080/api' 
+const API_URL = typeof window === 'undefined'
+  ? 'http://back:8080/api'
   : '/api';
 
 // Fetch menu data

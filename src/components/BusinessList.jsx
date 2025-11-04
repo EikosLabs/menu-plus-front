@@ -369,6 +369,25 @@ export default function BusinessList({
 									</svg>
 									Ver QR
 								</button>
+								<a
+									href={`/brochure-editor?businessId=${business.id}`}
+									className="bg-white text-[#003A57] px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 font-medium text-sm flex items-center transition-all duration-300 transform hover:scale-105"
+								>
+									<svg
+										className="h-4 w-4 mr-1.5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+										/>
+									</svg>
+									Crear Folleto
+								</a>
 							</div>
 						</div>
 					</div>

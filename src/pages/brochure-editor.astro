@@ -1,0 +1,187 @@
+---
+/**
+ * Brochure Editor Page
+ * Page for creating and downloading printable menu brochures
+ */
+
+import Layout from '../layouts/Layout.astro';
+import BrochureEditor from '../components/BrochureEditor.jsx';
+
+// Check authentication
+const token = Astro.cookies.get('token')?.value;
+if (!token) {
+  return Astro.redirect('/login');
+}
+
+// Get business ID from query params
+const businessId = Astro.url.searchParams.get('businessId');
+if (!businessId) {
+  return Astro.redirect('/dashboard');
+}
+
+// Fetch business data
+const API_URL = import.meta.env.PROD
+  ? 'http://back:8080/api'
+  : 'http://localhost:8080/api';
+
+let business = null;
+let menus = [];
+let error = null;
+
+try {
+  // Fetch business
+  const businessResponse = await fetch(`${API_URL}/food-businesses/${businessId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!businessResponse.ok) {
+    throw new Error('Error al cargar el negocio');
+  }
+
+  business = await businessResponse.json();
+
+  // Fetch menus for this business
+  const menusResponse = await fetch(`${API_URL}/menus?foodBusinessId=${businessId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (menusResponse.ok) {
+    const menusData = await menusResponse.json();
+
+    // Fetch sections and items for each menu
+    if (Array.isArray(menusData)) {
+      menus = await Promise.all(
+        menusData.map(async (menu) => {
+          try {
+            // Fetch sections for this menu
+            const sectionsResponse = await fetch(
+              `${API_URL}/menus/${menu.id}/sections`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+              }
+            );
+
+            let sections = [];
+            if (sectionsResponse.ok) {
+              sections = await sectionsResponse.json();
+
+              // Fetch menu items for each section
+              sections = await Promise.all(
+                (sections || []).map(async (section) => {
+                  try {
+                    const itemsResponse = await fetch(
+                      `${API_URL}/menu-item?sectionId=${section.id}`,
+                      {
+                        headers: {
+                          'Authorization': `Bearer ${token}`,
+                        },
+                      }
+                    );
+
+                    let menuItems = [];
+                    if (itemsResponse.ok) {
+                      menuItems = await itemsResponse.json();
+                    }
+
+                    return {
+                      ...section,
+                      menuItems: Array.isArray(menuItems) ? menuItems : [],
+                    };
+                  } catch (err) {
+                    console.error('Error fetching items for section:', err);
+                    return {
+                      ...section,
+                      menuItems: [],
+                    };
+                  }
+                })
+              );
+            }
+
+            // Fetch uncategorized items (items without section)
+            let uncategorizedItems = [];
+            try {
+              const uncatResponse = await fetch(
+                `${API_URL}/menu-item?menuId=${menu.id}&uncategorized=true`,
+                {
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (uncatResponse.ok) {
+                uncategorizedItems = await uncatResponse.json();
+              }
+            } catch (err) {
+              console.error('Error fetching uncategorized items:', err);
+            }
+
+            return {
+              ...menu,
+              sections: Array.isArray(sections) ? sections : [],
+              uncategorizedItems: Array.isArray(uncategorizedItems) ? uncategorizedItems : [],
+            };
+          } catch (err) {
+            console.error('Error fetching menu details:', err);
+            return {
+              ...menu,
+              sections: [],
+              uncategorizedItems: [],
+            };
+          }
+        })
+      );
+    }
+  }
+} catch (err) {
+  console.error('Error fetching data:', err);
+  error = err.message;
+}
+
+const pageTitle = `Editor de Folletos - ${business?.name || 'MenuPlus'}`;
+---
+
+<Layout title={pageTitle}>
+  <main>
+    {error ? (
+      <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="bg-white border-neo p-8 shadow-neo-lg max-w-md">
+          <h1 class="text-2xl font-bold text-red-600 mb-4">Error</h1>
+          <p class="text-neo-gray mb-6">{error}</p>
+          <a
+            href="/dashboard"
+            class="inline-block px-6 py-3 bg-neo-flame text-white font-bold rounded border-neo shadow-neo-md hover:shadow-neo-lg"
+          >
+            Volver al Dashboard
+          </a>
+        </div>
+      </div>
+    ) : business ? (
+      <BrochureEditor
+        client:only="react"
+        business={business}
+        menus={menus}
+      />
+    ) : (
+      <div class="min-h-screen flex items-center justify-center">
+        <div class="text-center">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-neo-flame mb-4"></div>
+          <p class="text-neo-gray">Cargando...</p>
+        </div>
+      </div>
+    )}
+  </main>
+</Layout>
+
+<style>
+  main {
+    min-height: 100vh;
+  }
+</style>
