@@ -3,6 +3,7 @@ import menuService from "../services/menuService";
 import AddMenuItem from "./AddMenuItem";
 import QRCodeComponent from "./QRCodeComponent";
 import SectionManager from "./SectionManager";
+import FlyerEditor from "./FlyerEditor/FlyerEditor";
 
 export default function BusinessList({
 	businesses,
@@ -16,6 +17,7 @@ export default function BusinessList({
 	const [showSectionManager, setShowSectionManager] = useState(null);
 	const [selectedSection, setSelectedSection] = useState(null);
 	const [selectedMenuId, setSelectedMenuId] = useState(null);
+	const [showFlyerEditor, setShowFlyerEditor] = useState(null); // { businessId, menuId }
 
 	const handleShowAddMenuItem = (menuId, sectionId = null) => {
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
@@ -394,7 +396,7 @@ export default function BusinessList({
 											</svg>
 											{menu.name}
 										</h3>
-										<div className="flex gap-2 w-full sm:w-auto">
+										<div className="flex flex-wrap gap-2 w-full sm:w-auto">
 											<button
 												onClick={() => handleManageSections(menu.id)}
 												className="neo-btn neo-btn-secondary text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
@@ -413,6 +415,25 @@ export default function BusinessList({
 													/>
 												</svg>
 												Secciones
+											</button>
+											<button
+												onClick={() => setShowFlyerEditor({ businessId: business.id, menuId: menu.id })}
+												className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
+											>
+												<svg
+													className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														strokeWidth={2}
+														d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+													/>
+												</svg>
+												Crear Folleto
 											</button>
 											<button
 												onClick={() => {
@@ -676,6 +697,21 @@ export default function BusinessList({
 					onSectionAdded={handleSectionAdded}
 				/>
 			)}
+
+			{showFlyerEditor && (() => {
+				const business = businesses.find(b => b.id === showFlyerEditor.businessId);
+				const menu = business?.menus?.find(m => m.id === showFlyerEditor.menuId);
+				const menuItems = menu?.menuItems || [];
+
+				return (
+					<FlyerEditor
+						business={business}
+						menu={menu}
+						menuItems={menuItems}
+						onClose={() => setShowFlyerEditor(null)}
+					/>
+				);
+			})()}
 		</div>
 	);
 }
