@@ -3,7 +3,8 @@ import menuService from "../services/menuService";
 import AddMenuItem from "./AddMenuItem";
 import QRCodeComponent from "./QRCodeComponent";
 import SectionManager from "./SectionManager";
-import FlyerEditor from "./FlyerEditor/FlyerEditor";
+import MenuCardGenerator from "./FlyerEditor/MenuCardGenerator";
+import PromotionalFlyerGenerator from "./FlyerEditor/PromotionalFlyerGenerator";
 
 export default function BusinessList({
 	businesses,
@@ -17,7 +18,8 @@ export default function BusinessList({
 	const [showSectionManager, setShowSectionManager] = useState(null);
 	const [selectedSection, setSelectedSection] = useState(null);
 	const [selectedMenuId, setSelectedMenuId] = useState(null);
-	const [showFlyerEditor, setShowFlyerEditor] = useState(null); // { businessId, menuId }
+	const [showMenuCard, setShowMenuCard] = useState(null); // { businessId, menuId }
+	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null); // { businessId, menuId }
 
 	const handleShowAddMenuItem = (menuId, sectionId = null) => {
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
@@ -417,8 +419,29 @@ export default function BusinessList({
 												Secciones
 											</button>
 											<button
-												onClick={() => setShowFlyerEditor({ businessId: business.id, menuId: menu.id })}
+												onClick={() => setShowMenuCard({ businessId: business.id, menuId: menu.id })}
 												className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
+												title="Carta completa para imprimir"
+											>
+												<svg
+													className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														strokeWidth={2}
+														d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+													/>
+												</svg>
+												Crear Carta
+											</button>
+											<button
+												onClick={() => setShowPromotionalFlyer({ businessId: business.id, menuId: menu.id })}
+												className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
+												title="Folleto promocional"
 											>
 												<svg
 													className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0"
@@ -698,17 +721,32 @@ export default function BusinessList({
 				/>
 			)}
 
-			{showFlyerEditor && (() => {
-				const business = businesses.find(b => b.id === showFlyerEditor.businessId);
-				const menu = business?.menus?.find(m => m.id === showFlyerEditor.menuId);
+			{showMenuCard && (() => {
+				const business = businesses.find(b => b.id === showMenuCard.businessId);
+				const menu = business?.menus?.find(m => m.id === showMenuCard.menuId);
 				const menuItems = menu?.menuItems || [];
 
 				return (
-					<FlyerEditor
+					<MenuCardGenerator
 						business={business}
 						menu={menu}
 						menuItems={menuItems}
-						onClose={() => setShowFlyerEditor(null)}
+						onClose={() => setShowMenuCard(null)}
+					/>
+				);
+			})()}
+
+			{showPromotionalFlyer && (() => {
+				const business = businesses.find(b => b.id === showPromotionalFlyer.businessId);
+				const menu = business?.menus?.find(m => m.id === showPromotionalFlyer.menuId);
+				const menuItems = menu?.menuItems || [];
+
+				return (
+					<PromotionalFlyerGenerator
+						business={business}
+						menu={menu}
+						menuItems={menuItems}
+						onClose={() => setShowPromotionalFlyer(null)}
 					/>
 				);
 			})()}

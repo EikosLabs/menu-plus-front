@@ -21,8 +21,8 @@ export function FormField({
   };
 
   return (
-    <div className="neo-space-md">
-      <label htmlFor={name} className="neo-text neo-text-bold block mb-2">
+    <div className="mb-4">
+      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
         {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
@@ -37,7 +37,7 @@ export function FormField({
         disabled={disabled}
         maxLength={maxLength}
         required={required}
-        className={`neo-input w-full ${error ? 'border-red-500' : ''}`}
+        className={`neo-input w-full ${error ? 'neo-border-thick border-red-500' : ''}`}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${name}-error` : undefined}
       />
@@ -49,9 +49,9 @@ export function FormField({
       )}
 
       {error && (
-        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-2 flex items-center" role="alert">
+        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
           <svg
-            className="w-5 h-5 mr-2 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -91,8 +91,8 @@ export function TextAreaField({
   };
 
   return (
-    <div className="neo-space-md">
-      <label htmlFor={name} className="neo-text neo-text-bold block mb-2">
+    <div className="mb-4">
+      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
         {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
@@ -107,7 +107,7 @@ export function TextAreaField({
         maxLength={maxLength}
         rows={rows}
         required={required}
-        className={`neo-textarea w-full resize-none ${error ? 'border-red-500' : ''}`}
+        className={`neo-textarea w-full resize-none ${error ? 'neo-border-thick border-red-500' : ''}`}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${name}-error` : undefined}
       />
@@ -119,9 +119,9 @@ export function TextAreaField({
       )}
 
       {error && (
-        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-2 flex items-center" role="alert">
+        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
           <svg
-            className="w-5 h-5 mr-2 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -160,8 +160,8 @@ export function SelectField({
   };
 
   return (
-    <div className="neo-space-md">
-      <label htmlFor={name} className="neo-text neo-text-bold block mb-2">
+    <div className="mb-4">
+      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
         {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
@@ -173,7 +173,7 @@ export function SelectField({
         onChange={handleChange}
         disabled={disabled}
         required={required}
-        className={`neo-select w-full ${error ? 'border-red-500' : ''}`}
+        className={`neo-select w-full ${error ? 'neo-border-thick border-red-500' : ''}`}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${name}-error` : undefined}
       >
@@ -186,9 +186,9 @@ export function SelectField({
       </select>
 
       {error && (
-        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-2 flex items-center" role="alert">
+        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
           <svg
-            className="w-5 h-5 mr-2 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -262,8 +262,8 @@ export function FileUploadField({
   };
 
   return (
-    <div className="neo-space-md">
-      <label className="neo-text neo-text-bold block mb-2">
+    <div className="mb-4">
+      <label className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
         {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
@@ -274,7 +274,7 @@ export function FileUploadField({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          neo-border neo-border-thick border-dashed rounded-lg p-6 text-center cursor-pointer
+          neo-border neo-border-thick border-dashed rounded-lg p-4 text-center cursor-pointer
           transition-all duration-200
           ${isDragging ? 'border-neo-flame bg-neo-lavender neo-shadow-md' : 'border-neo-black hover:neo-shadow-sm'}
           ${error ? 'border-red-500' : ''}
@@ -312,7 +312,7 @@ export function FileUploadField({
         ) : (
           <div>
             <svg
-              className="w-12 h-12 mx-auto text-neo-black opacity-40 mb-3"
+              className="w-10 h-10 mx-auto text-neo-black opacity-40 mb-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -324,7 +324,7 @@ export function FileUploadField({
                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
               />
             </svg>
-            <p className="neo-text text-sm mb-1">
+            <p className="neo-text text-sm mb-0.5">
               Arrastra y suelta tu imagen aquí
             </p>
             <p className="neo-text text-xs opacity-60">
@@ -335,9 +335,9 @@ export function FileUploadField({
       </div>
 
       {error && (
-        <div className="neo-alert neo-alert-error mt-2 flex items-center" role="alert">
+        <div className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
           <svg
-            className="w-5 h-5 mr-2 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

@@ -56,9 +56,9 @@ export default function OnboardingComplete({
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 max-w-3xl mx-auto px-2">
-          <div className="neo-card neo-shadow-md bg-white p-3 sm:p-4">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-neo-sunset rounded-full flex items-center justify-center mx-auto mb-2 neo-border">
-              <svg className="w-5 h-5 text-neo-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="neo-card-3d bg-white p-3 sm:p-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-sunset rounded-full flex items-center justify-center mx-auto mb-2 neo-border-thick">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
@@ -66,9 +66,9 @@ export default function OnboardingComplete({
             <p className="neo-text text-xs opacity-70">Información básica lista</p>
           </div>
 
-          <div className="neo-card neo-shadow-md bg-white p-3 sm:p-4">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-neo-lavender rounded-full flex items-center justify-center mx-auto mb-2 neo-border">
-              <svg className="w-5 h-5 text-neo-flame" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="neo-card-3d bg-white p-3 sm:p-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-lavender rounded-full flex items-center justify-center mx-auto mb-2 neo-border-thick">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-neo-flame" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -76,9 +76,9 @@ export default function OnboardingComplete({
             <p className="neo-text text-xs opacity-70">Listo para usar</p>
           </div>
 
-          <div className="neo-card neo-shadow-md bg-white p-3 sm:p-4">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-neo-flame rounded-full flex items-center justify-center mx-auto mb-2 neo-border">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="neo-card-3d bg-white p-3 sm:p-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-flame rounded-full flex items-center justify-center mx-auto mb-2 neo-border-thick">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
