@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { exportToPDF } from './utils/pdfExport';
 import { FOLLETO_TEMPLATES, FOLLETO_FORMATS } from './utils/flyerTemplates';
 import PromotionalFlyerPreview from './PromotionalFlyerPreview';
@@ -21,6 +21,21 @@ export default function PromotionalFlyerGenerator({
 
   const template = FOLLETO_TEMPLATES[selectedTemplate];
   const maxItems = template.maxItems;
+
+  // Debug log
+  useEffect(() => {
+    console.log('PromotionalFlyerGenerator - menuItems:', menuItems);
+    console.log('PromotionalFlyerGenerator - business:', business);
+    console.log('PromotionalFlyerGenerator - menu:', menu);
+  }, [menuItems, business, menu]);
+
+  // Block body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   /**
    * Toggle item selection
@@ -91,8 +106,19 @@ export default function PromotionalFlyerGenerator({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-full max-w-7xl max-h-[95vh] flex flex-col overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4 overflow-auto"
+      onClick={(e) => {
+        // Close on backdrop click
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-auto max-w-7xl my-4 flex flex-col overflow-hidden"
+        style={{ maxHeight: 'calc(100vh - 2rem)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b-2 border-black">
           <div>
@@ -111,9 +137,9 @@ export default function PromotionalFlyerGenerator({
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Configuration */}
-          <div className="w-80 border-r-2 border-black overflow-auto p-4 space-y-4">
+          <div className="w-full md:w-80 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {/* Template Selection */}
             <div>
               <h3 className="neo-h5 mb-3">Tipo de Folleto</h3>
@@ -286,29 +312,29 @@ export default function PromotionalFlyerGenerator({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t-2 border-black bg-gray-50">
-          <div className="flex items-center gap-2">
-            <span className="neo-text-bold text-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-between p-3 sm:p-4 border-t-2 border-black bg-gray-50 gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center sm:text-left w-full sm:w-auto">
+            <span className="neo-text-bold text-xs sm:text-sm">
               {business?.name} - {menu?.name}
             </span>
-            <span className="text-gray-500 text-sm">
-              • {selectedItems.length} de {maxItems} platos seleccionados
+            <span className="text-gray-500 text-xs sm:text-sm">
+              • {selectedItems.length} de {maxItems} platos
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="neo-btn neo-btn-white"
+              className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs sm:text-sm"
             >
               Cancelar
             </button>
             <button
               onClick={handleExport}
               disabled={isExporting || selectedItems.length === 0}
-              className="neo-btn neo-btn-primary"
+              className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs sm:text-sm"
             >
-              {isExporting ? '⏳ Generando...' : '📄 Descargar Folleto PDF'}
+              {isExporting ? '⏳ Generando...' : '📄 Descargar PDF'}
             </button>
           </div>
         </div>
