@@ -5,6 +5,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { exportToPDF } from './utils/pdfExport';
 import { CARTA_TEMPLATES } from './utils/flyerTemplates';
 import MenuCardPreview from './MenuCardPreview';
+import menuService from '../../services/menuService';
 
 /**
  * Menu Card Generator - Full menu for printing
@@ -14,12 +15,24 @@ export default function MenuCardGenerator({
   business,
   menu,
   menuItems = [],
-  onClose
+  onClose,
+  savedFlyer = null
 }) {
-  const [selectedTemplate, setSelectedTemplate] = useState('elegante');
-  const [orderedItems, setOrderedItems] = useState([...menuItems]);
+  const [selectedTemplate, setSelectedTemplate] = useState(savedFlyer?.templateId || 'elegante');
+  const [orderedItems, setOrderedItems] = useState(() => {
+    if (savedFlyer?.itemsOrder && savedFlyer.itemsOrder.length > 0) {
+      // Reorder items based on saved order
+      const orderedIds = savedFlyer.itemsOrder;
+      const itemsMap = new Map(menuItems.map(item => [item.id, item]));
+      return orderedIds.map(id => itemsMap.get(id)).filter(Boolean);
+    }
+    return [...menuItems];
+  });
   const [isExporting, setIsExporting] = useState(false);
-  const [paperSize, setPaperSize] = useState('A4');
+  const [paperSize, setPaperSize] = useState(savedFlyer?.paperSize || 'A4');
+  const [cartaName, setCartaName] = useState(savedFlyer?.name || `Carta ${business?.name || 'Menu'} - ${new Date().toLocaleDateString()}`);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedId, setSavedId] = useState(savedFlyer?.id || null);
 
   const previewRef = useRef(null);
 
@@ -46,6 +59,43 @@ export default function MenuCardGenerator({
   };
 
   /**
+   * Save carta configuration to backend
+   */
+  const handleSave = async () => {
+    if (!cartaName.trim()) {
+      alert('Por favor ingresa un nombre para la carta');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const flyerData = {
+        name: cartaName,
+        type: 'carta',
+        templateId: selectedTemplate,
+        selectedItemIds: JSON.stringify([]), // Carta shows all items
+        itemsOrder: JSON.stringify(orderedItems.map(item => item.id)),
+        paperSize: paperSize,
+      };
+
+      if (savedId) {
+        // Update existing
+        await menuService.updateFlyer(savedId, flyerData);
+        alert('Carta actualizada correctamente');
+      } else {
+        // Create new
+        const result = await menuService.createFlyer(menu.id, flyerData);
+        setSavedId(result.id);
+        alert('Carta guardada correctamente');
+      }
+    } catch (error) {
+      alert(`Error al guardar: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /**
    * Export to PDF
    */
   const handleExport = async () => {
@@ -54,7 +104,7 @@ export default function MenuCardGenerator({
     setIsExporting(true);
     try {
       await exportToPDF(previewRef.current, {
-        fileName: `${business?.name || 'menu'}-carta.pdf`,
+        fileName: `${cartaName || business?.name || 'menu'}-carta.pdf`,
         paperSize,
         orientation: 'portrait',
         quality: 2,
@@ -118,6 +168,23 @@ export default function MenuCardGenerator({
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Configuration */}
           <div className="w-full md:w-80 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+            {/* Carta Name */}
+            <div>
+              <h3 className="neo-h5 mb-3">Nombre de la Carta</h3>
+              <input
+                type="text"
+                value={cartaName}
+                onChange={(e) => setCartaName(e.target.value)}
+                className="w-full neo-border rounded-lg px-3 py-2 neo-text text-sm"
+                placeholder="Ej: Carta Elegante 2024"
+              />
+              {savedId && (
+                <p className="neo-text text-xs text-neo-flame mt-1">
+                  ✓ Guardada
+                </p>
+              )}
+            </div>
+
             {/* Template Selection */}
             <div>
               <h3 className="neo-h5 mb-3">Diseño de la Carta</h3>
@@ -233,6 +300,13 @@ export default function MenuCardGenerator({
               className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs sm:text-sm"
             >
               Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving || !cartaName.trim()}
+              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs sm:text-sm"
+            >
+              {isSaving ? '⏳ Guardando...' : savedId ? '💾 Actualizar' : '💾 Guardar'}
             </button>
             <button
               onClick={handleExport}

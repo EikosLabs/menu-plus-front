@@ -5,6 +5,7 @@ import QRCodeComponent from "./QRCodeComponent";
 import SectionManager from "./SectionManager";
 import MenuCardGenerator from "./FlyerEditor/MenuCardGenerator";
 import PromotionalFlyerGenerator from "./FlyerEditor/PromotionalFlyerGenerator";
+import SavedFlyersList from "./FlyerEditor/SavedFlyersList";
 
 export default function BusinessList({
 	businesses,
@@ -20,6 +21,7 @@ export default function BusinessList({
 	const [selectedMenuId, setSelectedMenuId] = useState(null);
 	const [showMenuCard, setShowMenuCard] = useState(null); // { businessId, menuId }
 	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null); // { businessId, menuId }
+	const [showSavedFlyers, setShowSavedFlyers] = useState(null); // { menuId }
 
 	const handleShowAddMenuItem = (menuId, sectionId = null) => {
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
@@ -141,6 +143,41 @@ export default function BusinessList({
 			);
 		} catch (error) {
 			console.error('Error updating item:', error);
+		}
+	};
+
+	const handleLoadFlyer = (flyer, businessId, menuId) => {
+		setShowSavedFlyers(null);
+
+		// Parse the data
+		const selectedItemIds = flyer.selectedItemIds ? JSON.parse(flyer.selectedItemIds) : [];
+		const itemsOrder = flyer.itemsOrder ? JSON.parse(flyer.itemsOrder) : [];
+
+		// Open the appropriate editor with the saved configuration
+		if (flyer.type === 'carta') {
+			setShowMenuCard({
+				businessId,
+				menuId,
+				savedFlyer: {
+					id: flyer.id,
+					name: flyer.name,
+					templateId: flyer.templateId,
+					itemsOrder: itemsOrder,
+					paperSize: flyer.paperSize
+				}
+			});
+		} else {
+			setShowPromotionalFlyer({
+				businessId,
+				menuId,
+				savedFlyer: {
+					id: flyer.id,
+					name: flyer.name,
+					templateId: flyer.templateId,
+					selectedItemIds: selectedItemIds,
+					paperSize: flyer.paperSize
+				}
+			});
 		}
 	};
 
@@ -459,6 +496,26 @@ export default function BusinessList({
 												Crear Folleto
 											</button>
 											<button
+												onClick={() => setShowSavedFlyers({ businessId: business.id, menuId: menu.id })}
+												className="neo-btn neo-btn-secondary text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
+												title="Ver folletos y cartas guardados"
+											>
+												<svg
+													className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														strokeWidth={2}
+														d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"
+													/>
+												</svg>
+												Ver Guardados
+											</button>
+											<button
 												onClick={() => {
 													setSelectedSection(null);
 													handleShowAddMenuItem(menu.id);
@@ -732,6 +789,7 @@ export default function BusinessList({
 						menu={menu}
 						menuItems={menuItems}
 						onClose={() => setShowMenuCard(null)}
+						savedFlyer={showMenuCard.savedFlyer}
 					/>
 				);
 			})()}
@@ -747,6 +805,21 @@ export default function BusinessList({
 						menu={menu}
 						menuItems={menuItems}
 						onClose={() => setShowPromotionalFlyer(null)}
+						savedFlyer={showPromotionalFlyer.savedFlyer}
+					/>
+				);
+			})()}
+
+			{showSavedFlyers && (() => {
+				const menu = businesses
+					.find(b => b.id === showSavedFlyers.businessId)
+					?.menus?.find(m => m.id === showSavedFlyers.menuId);
+
+				return (
+					<SavedFlyersList
+						menu={menu}
+						onClose={() => setShowSavedFlyers(null)}
+						onLoadFlyer={(flyer) => handleLoadFlyer(flyer, showSavedFlyers.businessId, showSavedFlyers.menuId)}
 					/>
 				);
 			})()}

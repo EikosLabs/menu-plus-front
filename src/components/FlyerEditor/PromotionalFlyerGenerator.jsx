@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { exportToPDF } from './utils/pdfExport';
 import { FOLLETO_TEMPLATES, FOLLETO_FORMATS } from './utils/flyerTemplates';
 import PromotionalFlyerPreview from './PromotionalFlyerPreview';
+import menuService from '../../services/menuService';
 
 /**
  * Promotional Flyer Generator - Small promotional prints
@@ -11,11 +12,22 @@ export default function PromotionalFlyerGenerator({
   business,
   menu,
   menuItems = [],
-  onClose
+  onClose,
+  savedFlyer = null
 }) {
-  const [selectedTemplate, setSelectedTemplate] = useState('especiales');
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(savedFlyer?.templateId || 'especiales');
+  const [selectedItems, setSelectedItems] = useState(() => {
+    if (savedFlyer?.selectedItemIds && savedFlyer.selectedItemIds.length > 0) {
+      // Get selected items based on saved IDs
+      const selectedIds = savedFlyer.selectedItemIds;
+      return menuItems.filter(item => selectedIds.includes(item.id));
+    }
+    return [];
+  });
   const [isExporting, setIsExporting] = useState(false);
+  const [folletoName, setFolletoName] = useState(savedFlyer?.name || `Folleto ${business?.name || 'Menu'} - ${new Date().toLocaleDateString()}`);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedId, setSavedId] = useState(savedFlyer?.id || null);
 
   const previewRef = useRef(null);
 
@@ -80,6 +92,48 @@ export default function PromotionalFlyerGenerator({
   };
 
   /**
+   * Save folleto configuration to backend
+   */
+  const handleSave = async () => {
+    if (!folletoName.trim()) {
+      alert('Por favor ingresa un nombre para el folleto');
+      return;
+    }
+
+    if (selectedItems.length === 0) {
+      alert('Debes seleccionar al menos un plato');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const flyerData = {
+        name: folletoName,
+        type: 'folleto',
+        templateId: selectedTemplate,
+        selectedItemIds: JSON.stringify(selectedItems.map(item => item.id)),
+        itemsOrder: JSON.stringify(selectedItems.map(item => item.id)),
+        paperSize: 'A4',
+      };
+
+      if (savedId) {
+        // Update existing
+        await menuService.updateFlyer(savedId, flyerData);
+        alert('Folleto actualizado correctamente');
+      } else {
+        // Create new
+        const result = await menuService.createFlyer(menu.id, flyerData);
+        setSavedId(result.id);
+        alert('Folleto guardado correctamente');
+      }
+    } catch (error) {
+      alert(`Error al guardar: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /**
    * Export to PDF
    */
   const handleExport = async () => {
@@ -93,7 +147,7 @@ export default function PromotionalFlyerGenerator({
     setIsExporting(true);
     try {
       await exportToPDF(previewRef.current, {
-        fileName: `${business?.name || 'menu'}-folleto.pdf`,
+        fileName: `${folletoName || business?.name || 'menu'}-folleto.pdf`,
         paperSize: 'A4',
         orientation: 'portrait',
         quality: 2,
@@ -140,6 +194,23 @@ export default function PromotionalFlyerGenerator({
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Configuration */}
           <div className="w-full md:w-80 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+            {/* Folleto Name */}
+            <div>
+              <h3 className="neo-h5 mb-3">Nombre del Folleto</h3>
+              <input
+                type="text"
+                value={folletoName}
+                onChange={(e) => setFolletoName(e.target.value)}
+                className="w-full neo-border rounded-lg px-3 py-2 neo-text text-sm"
+                placeholder="Ej: Especiales de la Semana"
+              />
+              {savedId && (
+                <p className="neo-text text-xs text-neo-flame mt-1">
+                  ✓ Guardado
+                </p>
+              )}
+            </div>
+
             {/* Template Selection */}
             <div>
               <h3 className="neo-h5 mb-3">Tipo de Folleto</h3>
@@ -328,6 +399,13 @@ export default function PromotionalFlyerGenerator({
               className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs sm:text-sm"
             >
               Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving || !folletoName.trim() || selectedItems.length === 0}
+              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs sm:text-sm"
+            >
+              {isSaving ? '⏳ Guardando...' : savedId ? '💾 Actualizar' : '💾 Guardar'}
             </button>
             <button
               onClick={handleExport}
