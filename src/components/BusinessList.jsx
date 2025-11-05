@@ -781,7 +781,7 @@ export default function BusinessList({
 			{showMenuCard && (() => {
 				const business = businesses.find(b => b.id === showMenuCard.businessId);
 				const menu = business?.menus?.find(m => m.id === showMenuCard.menuId);
-				const menuItems = menu?.menuItems || [];
+				const menuItems = menu?.sections?.flatMap(section => section.menuItems || []) || [];
 
 				return (
 					<MenuCardGenerator
@@ -797,7 +797,7 @@ export default function BusinessList({
 			{showPromotionalFlyer && (() => {
 				const business = businesses.find(b => b.id === showPromotionalFlyer.businessId);
 				const menu = business?.menus?.find(m => m.id === showPromotionalFlyer.menuId);
-				const menuItems = menu?.menuItems || [];
+				const menuItems = menu?.sections?.flatMap(section => section.menuItems || []) || [];
 
 				return (
 					<PromotionalFlyerGenerator
