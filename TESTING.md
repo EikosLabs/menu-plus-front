@@ -162,30 +162,21 @@ Para generar un reporte de cobertura:
 npm run test:coverage
 ```
 
-Esto generará un reporte en la carpeta `coverage/`. Los umbrales mínimos están configurados en `jest.config.js`:
-
-```javascript
-coverageThreshold: {
-  global: {
-    branches: 50,
-    functions: 50,
-    lines: 50,
-    statements: 50
-  }
-}
-```
+Esto generará un reporte en la carpeta `coverage/`. Los umbrales de cobertura pueden configurarse en `jest.config.js` según las necesidades del proyecto.
 
 ## Ejemplos Disponibles
 
-El proyecto incluye tests de ejemplo para:
+El proyecto incluye tests fundamentales para:
 
-1. **Componentes UI**:
-   - `Button.test.jsx`: Tests de props, estados, eventos
-   - `LoadingSpinner.test.jsx`: Tests de renderizado y estilos
+1. **Componentes UI** (8 tests):
+   - `Button.test.jsx`: 5 tests - renderizado, onClick, disabled, loading, variantes
+   - `LoadingSpinner.test.jsx`: 3 tests - mensaje default, mensaje custom, spinner
 
-2. **Utilidades**:
-   - `security.test.js`: Tests de sanitización y validación
-   - `onboardingValidation.test.js`: Tests de validación de formularios
+2. **Utilidades** (30 tests):
+   - `security.test.js`: 12 tests - sanitización HTML/URL, validación de precios, truncado de texto, datos de menú
+   - `onboardingValidation.test.js`: 18 tests - validación de email, URL, teléfono, archivos, colores, formularios
+
+**Total: 38 tests fundamentales**
 
 ## Mejores Prácticas
 

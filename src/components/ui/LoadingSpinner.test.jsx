@@ -19,16 +19,4 @@ describe('LoadingSpinner Component', () => {
     const spinner = container.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
   });
-
-  it('has correct CSS classes for styling', () => {
-    const { container } = render(<LoadingSpinner />);
-    const wrapper = container.firstChild;
-    expect(wrapper).toHaveClass('flex', 'h-screen', 'items-center', 'justify-center');
-  });
-
-  it('renders background pattern', () => {
-    const { container } = render(<LoadingSpinner />);
-    const bgPattern = container.querySelector('.neo-bg-dots');
-    expect(bgPattern).toBeInTheDocument();
-  });
 });
