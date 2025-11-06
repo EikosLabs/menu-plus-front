@@ -34,7 +34,22 @@ try {
   });
 
   if (!response.ok) {
-    throw new Error(`Unable to load menu (${response.status})`);
+    // Try to get error message from response
+    let errorMessage = `Unable to load menu (${response.status})`;
+    try {
+      const errorData = await response.json();
+      if (errorData.error) {
+        errorMessage = errorData.error;
+      }
+    } catch {
+      // If response is not JSON, use default message
+      if (response.status === 400) {
+        errorMessage = 'Invalid QR code format. Please scan the QR code again or contact support.';
+      } else if (response.status === 404) {
+        errorMessage = 'Menu not found. Please verify the QR code or contact the restaurant.';
+      }
+    }
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
