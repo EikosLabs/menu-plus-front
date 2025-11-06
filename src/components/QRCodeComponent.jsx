@@ -23,6 +23,14 @@ export default function QRCodeComponent({
 			: "";
 	}, [businessQrCodeId]);
 
+	// Bloquear scroll cuando el modal está abierto
+	useEffect(() => {
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = 'unset';
+		};
+	}, []);
+
 	useEffect(() => {
 		let isMounted = true;
 		let timeoutId = null;
@@ -109,6 +117,7 @@ export default function QRCodeComponent({
 			const padding = 60;
 			const qrSize = 400;
 			const totalWidth = qrSize + padding * 2;
+			const totalHeight = qrSize + padding * 2 + 130; // QR + padding + espacio para textos
 
 			canvas.width = totalWidth;
 			canvas.height = totalHeight;
@@ -255,15 +264,19 @@ export default function QRCodeComponent({
 	};
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
-			<div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-auto overflow-hidden">
-				<div className="p-6">
+		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+			<div className="relative bg-white neo-border neo-shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto">
+				{/* Header con título y botón cerrar */}
+				<div className="relative border-b neo-border px-4 py-3 sm:px-5 sm:py-4 bg-neo-lavender">
+					<h3 className="neo-heading neo-h4 text-base sm:text-lg text-center pr-8">
+						Código QR del Menú
+					</h3>
 					<button
 						onClick={onClose}
-						className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+						className="absolute top-2 right-2 sm:top-3 sm:right-3 neo-btn neo-btn-sm bg-white hover:bg-gray-100"
 					>
 						<svg
-							className="w-6 h-6"
+							className="w-5 h-5"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
@@ -276,7 +289,9 @@ export default function QRCodeComponent({
 							/>
 						</svg>
 					</button>
+				</div>
 
+				<div className="p-4 sm:p-5">
 					{loading && (
 						<div className="flex flex-col items-center justify-center py-12">
 							<div className="animate-spin rounded-full h-12 w-12 border-4 border-[#1a1a1a] border-t-transparent mb-4"></div>
@@ -312,8 +327,8 @@ export default function QRCodeComponent({
 					)}
 
 					{!loading && !error && qrUrl && (
-						<div className="space-y-6">
-							<div className="bg-slate-50 rounded-lg p-4">
+						<div className="space-y-4 sm:space-y-6">
+							<div className="bg-slate-50 rounded-lg p-3 sm:p-4">
 								<div className="flex items-center justify-between">
 									<div className="flex-1 min-w-0">
 										<p className="text-xs text-slate-500 mb-1">URL del menú:</p>
@@ -323,10 +338,10 @@ export default function QRCodeComponent({
 									</div>
 									<button
 										onClick={handleCopyUrl}
-										className={`ml-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+										className={`ml-3 neo-btn neo-btn-sm ${
 											copied
-												? "bg-green-100 text-green-700 scale-95"
-												: "bg-slate-200 text-slate-700 hover:bg-slate-300"
+												? "bg-green-400 text-neo-black"
+												: "neo-btn-secondary"
 										}`}
 									>
 										{copied ? (
@@ -369,22 +384,22 @@ export default function QRCodeComponent({
 							</div>
 
 							<div className="text-center">
-								<div className="bg-white p-6 rounded-xl border-2 border-slate-200 inline-block">
+								<div className="bg-white p-4 sm:p-6 rounded-xl border-2 border-slate-200 inline-block">
 									<img
 										src={qrUrl}
 										alt="Código QR del menú"
-										className="w-48 h-48 mx-auto"
+										className="w-40 h-40 sm:w-48 sm:h-48 mx-auto"
 									/>
 								</div>
-								<p className="text-slate-600 text-sm mt-4">
+								<p className="text-slate-600 text-xs sm:text-sm mt-3 sm:mt-4 px-2">
 									Escanea este código QR para acceder al menú digital
 								</p>
 							</div>
 
-							<div className="grid grid-cols-2 gap-3">
+							<div className="grid grid-cols-2 gap-2 sm:gap-3">
 								<button
 									onClick={() => window.open(menuUrl, "_blank")}
-									className="flex items-center justify-center px-4 py-3 bg-[#E05C33] text-white rounded-lg hover:bg-[#d14a26] transition-colors font-medium"
+									className="neo-btn neo-btn-primary flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -404,7 +419,7 @@ export default function QRCodeComponent({
 
 								<button
 									onClick={handleDownloadQr}
-									className="flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+									className="neo-btn neo-btn-secondary flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -423,10 +438,10 @@ export default function QRCodeComponent({
 								</button>
 							</div>
 
-							<div className="grid grid-cols-2 gap-3">
+							<div className="grid grid-cols-2 gap-2 sm:gap-3">
 								<button
 									onClick={handlePrintQr}
-									className="flex items-center justify-center px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
+									className="neo-btn bg-green-400 neo-border neo-shadow-md text-neo-black hover:bg-green-500 flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -446,7 +461,7 @@ export default function QRCodeComponent({
 
 								<button
 									onClick={() => setShowShareMenu(!showShareMenu)}
-									className="flex items-center justify-center px-4 py-3 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors font-medium"
+									className="neo-btn neo-btn-outline flex items-center justify-center text-sm sm:text-base"
 								>
 									<svg
 										className="w-5 h-5 mr-2"
@@ -487,10 +502,10 @@ export default function QRCodeComponent({
 					)}
 				</div>
 
-				<div className="bg-slate-50 px-6 py-4 flex justify-end">
+				<div className="bg-neo-lavender px-4 py-3 sm:px-6 sm:py-4 flex justify-end neo-border-t">
 					<button
 						onClick={onClose}
-						className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+						className="neo-btn neo-btn-white"
 					>
 						Cerrar
 					</button>

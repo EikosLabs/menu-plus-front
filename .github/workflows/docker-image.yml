@@ -32,7 +32,7 @@ jobs:
             sudo docker rmi menu-plus-front:latest || true
             sudo docker build --no-cache -t menu-plus-front:latest .
             cd /home/ubuntu
-            sudo docker compose up -d front
+            sudo docker compose up -d  --no-deps front
             sudo docker image prune -f
             echo "✅ Frontend deployed successfully!"
             sudo docker logs menusesqr-front --tail 20

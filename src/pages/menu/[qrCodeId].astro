@@ -8,6 +8,7 @@ import MenuSection from '../../components/menu/MenuSection.astro';
 import ItemModal from '../../components/menu/ItemModal.astro';
 import SurpriseButton from '../../components/menu/SurpriseButton.astro';
 import { sanitizeMenuData } from '../../utils/security.js';
+import '../../styles/menu-variables.css';
 
 const { qrCodeId } = Astro.params;
 
@@ -23,17 +24,32 @@ const API_URL = import.meta.env.SSR
   ? 'http://menusesqr-back:8080/api'
   : (import.meta.env.PUBLIC_API_URL || '/api');
 
-// API URL - usa la URL interna de Docker cuando se ejecuta en el servidor
-const API_URL = typeof window === 'undefined' 
-  ? 'http://back:8080/api' 
-  : '/api';
-
 // Fetch menu data
 try {
-  const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`);
+  const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`, {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  });
 
   if (!response.ok) {
-    throw new Error(`Unable to load menu (${response.status})`);
+    // Try to get error message from response
+    let errorMessage = `Unable to load menu (${response.status})`;
+    try {
+      const errorData = await response.json();
+      if (errorData.error) {
+        errorMessage = errorData.error;
+      }
+    } catch {
+      // If response is not JSON, use default message
+      if (response.status === 400) {
+        errorMessage = 'Invalid QR code format. Please scan the QR code again or contact support.';
+      } else if (response.status === 404) {
+        errorMessage = 'Menu not found. Please verify the QR code or contact the restaurant.';
+      }
+    }
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
@@ -69,8 +85,6 @@ if (menu) {
 ---
 
 <Layout title={business?.name || 'Menu'}>
-  <link rel="stylesheet" href="/src/styles/menu-variables.css" />
-
   {customColors && (customColors.primary || customColors.secondary || customColors.accent) && (
     <style is:inline set:html={`
       :root {

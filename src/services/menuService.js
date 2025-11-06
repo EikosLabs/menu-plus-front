@@ -578,6 +578,101 @@ class MenuService {
 			return [];
 		}
 	}
+
+	async createFlyer(menuId, flyerData) {
+		if (!flyerData.name) {
+			throw new Error("El nombre del folleto/carta es requerido");
+		}
+
+		const flyerPayload = {
+			name: flyerData.name,
+			type: flyerData.type || "folleto",
+			templateId: flyerData.templateId || "elegante",
+			selectedItemIds: flyerData.selectedItemIds || "",
+			itemsOrder: flyerData.itemsOrder || "",
+			paperSize: flyerData.paperSize || "A4",
+			menuId: menuId,
+		};
+
+		const response = await this.apiClient.post(
+			`/menus/${menuId}/flyers`,
+			flyerPayload,
+		);
+
+		if (response.isEmpty) {
+			return {
+				...flyerPayload,
+				id: Date.now(),
+				createdAt: new Date().toISOString(),
+			};
+		}
+
+		return response.data;
+	}
+
+	async getFlyer(flyerId) {
+		try {
+			const response = await this.apiClient.get(`/flyers/${flyerId}`);
+
+			if (response.isEmpty) {
+				throw new Error(`Folleto con ID ${flyerId} no encontrado`);
+			}
+
+			return response.data;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async getFlyersByMenu(menuId) {
+		try {
+			const response = await this.apiClient.get(`/menus/${menuId}/flyers`);
+
+			if (response.isEmpty) {
+				return [];
+			}
+
+			return response.data;
+		} catch (_error) {
+			return [];
+		}
+	}
+
+	async updateFlyer(flyerId, flyerData) {
+		const flyerPayload = {
+			name: flyerData.name,
+			type: flyerData.type,
+			templateId: flyerData.templateId,
+			selectedItemIds: flyerData.selectedItemIds,
+			itemsOrder: flyerData.itemsOrder,
+			paperSize: flyerData.paperSize,
+			pdfKey: flyerData.pdfKey,
+		};
+
+		Object.keys(flyerPayload).forEach(
+			(key) => flyerPayload[key] === undefined && delete flyerPayload[key],
+		);
+
+		const response = await this.apiClient.put(
+			`/flyers/${flyerId}`,
+			flyerPayload,
+		);
+
+		if (response.isEmpty) {
+			return {
+				id: flyerId,
+				...flyerPayload,
+				updatedAt: new Date().toISOString(),
+			};
+		}
+
+		return response.data;
+	}
+
+	async deleteFlyer(flyerId) {
+		await this.apiClient.delete(`/flyers/${flyerId}`);
+		return true;
+	}
 }
 
 const apiClient = new ApiClient(API_URL);
@@ -608,6 +703,12 @@ export default {
 		menuService.moveSectionUp(menuId, sectionId),
 	moveSectionDown: (menuId, sectionId) =>
 		menuService.moveSectionDown(menuId, sectionId),
+
+	createFlyer: (menuId, data) => menuService.createFlyer(menuId, data),
+	getFlyer: (flyerId) => menuService.getFlyer(flyerId),
+	getFlyersByMenu: (menuId) => menuService.getFlyersByMenu(menuId),
+	updateFlyer: (flyerId, data) => menuService.updateFlyer(flyerId, data),
+	deleteFlyer: (flyerId) => menuService.deleteFlyer(flyerId),
 
 	uploadImage: (file) => imageUploader.upload(file),
 

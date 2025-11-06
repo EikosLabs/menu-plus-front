@@ -21,12 +21,12 @@ export function FormField({
   };
 
   return (
-    <div className="form-field">
-      <label htmlFor={name} className="form-label">
+    <div className="mb-4">
+      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
-        {required && <span className="required">*</span>}
+        {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
-      
+
       <input
         id={name}
         name={name}
@@ -37,28 +37,29 @@ export function FormField({
         disabled={disabled}
         maxLength={maxLength}
         required={required}
-        className={`form-input ${error ? 'error' : ''}`}
+        className={`neo-input w-full ${error ? 'neo-border-thick border-red-500' : ''}`}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${name}-error` : undefined}
       />
-      
+
       {showCharCount && maxLength && (
-        <div className="text-xs text-gray-500 mt-1 text-right">
+        <div className="neo-text text-xs mt-1 text-right text-neo-black opacity-60">
           {value.length} / {maxLength}
         </div>
       )}
-      
+
       {error && (
-        <div id={`${name}-error`} className="form-error" role="alert">
-          <svg 
-            fill="none" 
-            stroke="currentColor" 
+        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
+          <svg
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
@@ -90,12 +91,12 @@ export function TextAreaField({
   };
 
   return (
-    <div className="form-field">
-      <label htmlFor={name} className="form-label">
+    <div className="mb-4">
+      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
-        {required && <span className="required">*</span>}
+        {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
-      
+
       <textarea
         id={name}
         name={name}
@@ -106,28 +107,29 @@ export function TextAreaField({
         maxLength={maxLength}
         rows={rows}
         required={required}
-        className={`form-input resize-none ${error ? 'error' : ''}`}
+        className={`neo-textarea w-full resize-none ${error ? 'neo-border-thick border-red-500' : ''}`}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${name}-error` : undefined}
       />
-      
+
       {showCharCount && maxLength && (
-        <div className="text-xs text-gray-500 mt-1 text-right">
+        <div className="neo-text text-xs mt-1 text-right text-neo-black opacity-60">
           {value.length} / {maxLength}
         </div>
       )}
-      
+
       {error && (
-        <div id={`${name}-error`} className="form-error" role="alert">
-          <svg 
-            fill="none" 
-            stroke="currentColor" 
+        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
+          <svg
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
@@ -158,12 +160,12 @@ export function SelectField({
   };
 
   return (
-    <div className="form-field">
-      <label htmlFor={name} className="form-label">
+    <div className="mb-4">
+      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
-        {required && <span className="required">*</span>}
+        {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
-      
+
       <select
         id={name}
         name={name}
@@ -171,7 +173,7 @@ export function SelectField({
         onChange={handleChange}
         disabled={disabled}
         required={required}
-        className={`form-input ${error ? 'error' : ''}`}
+        className={`neo-select w-full ${error ? 'neo-border-thick border-red-500' : ''}`}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${name}-error` : undefined}
       >
@@ -182,18 +184,19 @@ export function SelectField({
           </option>
         ))}
       </select>
-      
+
       {error && (
-        <div id={`${name}-error`} className="form-error" role="alert">
-          <svg 
-            fill="none" 
-            stroke="currentColor" 
+        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
+          <svg
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
@@ -259,21 +262,21 @@ export function FileUploadField({
   };
 
   return (
-    <div className="form-field">
-      <label className="form-label">
+    <div className="mb-4">
+      <label className="neo-text neo-text-bold block mb-1.5 text-sm">
         {label}
-        {required && <span className="required">*</span>}
+        {required && <span className="text-neo-flame ml-1">*</span>}
       </label>
-      
+
       <div
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
-          transition-colors duration-200
-          ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+          neo-border neo-border-thick border-dashed rounded-lg p-4 text-center cursor-pointer
+          transition-all duration-200
+          ${isDragging ? 'border-neo-flame bg-neo-lavender neo-shadow-md' : 'border-neo-black hover:neo-shadow-sm'}
           ${error ? 'border-red-500' : ''}
         `}
       >
@@ -288,16 +291,16 @@ export function FileUploadField({
         
         {preview ? (
           <div className="relative">
-            <img 
-              src={preview} 
-              alt="Preview" 
-              className="max-h-48 mx-auto rounded"
+            <img
+              src={preview}
+              alt="Preview"
+              className="max-h-48 mx-auto rounded neo-border"
             />
             {onRemove && (
               <button
                 type="button"
                 onClick={handleRemove}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                className="neo-btn neo-btn-sm bg-red-500 text-white absolute top-2 right-2 rounded-full p-2 hover:bg-red-600"
                 aria-label="Remover imagen"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,40 +311,41 @@ export function FileUploadField({
           </div>
         ) : (
           <div>
-            <svg 
-              className="w-12 h-12 mx-auto text-gray-400 mb-3" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-10 h-10 mx-auto text-neo-black opacity-40 mb-2"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
               />
             </svg>
-            <p className="text-sm text-gray-600 mb-1">
+            <p className="neo-text text-sm mb-0.5">
               Arrastra y suelta tu imagen aquí
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="neo-text text-xs opacity-60">
               o haz clic para seleccionar
             </p>
           </div>
         )}
       </div>
-      
+
       {error && (
-        <div className="form-error" role="alert">
-          <svg 
-            fill="none" 
-            stroke="currentColor" 
+        <div className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
+          <svg
+            className="w-4 h-4 flex-shrink-0 mt-0.5"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>

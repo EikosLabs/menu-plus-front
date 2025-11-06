@@ -50,6 +50,14 @@ export default function AddMenuItem({
 		};
 	}, [loading, onCancel]);
 
+	// Bloquear scroll cuando el modal está abierto
+	useEffect(() => {
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = 'unset';
+		};
+	}, []);
+
 	useEffect(() => {
 		async function fetchCategories() {
 			if (!isMounted.current) {
@@ -344,26 +352,26 @@ export default function AddMenuItem({
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50 backdrop-blur-sm transition-all duration-300"
+			className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-all duration-300 p-4"
 			onClick={onCancel}
 		>
 			<div
-				className="m-4 max-h-[90vh] w-full max-w-2xl transform animate-fadeInUp overflow-y-auto rounded-xl bg-white shadow-2xl transition-all duration-300"
+				className="w-full max-w-xl max-h-[85vh] transform animate-fadeInUp overflow-y-auto bg-white neo-border neo-shadow-2xl transition-all duration-300"
 				onClick={handleModalClick}
 			>
-				<div className="relative p-6 md:p-8">
+				<div className="relative p-4 sm:p-5">
 					<button
 						onClick={() => {
 							if (!loading) {
 								onCancel();
 							}
 						}}
-						className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						className="absolute top-3 right-3 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
 						aria-label="Cerrar modal"
 						disabled={loading}
 					>
 						<svg
-							className="h-6 w-6"
+							className="h-5 w-5"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -377,12 +385,12 @@ export default function AddMenuItem({
 						</svg>
 					</button>
 
-					<div className="mb-6 flex items-center">
+					<div className="mb-4 flex items-center">
 						<div
-							className={`${isEditing ? "bg-neo-sunset" : "bg-neo-flame"} mr-4 flex-shrink-0 rounded-lg bg-opacity-10 p-3.5`}
+							className={`${isEditing ? "bg-neo-sunset" : "bg-neo-flame"} mr-3 flex-shrink-0 rounded-lg bg-opacity-10 p-2.5`}
 						>
 							<svg
-								className={`h-7 w-7 ${isEditing ? "text-neo-sunset" : "text-neo-flame"}`}
+								className={`h-6 w-6 ${isEditing ? "text-neo-sunset" : "text-neo-flame"}`}
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -404,13 +412,13 @@ export default function AddMenuItem({
 								)}
 							</svg>
 						</div>
-						<h2 className="neo-heading neo-h3">
+						<h2 className="neo-heading neo-h4 text-lg sm:text-xl">
 							{isEditing ? "Editar Plato" : "Agregar Nuevo Plato"}
 						</h2>
 					</div>
 
 					{error && (
-						<div className="mb-6 neo-alert neo-alert-error animate-fadeIn">
+						<div className="mb-4 neo-alert neo-alert-error animate-fadeIn">
 							<div className="flex items-center">
 								<svg
 									className="mr-2 h-5 w-5 flex-shrink-0"
@@ -432,7 +440,7 @@ export default function AddMenuItem({
 					)}
 
 					{message && (
-						<div className="mb-6 neo-alert neo-alert-success animate-fadeIn">
+						<div className="mb-4 neo-alert neo-alert-success animate-fadeIn">
 							<div className="flex items-center">
 								<svg
 									className="mr-2 h-5 w-5 flex-shrink-0"
@@ -456,10 +464,10 @@ export default function AddMenuItem({
 					<form
 						ref={formRef}
 						onSubmit={handleSubmit}
-						className="space-y-5 sm:space-y-6"
+						className="space-y-3 sm:space-y-4"
 					>
-						<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-							<div className="space-y-4">
+						<div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+							<div className="space-y-3">
 								<div>
 									<label className="mb-1 block font-medium text-gray-700 text-sm">
 										Imagen del Plato
@@ -550,11 +558,11 @@ export default function AddMenuItem({
 								</div>
 							</div>
 
-							<div className="space-y-4">
+							<div className="space-y-3">
 								<div>
 									<label
 										htmlFor="name"
-										className="mb-1 block font-medium text-gray-700 text-sm"
+										className="mb-1 block neo-text neo-text-bold"
 									>
 										Nombre del Plato *
 									</label>
@@ -565,10 +573,10 @@ export default function AddMenuItem({
 										value={formData.name}
 										onChange={handleChange}
 										onBlur={handleBlur}
-										className={`w-full rounded-lg border px-4 py-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+										className={`neo-input ${
 											nameError
-												? "border-red-300 focus:border-red-500 focus:ring-red-500"
-												: "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+												? "border-red-500"
+												: ""
 										}`}
 										placeholder="Ej: Pizza Margherita"
 										disabled={loading}
@@ -599,10 +607,10 @@ export default function AddMenuItem({
 											onBlur={handleBlur}
 											step="0.01"
 											min="0"
-											className={`w-full rounded-lg border py-2.5 pl-8 pr-4 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+											className={`neo-input pl-8 ${
 												priceError
-													? "border-red-300 focus:border-red-500 focus:ring-red-500"
-													: "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+													? "border-red-500"
+													: ""
 											}`}
 											placeholder="0.00"
 											disabled={loading}
@@ -626,7 +634,7 @@ export default function AddMenuItem({
 										name="menuItemCategoryId"
 										value={formData.menuItemCategoryId || ""}
 										onChange={handleChange}
-										className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+										className="neo-input neo-select"
 										disabled={loading || loadingCategories}
 									>
 										<option value="">Sin categoría</option>
@@ -650,7 +658,7 @@ export default function AddMenuItem({
 										name="sectionId"
 										value={formData.sectionId || ""}
 										onChange={handleChange}
-										className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+										className="neo-input neo-select"
 										disabled={loading || loadingSections}
 									>
 										<option value="">Sin sección</option>
@@ -695,17 +703,17 @@ export default function AddMenuItem({
 								value={formData.description}
 								onChange={handleChange}
 								rows={3}
-								className="w-full rounded-lg border border-gray-300 px-4 py-2.5 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+								className="neo-input neo-textarea"
 								placeholder="Describe los ingredientes y características del plato..."
 								disabled={loading}
 							/>
 						</div>
 
-						<div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
+						<div className="flex flex-col-reverse gap-3 pt-2 sm:pt-4 sm:flex-row sm:justify-end">
 							<button
 								type="button"
 								onClick={onCancel}
-								className="w-full rounded-lg border border-gray-300 bg-white px-6 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+								className="neo-btn neo-btn-white w-full sm:w-auto"
 								disabled={loading}
 							>
 								Cancelar
