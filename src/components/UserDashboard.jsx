@@ -9,6 +9,7 @@ import DashboardHeader from "./ui/DashboardHeader";
 import BusinessSection from "./sections/BusinessSection";
 import StatsSection from "./sections/StatsSection";
 import ProfileSection from "./sections/ProfileSection";
+import TemplateSection from "./sections/TemplateSection";
 
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
@@ -112,6 +113,7 @@ export default function UserDashboard() {
 					/>
 				)}
 
+				{activeSection === "templates" && <TemplateSection businesses={businesses} />}
 				{activeSection === "estadisticas" && <StatsSection />}
 				{activeSection === "perfil" && <ProfileSection />}
 			</main>

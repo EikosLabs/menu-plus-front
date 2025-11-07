@@ -5,6 +5,8 @@ const DashboardHeader = ({ activeSection }) => {
 		switch (activeSection) {
 			case "negocios":
 				return "Mis Negocios";
+			case "templates":
+				return "Templates";
 			case "estadisticas":
 				return "Estadísticas";
 			case "perfil":
