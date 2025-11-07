@@ -169,21 +169,21 @@ export default function PromotionalFlyerGenerator({
         }
       }}
     >
-      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-auto max-w-7xl my-4 flex flex-col overflow-hidden"
-        style={{ maxHeight: 'calc(100vh - 2rem)' }}
+      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-auto max-w-7xl my-2 sm:my-4 flex flex-col overflow-hidden"
+        style={{ maxHeight: 'calc(100vh - 1rem)' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b-2 border-black">
-          <div>
-            <h2 className="neo-h3 m-0">Crear Folleto Promocional</h2>
-            <p className="neo-text text-sm opacity-70 mt-1">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b-2 border-black">
+          <div className="flex-1 min-w-0 pr-2">
+            <h2 className="neo-h3 m-0 text-base sm:text-lg md:text-xl">Crear Folleto Promocional</h2>
+            <p className="neo-text text-xs sm:text-sm opacity-70 mt-1 hidden sm:block">
               Selecciona los platos que quieres destacar
             </p>
           </div>
           <button
             onClick={onClose}
-            className="neo-btn neo-btn-sm"
+            className="neo-btn neo-btn-sm flex-shrink-0"
             aria-label="Cerrar"
           >
             ✕
@@ -193,15 +193,15 @@ export default function PromotionalFlyerGenerator({
         {/* Content */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Configuration */}
-          <div className="w-full md:w-80 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="w-full md:w-80 lg:w-96 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3">
             {/* Folleto Name */}
             <div>
-              <h3 className="neo-h5 mb-3">Nombre del Folleto</h3>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Nombre del Folleto</h3>
               <input
                 type="text"
                 value={folletoName}
                 onChange={(e) => setFolletoName(e.target.value)}
-                className="w-full neo-border rounded-lg px-3 py-2 neo-text text-sm"
+                className="w-full neo-border rounded-lg px-2 sm:px-3 py-2 neo-text text-xs sm:text-sm"
                 placeholder="Ej: Especiales de la Semana"
               />
               {savedId && (
@@ -213,7 +213,7 @@ export default function PromotionalFlyerGenerator({
 
             {/* Template Selection */}
             <div>
-              <h3 className="neo-h5 mb-3">Tipo de Folleto</h3>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Tipo de Folleto</h3>
               <div className="space-y-2">
                 {Object.values(FOLLETO_TEMPLATES).map((tmpl) => (
                   <button
@@ -225,19 +225,19 @@ export default function PromotionalFlyerGenerator({
                         setSelectedItems(selectedItems.slice(0, tmpl.maxItems));
                       }
                     }}
-                    className={`w-full text-left p-3 neo-border rounded-lg transition-all ${
+                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
                       selectedTemplate === tmpl.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                         : 'hover:bg-gray-50'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{tmpl.icon}</span>
-                      <div className="flex-1">
-                        <div className="neo-text-bold text-sm">{tmpl.name}</div>
-                        <div className="neo-text text-xs opacity-70">{tmpl.description}</div>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-xl sm:text-2xl flex-shrink-0">{tmpl.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="neo-text-bold text-xs sm:text-sm">{tmpl.name}</div>
+                        <div className="neo-text text-xs opacity-70 hidden sm:block">{tmpl.description}</div>
                         <div className="neo-text text-xs mt-1 text-neo-flame">
-                          Máx. {tmpl.maxItems} platos • {FOLLETO_FORMATS[tmpl.format].name}
+                          Máx. {tmpl.maxItems} • {FOLLETO_FORMATS[tmpl.format].name}
                         </div>
                       </div>
                     </div>
@@ -248,12 +248,12 @@ export default function PromotionalFlyerGenerator({
 
             {/* Selected Items */}
             <div>
-              <h3 className="neo-h5 mb-3">
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">
                 Platos Seleccionados ({selectedItems.length}/{maxItems})
               </h3>
 
               {selectedItems.length === 0 ? (
-                <div className="neo-alert bg-neo-lavender p-3 text-xs">
+                <div className="neo-alert bg-neo-lavender p-2 sm:p-3 text-xs">
                   Selecciona platos de la lista de abajo
                 </div>
               ) : (
@@ -261,29 +261,30 @@ export default function PromotionalFlyerGenerator({
                   {selectedItems.map((item, index) => (
                     <div
                       key={item.id}
-                      className="neo-border bg-white p-2 rounded flex items-center gap-2"
+                      className="neo-border bg-white p-2 rounded flex items-center gap-1.5 sm:gap-2"
                     >
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-neo-flame text-white flex items-center justify-center">
+                      <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neo-flame text-white flex items-center justify-center">
                         <span className="text-xs neo-text-bold">{index + 1}</span>
                       </div>
                       {item.imageUri && (
                         <img
                           src={item.imageUri}
                           alt={item.name}
-                          className="w-8 h-8 object-cover rounded"
+                          className="w-7 h-7 sm:w-8 sm:h-8 object-cover rounded flex-shrink-0"
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="neo-text-bold text-sm truncate">{item.name}</div>
+                        <div className="neo-text-bold text-xs sm:text-sm truncate">{item.name}</div>
                         <div className="neo-text text-xs opacity-70">${item.price.toFixed(2)}</div>
                       </div>
-                      <div className="flex gap-1">
+                      <div className="flex gap-0.5 flex-shrink-0">
                         <button
                           onClick={() => moveItemUp(index)}
                           disabled={index === 0}
                           className="p-1 hover:bg-gray-100 rounded disabled:opacity-30"
+                          aria-label="Subir"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                           </svg>
                         </button>
@@ -291,16 +292,18 @@ export default function PromotionalFlyerGenerator({
                           onClick={() => moveItemDown(index)}
                           disabled={index === selectedItems.length - 1}
                           className="p-1 hover:bg-gray-100 rounded disabled:opacity-30"
+                          aria-label="Bajar"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </button>
                         <button
                           onClick={() => toggleItemSelection(item)}
                           className="p-1 hover:bg-red-100 text-red-500 rounded"
+                          aria-label="Eliminar"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         </button>
@@ -313,19 +316,19 @@ export default function PromotionalFlyerGenerator({
 
             {/* Available Items */}
             <div>
-              <h3 className="neo-h5 mb-3">Todos los Platos ({menuItems.length})</h3>
-              <p className="neo-text text-xs opacity-70 mb-3">
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Todos los Platos ({menuItems.length})</h3>
+              <p className="neo-text text-xs opacity-70 mb-2">
                 Haz clic para agregar
               </p>
 
-              <div className="space-y-1 max-h-[300px] overflow-auto">
+              <div className="space-y-1 max-h-[250px] sm:max-h-[300px] overflow-auto">
                 {menuItems.map((item) => {
                   const isSelected = selectedItems.find(i => i.id === item.id);
                   return (
                     <button
                       key={item.id}
                       onClick={() => toggleItemSelection(item)}
-                      className={`w-full text-left neo-border p-2 rounded flex items-center gap-2 transition-all ${
+                      className={`w-full text-left neo-border p-2 rounded flex items-center gap-1.5 sm:gap-2 transition-all ${
                         isSelected
                           ? 'bg-neo-flame text-white border-neo-flame'
                           : 'bg-white hover:bg-gray-50'
@@ -335,17 +338,17 @@ export default function PromotionalFlyerGenerator({
                         <img
                           src={item.imageUri}
                           alt={item.name}
-                          className="w-8 h-8 object-cover rounded"
+                          className="w-7 h-7 sm:w-8 sm:h-8 object-cover rounded flex-shrink-0"
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="neo-text-bold text-sm truncate">{item.name}</div>
+                        <div className="neo-text-bold text-xs sm:text-sm truncate">{item.name}</div>
                         <div className={`neo-text text-xs ${isSelected ? 'opacity-90' : 'opacity-70'}`}>
                           ${item.price.toFixed(2)}
                         </div>
                       </div>
                       {isSelected && (
-                        <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       )}
@@ -357,7 +360,7 @@ export default function PromotionalFlyerGenerator({
           </div>
 
           {/* Preview Area */}
-          <div className="flex-1 overflow-auto bg-gray-100 p-8">
+          <div className="flex-1 overflow-auto bg-gray-100 p-3 sm:p-4 md:p-6 lg:p-8">
             <div className="max-w-4xl mx-auto">
               {selectedItems.length > 0 ? (
                 <PromotionalFlyerPreview
@@ -368,12 +371,12 @@ export default function PromotionalFlyerGenerator({
                   template={template}
                 />
               ) : (
-                <div className="bg-white neo-border rounded-lg p-12 text-center">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white neo-border rounded-lg p-6 sm:p-8 md:p-12 text-center">
+                  <svg className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <h3 className="neo-h4 mb-2">Selecciona platos para ver la vista previa</h3>
-                  <p className="neo-text text-sm opacity-70">
+                  <h3 className="neo-h4 mb-2 text-sm sm:text-base">Selecciona platos para ver la vista previa</h3>
+                  <p className="neo-text text-xs sm:text-sm opacity-70">
                     Elige hasta {maxItems} platos de la lista
                   </p>
                 </div>
@@ -383,36 +386,38 @@ export default function PromotionalFlyerGenerator({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between p-3 sm:p-4 border-t-2 border-black bg-gray-50 gap-3">
-          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center sm:text-left w-full sm:w-auto">
-            <span className="neo-text-bold text-xs sm:text-sm">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-2.5 sm:p-3 md:p-4 border-t-2 border-black bg-gray-50 gap-2 sm:gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-1 text-center sm:text-left">
+            <span className="neo-text-bold text-xs">
               {business?.name} - {menu?.name}
             </span>
-            <span className="text-gray-500 text-xs sm:text-sm">
+            <span className="text-gray-500 text-xs">
               • {selectedItems.length} de {maxItems} platos
             </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={onClose}
-              className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs sm:text-sm"
+              className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving || !folletoName.trim() || selectedItems.length === 0}
-              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs sm:text-sm"
+              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              {isSaving ? '⏳ Guardando...' : savedId ? '💾 Actualizar' : '💾 Guardar'}
+              {isSaving ? '⏳' : savedId ? '💾' : '💾'}
+              <span className="hidden sm:inline ml-1">{isSaving ? 'Guardando...' : savedId ? 'Actualizar' : 'Guardar'}</span>
             </button>
             <button
               onClick={handleExport}
               disabled={isExporting || selectedItems.length === 0}
-              className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs sm:text-sm"
+              className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              {isExporting ? '⏳ Generando...' : '📄 Descargar PDF'}
+              {isExporting ? '⏳' : '📄'}
+              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
             </button>
           </div>
         </div>

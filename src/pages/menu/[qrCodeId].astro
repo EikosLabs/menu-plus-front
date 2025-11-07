@@ -23,10 +23,9 @@ if (!qrCodeId || qrCodeId.trim() === '') {
 }
 
 // API URL - usa la variable de entorno o fallback
-// En el servidor (SSR), usamos el nombre del contenedor backend en Docker
-// En cliente usamos /api (nginx hace el proxy)
-const API_URL = import.meta.env.SSR 
-  ? 'http://menusesqr-back:8080/api'
+// En el servidor (SSR), usa API_BACKEND_URL si está disponible; en cliente usa /api (nginx proxy)
+const API_URL = import.meta.env.SSR
+  ? (process.env.API_BACKEND_URL || 'http://menu-plus-backend:5000/api')
   : (import.meta.env.PUBLIC_API_URL || '/api');
 
 // Fetch menu data

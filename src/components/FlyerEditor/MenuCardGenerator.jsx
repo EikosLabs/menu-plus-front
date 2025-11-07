@@ -143,21 +143,21 @@ export default function MenuCardGenerator({
         }
       }}
     >
-      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-auto max-w-7xl my-4 flex flex-col overflow-hidden"
-        style={{ maxHeight: 'calc(100vh - 2rem)' }}
+      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-auto max-w-7xl my-2 sm:my-4 flex flex-col overflow-hidden"
+        style={{ maxHeight: 'calc(100vh - 1rem)' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b-2 border-black">
-          <div>
-            <h2 className="neo-h3 m-0">Crear Carta para Imprimir</h2>
-            <p className="neo-text text-sm opacity-70 mt-1">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b-2 border-black">
+          <div className="flex-1 min-w-0 pr-2">
+            <h2 className="neo-h3 m-0 text-base sm:text-lg md:text-xl">Crear Carta para Imprimir</h2>
+            <p className="neo-text text-xs sm:text-sm opacity-70 mt-1 hidden sm:block">
               Carta completa con todos tus platos
             </p>
           </div>
           <button
             onClick={onClose}
-            className="neo-btn neo-btn-sm"
+            className="neo-btn neo-btn-sm flex-shrink-0"
             aria-label="Cerrar"
           >
             ✕
