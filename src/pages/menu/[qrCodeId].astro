@@ -1,190 +1,232 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
-import MenuHero from '../../components/menu/MenuHero.astro';
-import CategoryNav from '../../components/menu/CategoryNav.astro';
-import MenuSection from '../../components/menu/MenuSection.astro';
-import ItemModal from '../../components/menu/ItemModal.astro';
-import SurpriseButton from '../../components/menu/SurpriseButton.astro';
-import { sanitizeMenuData } from '../../utils/security.js';
 import '../../styles/menu-variables.css';
 
 const { qrCodeId } = Astro.params;
-
-let menu = null;
-let error = null;
-let business = null;
-let customColors = null;
-
-// Validate qrCodeId format before making the request
-if (!qrCodeId || qrCodeId.trim() === '') {
-  error = 'Invalid QR code. Please scan a valid QR code.';
-}
-
-// API URL - usa la variable de entorno o fallback
-// En el servidor (SSR), usa API_BACKEND_URL si está disponible; en cliente usa /api (nginx proxy)
-const API_URL = import.meta.env.SSR
-  ? (process.env.API_BACKEND_URL || 'http://menu-plus-backend:5000/api')
-  : (import.meta.env.PUBLIC_API_URL || '/api');
-
-// Fetch menu data
-if (!error) {
-  try {
-    const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      // Try to get error message from response
-      let errorMessage = `Unable to load menu (${response.status})`;
-      try {
-        const errorData = await response.json();
-        if (errorData.error) {
-          errorMessage = errorData.error;
-        }
-      } catch {
-        // If response is not JSON, use default message
-        if (response.status === 400) {
-          errorMessage = 'Invalid QR code format. Please scan the QR code again or contact support.';
-        } else if (response.status === 404) {
-          errorMessage = 'Menu not found. Please verify the QR code or contact the restaurant.';
-        }
-      }
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    menu = sanitizeMenuData(data);
-    business = menu.business;
-
-    // Extraer colores personalizados del negocio
-    if (business) {
-      customColors = {
-        primary: business.primaryColor || null,
-        secondary: business.secondaryColor || null,
-        accent: business.accentColor || null
-      };
-    }
-  } catch (e) {
-    error = e.message;
-    console.error('Error loading menu:', e);
-  }
-}
-
-// Organize items by section
-const itemsBySection = {};
-
-if (menu) {
-  menu.sections.forEach((section) => {
-    const key = String(section.id).toLowerCase();
-    itemsBySection[key] = section.menuItems || [];
-  });
-
-  if (menu.menuItems?.length) {
-    itemsBySection['no-section'] = menu.menuItems;
-  }
-}
 ---
 
-<Layout title={business?.name || 'Menu'}>
-  {customColors && (customColors.primary || customColors.secondary || customColors.accent) && (
-    <style is:inline set:html={`
-      :root {
-        ${customColors.primary ? `--primary-dark: ${customColors.primary};` : ''}
-        ${customColors.secondary ? `--secondary-dark: ${customColors.secondary};` : ''}
-        ${customColors.accent ? `--accent-gold: ${customColors.accent};` : ''}
-      }
-    `} />
-  )}
-
+<Layout title="Menu">
   <main class="menu-page bg-neo-lavender relative">
     <!-- Decorative Background Pattern -->
     <div class="absolute inset-0 neo-bg-dots opacity-5 pointer-events-none"></div>
 
-    {error && (
-      <div class="error-state neo-card-3d relative z-10 max-w-2xl mx-auto">
-        <div class="error-state__icon">⚠️</div>
-        <h2 class="error-state__title neo-heading neo-h3">No se pudo cargar el menú</h2>
-        <p class="error-state__message neo-text">{error}</p>
-
-        <div class="error-state__details">
-          <p class="text-sm text-gray-600 mb-4">
-            El código QR escaneado no está asociado a ningún menú activo.
-          </p>
-
-          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-4">
-            <p class="text-xs font-semibold text-gray-700 mb-2">Posibles causas:</p>
-            <ul class="text-xs text-gray-600 space-y-1">
-              <li>• El restaurante aún no ha configurado su menú digital</li>
-              <li>• El código QR es antiguo y ya no está activo</li>
-              <li>• Hubo un error al escanear el código</li>
-            </ul>
-          </div>
-
-          <p class="text-xs text-gray-500 mb-4">
-            <strong>ID del código:</strong> <code class="bg-gray-100 px-2 py-1 rounded">{qrCodeId}</code>
-          </p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-2 justify-center">
-          <button class="error-state__button neo-btn neo-btn-primary" onclick="window.location.reload()">
-            Reintentar
-          </button>
-          <a href="/" class="error-state__button neo-btn neo-btn-secondary">
-            Volver al inicio
-          </a>
-        </div>
+    <!-- Loading State (initial) -->
+    <div id="loading-state" class="loading-state">
+      <div class="loading-state__spinner">
+        <div class="spinner__plate"></div>
+        <div class="spinner__fork"></div>
+        <div class="spinner__knife"></div>
       </div>
-    )}
+      <p class="loading-state__text">Preparing your menu...</p>
+    </div>
 
-    {!menu && !error && (
-      <div class="loading-state">
-        <div class="loading-state__spinner">
-          <div class="spinner__plate"></div>
-          <div class="spinner__fork"></div>
-          <div class="spinner__knife"></div>
+    <!-- Error State (hidden initially) -->
+    <div id="error-state" class="error-state neo-card-3d relative z-10 max-w-2xl mx-auto" style="display: none;">
+      <div class="error-state__icon">⚠️</div>
+      <h2 class="error-state__title neo-heading neo-h3">No se pudo cargar el menú</h2>
+      <p class="error-state__message neo-text" id="error-message"></p>
+
+      <div class="error-state__details">
+        <p class="text-sm text-gray-600 mb-4">
+          El código QR escaneado no está asociado a ningún menú activo.
+        </p>
+
+        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-4">
+          <p class="text-xs font-semibold text-gray-700 mb-2">Posibles causas:</p>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>• El restaurante aún no ha configurado su menú digital</li>
+            <li>• El código QR es antiguo y ya no está activo</li>
+            <li>• Hubo un error al escanear el código</li>
+          </ul>
         </div>
-        <p class="loading-state__text">Preparing your menu...</p>
+
+        <p class="text-xs text-gray-500 mb-4">
+          <strong>ID del código:</strong> <code class="bg-gray-100 px-2 py-1 rounded" id="qr-code-id">{qrCodeId}</code>
+        </p>
       </div>
-    )}
 
-    {menu && !error && (
-      <>
-        <MenuHero business={business} />
+      <div class="flex flex-col sm:flex-row gap-2 justify-center">
+        <button class="error-state__button neo-btn neo-btn-primary" onclick="window.location.reload()">
+          Reintentar
+        </button>
+        <a href="/" class="error-state__button neo-btn neo-btn-secondary">
+          Volver al inicio
+        </a>
+      </div>
+    </div>
 
-        <CategoryNav
-          sections={menu.sections}
-          hasOtherItems={!!itemsBySection['no-section']}
-        />
+    <!-- Menu Content (hidden initially) -->
+    <div id="menu-content" style="display: none;">
+      <!-- Content will be dynamically inserted here -->
+    </div>
+  </main>
 
-        <div class="menu-content">
-          {menu.sections.map((section) => (
-            <MenuSection
-              section={section}
-              items={itemsBySection[String(section.id).toLowerCase()] || []}
-            />
-          ))}
+  <script>
+    import { sanitizeMenuData } from '../../utils/security.js';
 
-          {itemsBySection['no-section'] && (
-            <MenuSection
-              section={{ id: 'no-section', name: 'Other Items', description: 'Additional delicious options' }}
-              items={itemsBySection['no-section']}
-            />
-          )}
+    // Get qrCodeId from URL
+    const pathParts = window.location.pathname.split('/');
+    const qrCodeId = pathParts[pathParts.length - 1];
 
-          {Object.keys(itemsBySection).length === 0 && (
-            <div class="empty-state neo-card-3d-sunset">
-              <div class="empty-state__icon">🍽️</div>
-              <h2 class="empty-state__title neo-heading neo-h3">Our menu is being prepared</h2>
-              <p class="empty-state__message neo-text">Please check back soon for our delicious offerings.</p>
+    // API URL
+    const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
+
+    async function loadMenu() {
+      const loadingState = document.getElementById('loading-state');
+      const errorState = document.getElementById('error-state');
+      const menuContent = document.getElementById('menu-content');
+
+      try {
+        // Validate qrCodeId
+        if (!qrCodeId || qrCodeId.trim() === '') {
+          throw new Error('Invalid QR code. Please scan a valid QR code.');
+        }
+
+        const response = await fetch(`${API_URL}/menus/qr-code/${qrCodeId}`, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          let errorMessage = `Unable to load menu (${response.status})`;
+          try {
+            const errorData = await response.json();
+            if (errorData.error) {
+              errorMessage = errorData.error;
+            }
+          } catch {
+            if (response.status === 400) {
+              errorMessage = 'Invalid QR code format. Please scan the QR code again or contact support.';
+            } else if (response.status === 404) {
+              errorMessage = 'Menu not found. Please verify the QR code or contact the restaurant.';
+            }
+          }
+          throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+        const menu = sanitizeMenuData(data);
+        const business = menu.business;
+
+        // Update page title
+        document.title = business?.name || 'Menu';
+
+        // Apply custom colors if available
+        if (business) {
+          const customColors = {
+            primary: business.primaryColor || null,
+            secondary: business.secondaryColor || null,
+            accent: business.accentColor || null
+          };
+
+          if (customColors.primary || customColors.secondary || customColors.accent) {
+            const styleEl = document.createElement('style');
+            styleEl.innerHTML = `
+              :root {
+                ${customColors.primary ? `--primary-dark: ${customColors.primary};` : ''}
+                ${customColors.secondary ? `--secondary-dark: ${customColors.secondary};` : ''}
+                ${customColors.accent ? `--accent-gold: ${customColors.accent};` : ''}
+              }
+            `;
+            document.head.appendChild(styleEl);
+          }
+        }
+
+        // Organize items by section
+        const itemsBySection = {};
+        menu.sections.forEach((section) => {
+          const key = String(section.id).toLowerCase();
+          itemsBySection[key] = section.menuItems || [];
+        });
+
+        if (menu.menuItems?.length) {
+          itemsBySection['no-section'] = menu.menuItems;
+        }
+
+        // Render menu
+        renderMenu(menu, business, itemsBySection);
+
+        // Hide loading, show content
+        loadingState.style.display = 'none';
+        menuContent.style.display = 'block';
+
+      } catch (error) {
+        console.error('Error loading menu:', error);
+
+        // Show error state
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        document.getElementById('error-message').textContent = error.message;
+      }
+    }
+
+    function renderMenu(menu, business, itemsBySection) {
+      const menuContent = document.getElementById('menu-content');
+
+      let html = '';
+
+      // Menu Hero
+      if (business) {
+        html += `
+          <div class="menu-hero">
+            <div class="menu-hero__container">
+              ${business.logoUrl ? `
+                <div class="menu-hero__logo-wrapper">
+                  <img src="${business.logoUrl}" alt="${business.name}" class="menu-hero__logo" />
+                </div>
+              ` : ''}
+              <h1 class="menu-hero__title neo-heading neo-h1">${business.name}</h1>
+              ${business.description ? `<p class="menu-hero__description neo-text">${business.description}</p>` : ''}
             </div>
-          )}
-        </div>
+          </div>
+        `;
+      }
 
+      // Category Nav
+      if (menu.sections && menu.sections.length > 0) {
+        html += '<nav class="category-nav"><div class="category-nav__container">';
+        menu.sections.forEach(section => {
+          html += `<a href="#section-${section.id}" class="category-nav__item">${section.name}</a>`;
+        });
+        if (itemsBySection['no-section']) {
+          html += '<a href="#section-no-section" class="category-nav__item">Other Items</a>';
+        }
+        html += '</div></nav>';
+      }
+
+      // Menu Sections
+      html += '<div class="menu-content-inner">';
+
+      menu.sections.forEach(section => {
+        const items = itemsBySection[String(section.id).toLowerCase()] || [];
+        html += renderSection(section, items);
+      });
+
+      if (itemsBySection['no-section']) {
+        html += renderSection(
+          { id: 'no-section', name: 'Other Items', description: 'Additional delicious options' },
+          itemsBySection['no-section']
+        );
+      }
+
+      if (Object.keys(itemsBySection).length === 0) {
+        html += `
+          <div class="empty-state neo-card-3d-sunset">
+            <div class="empty-state__icon">🍽️</div>
+            <h2 class="empty-state__title neo-heading neo-h3">Our menu is being prepared</h2>
+            <p class="empty-state__message neo-text">Please check back soon for our delicious offerings.</p>
+          </div>
+        `;
+      }
+
+      html += '</div>';
+
+      // Footer
+      html += `
         <footer class="menu-footer">
           <div class="menu-footer__content">
             <p class="menu-footer__powered">
@@ -193,14 +235,78 @@ if (menu) {
             <p class="menu-footer__tagline">Digital menus made beautiful</p>
           </div>
         </footer>
+      `;
 
-        <ItemModal />
+      menuContent.innerHTML = html;
 
-        <!-- Botón Sorpréndeme -->
-        <SurpriseButton sections={menu.sections} menuItems={menu.menuItems || []} />
-      </>
-    )}
-  </main>
+      // Initialize modals and interactive elements
+      initializeInteractiveElements(menu);
+    }
+
+    function renderSection(section, items) {
+      let html = `
+        <section id="section-${section.id}" class="menu-section">
+          <div class="menu-section__header">
+            <h2 class="menu-section__title neo-heading neo-h2">${section.name}</h2>
+            ${section.description ? `<p class="menu-section__description neo-text">${section.description}</p>` : ''}
+          </div>
+          <div class="menu-section__items">
+      `;
+
+      items.forEach(item => {
+        html += `
+          <article class="menu-item neo-card-3d" data-item-id="${item.id}">
+            ${item.imageUrl ? `
+              <div class="menu-item__image-wrapper">
+                <img src="${item.imageUrl}" alt="${item.name}" class="menu-item__image" />
+              </div>
+            ` : ''}
+            <div class="menu-item__content">
+              <div class="menu-item__header">
+                <h3 class="menu-item__name neo-heading neo-h4">${item.name}</h3>
+                <span class="menu-item__price neo-text-accent">$${item.price.toFixed(2)}</span>
+              </div>
+              ${item.description ? `<p class="menu-item__description neo-text">${item.description}</p>` : ''}
+              ${item.allergens && item.allergens.length > 0 ? `
+                <div class="menu-item__allergens">
+                  ${item.allergens.map(allergen => `<span class="allergen-tag">${allergen}</span>`).join('')}
+                </div>
+              ` : ''}
+            </div>
+          </article>
+        `;
+      });
+
+      html += '</div></section>';
+      return html;
+    }
+
+    function initializeInteractiveElements(menu) {
+      // Add click handlers for menu items (for modals)
+      document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const itemId = this.dataset.itemId;
+          // Modal functionality would go here
+          console.log('Item clicked:', itemId);
+        });
+      });
+
+      // Smooth scroll for category nav
+      document.querySelectorAll('.category-nav__item').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href').substring(1);
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    // Load menu on page load
+    loadMenu();
+  </script>
 </Layout>
 
 <style>
@@ -208,10 +314,213 @@ if (menu) {
     min-height: 100vh;
   }
 
-  .menu-content {
+  .menu-content-inner {
     padding: 4rem 0;
     max-width: 1200px;
     margin: 0 auto;
+  }
+
+  /* Menu Hero */
+  .menu-hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+    color: var(--surface-white);
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .menu-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+
+  .menu-hero__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .menu-hero__logo-wrapper {
+    margin-bottom: 2rem;
+  }
+
+  .menu-hero__logo {
+    max-width: 150px;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 4px solid var(--surface-white);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .menu-hero__title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .menu-hero__description {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Category Nav */
+  .category-nav {
+    background: var(--surface-white);
+    border-bottom: 3px solid var(--border-dark);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-md);
+  }
+
+  .category-nav__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .category-nav__item {
+    padding: 0.75rem 1.5rem;
+    background: var(--background-primary);
+    border: 2px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+    box-shadow: 3px 3px 0 var(--border-dark);
+  }
+
+  .category-nav__item:hover {
+    background: var(--accent-gold);
+    color: var(--surface-white);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--border-dark);
+  }
+
+  /* Menu Section */
+  .menu-section {
+    margin-bottom: 4rem;
+    padding: 0 2rem;
+  }
+
+  .menu-section__header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .menu-section__title {
+    font-size: 2.5rem;
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .menu-section__description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+  }
+
+  .menu-section__items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  /* Menu Item */
+  .menu-item {
+    background: var(--surface-white);
+    border: 3px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 5px 5px 0 var(--border-dark);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+  }
+
+  .menu-item:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--border-dark);
+  }
+
+  .menu-item__image-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-bottom: 3px solid var(--border-dark);
+  }
+
+  .menu-item__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+  }
+
+  .menu-item:hover .menu-item__image {
+    transform: scale(1.05);
+  }
+
+  .menu-item__content {
+    padding: 1.5rem;
+  }
+
+  .menu-item__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+  }
+
+  .menu-item__name {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    flex: 1;
+  }
+
+  .menu-item__price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    white-space: nowrap;
+  }
+
+  .menu-item__description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .menu-item__allergens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .allergen-tag {
+    padding: 0.25rem 0.75rem;
+    background: var(--background-tertiary);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
   }
 
   /* Loading State */
