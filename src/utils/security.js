@@ -76,6 +76,7 @@ export const sanitizeMenuData = (menu) => {
   }
 
   return {
+    ...menu,
     sections: Array.isArray(menu.sections) ? menu.sections : [],
     menuItems: Array.isArray(menu.menuItems) ? menu.menuItems : [],
     business: menu.business || null,
