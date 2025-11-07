@@ -167,15 +167,15 @@ export default function MenuCardGenerator({
         {/* Content */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Configuration */}
-          <div className="w-full md:w-80 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="w-full md:w-80 lg:w-96 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3">
             {/* Carta Name */}
             <div>
-              <h3 className="neo-h5 mb-3">Nombre de la Carta</h3>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Nombre de la Carta</h3>
               <input
                 type="text"
                 value={cartaName}
                 onChange={(e) => setCartaName(e.target.value)}
-                className="w-full neo-border rounded-lg px-3 py-2 neo-text text-sm"
+                className="w-full neo-border rounded-lg px-2 sm:px-3 py-2 neo-text text-xs sm:text-sm"
                 placeholder="Ej: Carta Elegante 2024"
               />
               {savedId && (
@@ -187,26 +187,26 @@ export default function MenuCardGenerator({
 
             {/* Template Selection */}
             <div>
-              <h3 className="neo-h5 mb-3">Diseño de la Carta</h3>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Diseño de la Carta</h3>
               <div className="space-y-2">
                 {Object.values(CARTA_TEMPLATES).map((tmpl) => (
                   <button
                     key={tmpl.id}
                     onClick={() => setSelectedTemplate(tmpl.id)}
-                    className={`w-full text-left p-3 neo-border rounded-lg transition-all ${
+                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
                       selectedTemplate === tmpl.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                         : 'hover:bg-gray-50'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{tmpl.icon}</span>
-                      <div className="flex-1">
-                        <div className="neo-text-bold text-sm">{tmpl.name}</div>
-                        <div className="neo-text text-xs opacity-70">{tmpl.description}</div>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-xl sm:text-2xl flex-shrink-0">{tmpl.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="neo-text-bold text-xs sm:text-sm">{tmpl.name}</div>
+                        <div className="neo-text text-xs opacity-70 hidden sm:block">{tmpl.description}</div>
                         <div className="neo-text text-xs mt-1 text-neo-flame">
-                          {tmpl.showImages ? '📷 Con imágenes' : '📝 Solo texto'} •
-                          {tmpl.itemsPerRow === 1 ? ' 1 columna' : ' 2 columnas'}
+                          {tmpl.showImages ? '📷' : '📝'} •
+                          {tmpl.itemsPerRow === 1 ? ' 1 col' : ' 2 col'}
                         </div>
                       </div>
                     </div>
@@ -217,11 +217,11 @@ export default function MenuCardGenerator({
 
             {/* Paper size */}
             <div>
-              <h3 className="neo-h5 mb-3">Tamaño de Papel</h3>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Tamaño de Papel</h3>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPaperSize('A4')}
-                  className={`neo-btn neo-btn-sm flex-1 ${
+                  className={`neo-btn neo-btn-sm flex-1 text-xs ${
                     paperSize === 'A4' ? 'neo-btn-primary' : ''
                   }`}
                 >
@@ -229,7 +229,7 @@ export default function MenuCardGenerator({
                 </button>
                 <button
                   onClick={() => setPaperSize('LETTER')}
-                  className={`neo-btn neo-btn-sm flex-1 ${
+                  className={`neo-btn neo-btn-sm flex-1 text-xs ${
                     paperSize === 'LETTER' ? 'neo-btn-primary' : ''
                   }`}
                 >
@@ -240,8 +240,8 @@ export default function MenuCardGenerator({
 
             {/* Item Ordering */}
             <div>
-              <h3 className="neo-h5 mb-3">Orden de Platos ({orderedItems.length})</h3>
-              <p className="neo-text text-xs opacity-70 mb-3">
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Orden de Platos ({orderedItems.length})</h3>
+              <p className="neo-text text-xs opacity-70 mb-2">
                 Arrastra para reordenar
               </p>
 
@@ -254,7 +254,7 @@ export default function MenuCardGenerator({
                   items={orderedItems.map(item => item.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  <div className="space-y-1 max-h-[400px] overflow-auto">
+                  <div className="space-y-1 max-h-[300px] sm:max-h-[400px] overflow-auto">
                     {orderedItems.map((item, index) => (
                       <SortableItem
                         key={item.id}
@@ -269,7 +269,7 @@ export default function MenuCardGenerator({
           </div>
 
           {/* Preview Area */}
-          <div className="flex-1 overflow-auto bg-gray-100 p-8">
+          <div className="flex-1 overflow-auto bg-gray-100 p-3 sm:p-4 md:p-6 lg:p-8">
             <div className="max-w-4xl mx-auto">
               <MenuCardPreview
                 ref={previewRef}
@@ -284,36 +284,38 @@ export default function MenuCardGenerator({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between p-3 sm:p-4 border-t-2 border-black bg-gray-50 gap-3">
-          <div className="flex items-center gap-2 text-center sm:text-left w-full sm:w-auto">
-            <span className="neo-text-bold text-xs sm:text-sm">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-2.5 sm:p-3 md:p-4 border-t-2 border-black bg-gray-50 gap-2 sm:gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-1 text-center sm:text-left">
+            <span className="neo-text-bold text-xs">
               {business?.name} - {menu?.name}
             </span>
-            <span className="text-gray-500 text-xs sm:text-sm">
+            <span className="text-gray-500 text-xs">
               • {orderedItems.length} platos
             </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={onClose}
-              className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs sm:text-sm"
+              className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving || !cartaName.trim()}
-              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs sm:text-sm"
+              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              {isSaving ? '⏳ Guardando...' : savedId ? '💾 Actualizar' : '💾 Guardar'}
+              {isSaving ? '⏳' : savedId ? '💾' : '💾'}
+              <span className="hidden sm:inline ml-1">{isSaving ? 'Guardando...' : savedId ? 'Actualizar' : 'Guardar'}</span>
             </button>
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs sm:text-sm"
+              className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              {isExporting ? '⏳ Generando...' : '📄 Descargar PDF'}
+              {isExporting ? '⏳' : '📄'}
+              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
             </button>
           </div>
         </div>
@@ -347,24 +349,24 @@ function SortableItem({ item, index }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="neo-border bg-white p-2 rounded cursor-move hover:bg-gray-50 flex items-center gap-2"
+      className="neo-border bg-white p-2 rounded cursor-move hover:bg-gray-50 flex items-center gap-1.5 sm:gap-2"
     >
-      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+      <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gray-200 flex items-center justify-center">
         <span className="text-xs neo-text-bold">{index + 1}</span>
       </div>
       {item.imageUri && (
         <img
           src={item.imageUri}
           alt={item.name}
-          className="w-8 h-8 object-cover rounded"
+          className="w-7 h-7 sm:w-8 sm:h-8 object-cover rounded flex-shrink-0"
         />
       )}
       <div className="flex-1 min-w-0">
-        <div className="neo-text-bold text-sm truncate">{item.name}</div>
+        <div className="neo-text-bold text-xs sm:text-sm truncate">{item.name}</div>
         <div className="neo-text text-xs opacity-70">${item.price.toFixed(2)}</div>
       </div>
       <div className="flex-shrink-0 text-gray-400">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
         </svg>
       </div>

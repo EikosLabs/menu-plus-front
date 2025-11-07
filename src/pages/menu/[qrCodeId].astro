@@ -106,13 +106,38 @@ if (menu) {
     <div class="absolute inset-0 neo-bg-dots opacity-5 pointer-events-none"></div>
 
     {error && (
-      <div class="error-state neo-card-3d relative z-10">
-        <div class="error-state__icon">!</div>
-        <h2 class="error-state__title neo-heading neo-h3">Unable to Load Menu</h2>
+      <div class="error-state neo-card-3d relative z-10 max-w-2xl mx-auto">
+        <div class="error-state__icon">⚠️</div>
+        <h2 class="error-state__title neo-heading neo-h3">No se pudo cargar el menú</h2>
         <p class="error-state__message neo-text">{error}</p>
-        <button class="error-state__button neo-btn neo-btn-primary" onclick="window.location.reload()">
-          Try Again
-        </button>
+
+        <div class="error-state__details">
+          <p class="text-sm text-gray-600 mb-4">
+            El código QR escaneado no está asociado a ningún menú activo.
+          </p>
+
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-4">
+            <p class="text-xs font-semibold text-gray-700 mb-2">Posibles causas:</p>
+            <ul class="text-xs text-gray-600 space-y-1">
+              <li>• El restaurante aún no ha configurado su menú digital</li>
+              <li>• El código QR es antiguo y ya no está activo</li>
+              <li>• Hubo un error al escanear el código</li>
+            </ul>
+          </div>
+
+          <p class="text-xs text-gray-500 mb-4">
+            <strong>ID del código:</strong> <code class="bg-gray-100 px-2 py-1 rounded">{qrCodeId}</code>
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2 justify-center">
+          <button class="error-state__button neo-btn neo-btn-primary" onclick="window.location.reload()">
+            Reintentar
+          </button>
+          <a href="/" class="error-state__button neo-btn neo-btn-secondary">
+            Volver al inicio
+          </a>
+        </div>
       </div>
     )}
 
@@ -273,50 +298,68 @@ if (menu) {
   /* Error State */
   .error-state {
     text-align: center;
-    padding: 4rem 2rem;
+    padding: 2rem 1.5rem;
     background: var(--background-secondary);
     border-radius: var(--radius-xl);
-    max-width: 500px;
-    margin: 2rem auto;
+    margin: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .error-state {
+      padding: 3rem 2rem;
+      margin: 2rem auto;
+    }
   }
 
   .error-state__icon {
-    width: 80px;
-    height: 80px;
-    background: var(--accent-gold);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: bold;
-    margin: 0 auto 2rem;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    display: block;
   }
 
   .error-state__title {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: var(--text-primary);
     margin-bottom: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .error-state__title {
+      font-size: 1.5rem;
+    }
   }
 
   .error-state__message {
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .error-state__details {
+    margin: 1.5rem 0;
   }
 
   .error-state__button {
     background: var(--primary-dark);
     color: var(--surface-white);
     border: none;
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius-sm);
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  @media (min-width: 640px) {
+    .error-state__button {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+    }
   }
 
   .error-state__button:hover,
