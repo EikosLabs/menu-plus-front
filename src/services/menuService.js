@@ -435,6 +435,7 @@ class MenuService {
 			name: menuItemData.name,
 			description: menuItemData.description || "",
 			price: Number.parseFloat(menuItemData.price),
+			currencyType: menuItemData.currencyType !== undefined ? Number.parseInt(menuItemData.currencyType) : 0,
 			menuId: menuItemData.menuId,
 			isAvailable:
 				menuItemData.isAvailable === undefined
@@ -475,6 +476,7 @@ class MenuService {
 			name: menuItemData.name,
 			description: menuItemData.description,
 			price: Number.parseFloat(menuItemData.price),
+			currencyType: menuItemData.currencyType !== undefined ? Number.parseInt(menuItemData.currencyType) : undefined,
 			isAvailable:
 				menuItemData.isAvailable === undefined
 					? true

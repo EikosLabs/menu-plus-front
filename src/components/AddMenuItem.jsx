@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import menuService from "../services/menuService";
+import { Currency, getAllCurrencies, getCurrencySymbol } from "../utils/currencies";
 
 export default function AddMenuItem({
 	menuId,
@@ -13,6 +14,7 @@ export default function AddMenuItem({
 		name: "",
 		description: "",
 		price: "",
+		currencyType: Currency.USD,
 		isAvailable: true,
 		menuItemCategoryId: null,
 		menuId: menuId,
@@ -28,6 +30,7 @@ export default function AddMenuItem({
 	const [loadingCategories, setLoadingCategories] = useState(false);
 	const [sections, setSections] = useState([]);
 	const [loadingSections, setLoadingSections] = useState(false);
+	const [availableCurrencies] = useState(getAllCurrencies());
 	const fileInputRef = useRef(null);
 	const formRef = useRef(null);
 	const [touched, setTouched] = useState({
@@ -114,6 +117,7 @@ export default function AddMenuItem({
 				name: existingItem.name || "",
 				description: existingItem.description || "",
 				price: existingItem.price?.toString() || "",
+				currencyType: existingItem.currencyType !== undefined ? existingItem.currencyType : Currency.USD,
 				isAvailable:
 					existingItem.isAvailable !== undefined
 						? existingItem.isAvailable
@@ -129,6 +133,7 @@ export default function AddMenuItem({
 				name: "",
 				description: "",
 				price: "",
+				currencyType: Currency.USD,
 				isAvailable: true,
 				menuItemCategoryId: null,
 				sectionId: sectionId || null,
@@ -257,6 +262,7 @@ export default function AddMenuItem({
 				name: formData.name.trim(),
 				description: formData.description || "",
 				price: Number.parseFloat(formData.price),
+				currencyType: Number.parseInt(formData.currencyType),
 				menuId: menuId,
 				isAvailable: formData.isAvailable,
 				menuItemCategoryId:
@@ -279,6 +285,7 @@ export default function AddMenuItem({
 					name: dataToSend.name,
 					description: dataToSend.description,
 					price: dataToSend.price,
+					currencyType: dataToSend.currencyType,
 					isAvailable: dataToSend.isAvailable,
 					menuItemCategoryId: dataToSend.menuItemCategoryId,
 					sectionId: dataToSend.sectionId,
@@ -596,7 +603,7 @@ export default function AddMenuItem({
 									</label>
 									<div className="relative">
 										<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-											$
+											{getCurrencySymbol(formData.currencyType)}
 										</span>
 										<input
 											type="number"
@@ -620,6 +627,30 @@ export default function AddMenuItem({
 									{priceError && (
 										<p className="mt-1 text-red-600 text-sm">{priceError}</p>
 									)}
+								</div>
+
+								<div>
+									<label
+										htmlFor="currencyType"
+										className="mb-1 block font-medium text-gray-700 text-sm"
+									>
+										Moneda *
+									</label>
+									<select
+										id="currencyType"
+										name="currencyType"
+										value={formData.currencyType}
+										onChange={handleChange}
+										className="neo-input neo-select"
+										disabled={loading}
+										required
+									>
+										{availableCurrencies.map((currency) => (
+											<option key={currency.value} value={currency.value}>
+												{currency.symbol} - {currency.code} ({currency.name})
+											</option>
+										))}
+									</select>
 								</div>
 
 								<div>

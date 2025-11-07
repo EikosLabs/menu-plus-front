@@ -1,0 +1,169 @@
+/* Classic Template - Tradicional y atemporal */
+:root[data-template="classic"] {
+  --template-primary: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  --template-secondary: linear-gradient(135deg, #CD853F 0%, #DEB887 100%);
+  --template-accent: linear-gradient(135deg, #8B0000 0%, #A52A2A 100%);
+  --template-bg: linear-gradient(135deg, #FDF5E6 0%, #FAF0E6 100%);
+  --template-card-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  --template-border: 3px solid #8B4513;
+  --template-border-radius: 8px;
+}
+
+[data-template="classic"] .menu-page {
+  background: var(--template-bg);
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+[data-template="classic"] .hero-gradient {
+  background: var(--template-primary);
+}
+
+[data-template="classic"] .hero-title-main {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: 0.02em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-template="classic"] .category-nav {
+  background: #FFF8DC;
+  border-bottom: 3px double #8B4513;
+  box-shadow: 0 2px 10px rgba(139, 69, 19, 0.15);
+}
+
+[data-template="classic"] .category-chip {
+  background: #FFF8DC;
+  border: 2px solid #8B4513;
+  border-radius: 6px;
+  color: #8B4513;
+  box-shadow: 2px 2px 5px rgba(139, 69, 19, 0.2);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 600;
+}
+
+[data-template="classic"] .category-chip:hover,
+[data-template="classic"] .category-chip.active {
+  background: var(--template-primary);
+  color: white;
+  border-color: #8B4513;
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 8px rgba(139, 69, 19, 0.3);
+}
+
+[data-template="classic"] .section-icon {
+  background: var(--template-secondary);
+  border: 3px double #8B4513;
+  border-radius: 8px;
+  box-shadow: 3px 3px 10px rgba(139, 69, 19, 0.2);
+}
+
+[data-template="classic"] .section-header {
+  border-bottom: 3px double #8B4513;
+}
+
+[data-template="classic"] .section-title {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #8B4513;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+[data-template="classic"] .section-description {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  color: #A0522D;
+}
+
+[data-template="classic"] .menu-item {
+  background: #FFF8DC;
+  border: 2px solid #CD853F;
+  border-radius: var(--template-border-radius);
+  box-shadow: var(--template-card-shadow);
+}
+
+[data-template="classic"] .menu-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 25px rgba(139, 69, 19, 0.2);
+  border-color: #8B4513;
+}
+
+[data-template="classic"] .item-name {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #8B4513;
+  font-weight: 700;
+}
+
+[data-template="classic"] .item-description {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  color: #666;
+}
+
+[data-template="classic"] .item-price-wrapper {
+  background: var(--template-primary);
+  border: 2px solid #8B4513;
+  border-radius: 6px;
+  box-shadow: 2px 2px 5px rgba(139, 69, 19, 0.2);
+}
+
+[data-template="classic"] .item-price {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+[data-template="classic"] .item-image-overlay {
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.85) 0%, rgba(160, 82, 45, 0.85) 100%);
+}
+
+[data-template="classic"] .item-image-placeholder {
+  background: var(--template-secondary);
+  border-bottom: 3px solid #8B4513;
+}
+
+[data-template="classic"] .btn--primary {
+  background: var(--template-primary);
+  border: 3px solid #8B4513;
+  box-shadow: 3px 3px 10px rgba(139, 69, 19, 0.2);
+  border-radius: 6px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+[data-template="classic"] .btn--secondary {
+  background: #FFF8DC;
+  border: 3px solid #8B4513;
+  color: #8B4513;
+  box-shadow: 3px 3px 10px rgba(139, 69, 19, 0.2);
+  border-radius: 6px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+[data-template="classic"] .loading-card,
+[data-template="classic"] .error-card {
+  background: #FFF8DC;
+  border: 3px double #8B4513;
+  box-shadow: 0 8px 30px rgba(139, 69, 19, 0.15);
+}
+
+[data-template="classic"] .loading-title,
+[data-template="classic"] .error-title {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #8B4513;
+}
+
+[data-template="classic"] .menu-footer {
+  background: #8B4513;
+  border-top: 3px double #A0522D;
+}
+
+[data-template="classic"] .empty-state {
+  background: #FFF8DC;
+  border: 3px double #8B4513;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+[data-template="classic"] .empty-title {
+  color: #8B4513;
+}
+
+[data-template="classic"] .empty-text {
+  color: #A0522D;
+  font-style: italic;
+}

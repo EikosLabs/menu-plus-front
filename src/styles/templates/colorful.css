@@ -1,0 +1,114 @@
+/* Colorful Template - Vibrante para negocios juveniles */
+:root[data-template="colorful"] {
+  --template-primary: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --template-secondary: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  --template-accent: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  --template-bg: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  --template-card-shadow: 8px 8px 0 rgba(0, 0, 0, 0.1);
+  --template-border: 4px solid #000;
+  --template-border-radius: 30px;
+}
+
+[data-template="colorful"] .menu-page {
+  background: var(--template-bg);
+}
+
+[data-template="colorful"] .hero-gradient {
+  background: var(--template-primary);
+}
+
+[data-template="colorful"] .hero-pattern {
+  background-image:
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
+}
+
+[data-template="colorful"] .category-nav {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  border-bottom: 4px solid #000;
+}
+
+[data-template="colorful"] .category-chip {
+  background: white;
+  border: var(--template-border);
+  border-radius: 50px;
+  color: #1a1a1a;
+  font-weight: 900;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+[data-template="colorful"] .category-chip:hover,
+[data-template="colorful"] .category-chip.active {
+  background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  color: white;
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+}
+
+[data-template="colorful"] .section-icon {
+  background: var(--template-secondary);
+  border: var(--template-border);
+  border-radius: 25px;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+[data-template="colorful"] .section-header {
+  border-bottom: 5px solid #000;
+}
+
+[data-template="colorful"] .section-title {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-template="colorful"] .menu-item {
+  background: white;
+  border: var(--template-border);
+  border-radius: var(--template-border-radius);
+  box-shadow: var(--template-card-shadow);
+}
+
+[data-template="colorful"] .menu-item:nth-child(odd) {
+  border-color: #fa709a;
+}
+
+[data-template="colorful"] .menu-item:nth-child(even) {
+  border-color: #30cfd0;
+}
+
+[data-template="colorful"] .menu-item:hover {
+  transform: translate(-4px, -4px) scale(1.02);
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.15);
+}
+
+[data-template="colorful"] .item-price-wrapper {
+  background: var(--template-primary);
+  border: 3px solid #000;
+  border-radius: 50px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+[data-template="colorful"] .item-image-overlay {
+  background: linear-gradient(135deg, rgba(250, 112, 154, 0.9) 0%, rgba(254, 225, 64, 0.9) 100%);
+}
+
+[data-template="colorful"] .btn--primary {
+  background: var(--template-primary);
+  border: var(--template-border);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+[data-template="colorful"] .btn--secondary {
+  background: var(--template-secondary);
+  border: var(--template-border);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+[data-template="colorful"] .allergen-badge {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border: 2px solid #000;
+  color: #1a1a1a;
+  font-weight: 800;
+}

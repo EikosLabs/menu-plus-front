@@ -1,0 +1,100 @@
+/* Elegant Template - Sofisticado para restaurantes de alta gama */
+:root[data-template="elegant"] {
+  --template-primary: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  --template-secondary: linear-gradient(135deg, #c9a961 0%, #b8942a 100%);
+  --template-accent: linear-gradient(135deg, #8b7355 0%, #6b5641 100%);
+  --template-bg: linear-gradient(135deg, #fdfcfa 0%, #f5f3ef 100%);
+  --template-card-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --template-border: none;
+  --template-border-radius: 12px;
+}
+
+[data-template="elegant"] .menu-page {
+  background: var(--template-bg);
+  font-family: 'Playfair Display', 'Georgia', serif;
+}
+
+[data-template="elegant"] .hero-gradient {
+  background: var(--template-primary);
+}
+
+[data-template="elegant"] .hero-title-main {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  letter-spacing: 0.05em;
+}
+
+[data-template="elegant"] .category-nav {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+}
+
+[data-template="elegant"] .category-chip {
+  background: white;
+  border: 2px solid #c9a961;
+  border-radius: 30px;
+  color: #1a1a1a;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+[data-template="elegant"] .category-chip:hover,
+[data-template="elegant"] .category-chip.active {
+  background: var(--template-secondary);
+  color: white;
+  border-color: #c9a961;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(201, 169, 97, 0.3);
+}
+
+[data-template="elegant"] .section-icon {
+  background: var(--template-secondary);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(201, 169, 97, 0.3);
+}
+
+[data-template="elegant"] .section-header {
+  border-bottom: 2px solid #c9a961;
+}
+
+[data-template="elegant"] .menu-item {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--template-card-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-template="elegant"] .menu-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+[data-template="elegant"] .item-price-wrapper {
+  background: var(--template-secondary);
+  border: none;
+  border-radius: 30px;
+  box-shadow: none;
+}
+
+[data-template="elegant"] .item-image-overlay {
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.85) 0%, rgba(45, 45, 45, 0.85) 100%);
+}
+
+[data-template="elegant"] .item-name {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-weight: 600;
+}
+
+[data-template="elegant"] .btn--primary {
+  background: var(--template-secondary);
+  border: 2px solid #c9a961;
+  box-shadow: 0 4px 15px rgba(201, 169, 97, 0.3);
+}
+
+[data-template="elegant"] .btn--secondary {
+  background: white;
+  border: 2px solid #1a1a1a;
+}

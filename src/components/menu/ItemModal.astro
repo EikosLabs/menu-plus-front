@@ -26,13 +26,38 @@
   const modalImage = document.getElementById('modalImage');
   const modalDescription = document.getElementById('modalDescription');
 
+  // Currency symbols mapping
+  const currencySymbols = {
+    0: '$',      // USD
+    1: '$U',     // UYU
+    2: '£',      // GBP
+    3: '$',      // ARS
+    4: 'Bs',     // BOB
+    5: 'R$',     // BRL
+    6: '$',      // CLP
+    7: '$',      // COP
+    8: '₡',      // CRC
+    9: '$',      // CUP
+    10: 'RD$',   // DOP
+    11: 'Q',     // GTQ
+    12: 'L',     // HNL
+    13: '$',     // MXN
+    14: 'C$',    // NIO
+    15: 'B/.',   // PAB
+    16: 'S/',    // PEN
+    17: '₲',     // PYG
+    18: 'Bs.S'   // VES
+  };
+
   const openModal = (data) => {
     if (!modal || !data) return;
 
-    const { name, price, image, description } = data;
+    const { name, price, image, description, currencyType } = data;
+    const currency = currencyType !== undefined ? parseInt(currencyType) : 0;
+    const symbol = currencySymbols[currency] || '$';
 
     modalTitle.textContent = name || 'Unknown Item';
-    modalPrice.textContent = `$${parseFloat(price || 0).toFixed(2)}`;
+    modalPrice.textContent = `${symbol}${parseFloat(price || 0).toFixed(2)}`;
     modalImage.src = image || '';
     modalImage.alt = name || 'Menu item';
     modalDescription.textContent = description || 'No description available.';
@@ -70,6 +95,7 @@
       price: menuItem.dataset.itemPrice,
       image: menuItem.dataset.itemImage,
       description: menuItem.dataset.itemDescription,
+      currencyType: menuItem.dataset.itemCurrency,
     };
 
     openModal(data);
@@ -85,6 +111,7 @@
       price: menuItem.dataset.itemPrice,
       image: menuItem.dataset.itemImage,
       description: menuItem.dataset.itemDescription,
+      currencyType: menuItem.dataset.itemCurrency,
     };
 
     openModal(data);

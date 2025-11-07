@@ -3,6 +3,14 @@ export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
 import '../../styles/menu-variables.css';
+import '../../styles/templates/modern.css';
+import '../../styles/templates/elegant.css';
+import '../../styles/templates/casual.css';
+import '../../styles/templates/minimalist.css';
+import '../../styles/templates/colorful.css';
+import '../../styles/templates/dark.css';
+import '../../styles/templates/classic.css';
+import '../../styles/business-info.css';
 
 const { qrCodeId } = Astro.params;
 ---
@@ -85,6 +93,7 @@ const { qrCodeId } = Astro.params;
 
   <script>
     import { sanitizeMenuData } from '../../utils/security.js';
+    import { renderBusinessInfo } from '../../utils/renderBusinessInfo.js';
 
     const pathParts = window.location.pathname.split('/');
     const qrCodeId = pathParts[pathParts.length - 1];
@@ -131,6 +140,20 @@ const { qrCodeId } = Astro.params;
         document.title = business?.name || 'Menu';
 
         if (business) {
+          // Map template enum to template name
+          const templateMap = {
+            0: 'modern',
+            1: 'elegant',
+            2: 'casual',
+            3: 'minimalist',
+            4: 'colorful',
+            5: 'dark',
+            6: 'classic'
+          };
+
+          const templateName = templateMap[business.template] || 'modern';
+          document.documentElement.setAttribute('data-template', templateName);
+
           const customColors = {
             primary: business.primaryColor || null,
             secondary: business.secondaryColor || null,
@@ -268,6 +291,9 @@ const { qrCodeId } = Astro.params;
       }
 
       html += '</div>';
+
+      // Business Information
+      html += renderBusinessInfo(business);
 
       // Footer
       html += `
@@ -445,7 +471,7 @@ const { qrCodeId } = Astro.params;
   </script>
 </Layout>
 
-<style>
+<style is:global>
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }

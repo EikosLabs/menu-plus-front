@@ -409,11 +409,20 @@ const { sections, menuItems } = Astro.props;
     const description = document.getElementById('surprise-description');
     const price = document.getElementById('surprise-price');
 
+    // Currency symbols mapping
+    const currencySymbols = {
+      0: '$', 1: '$U', 2: '£', 3: '$', 4: 'Bs', 5: 'R$', 6: '$', 7: '$',
+      8: '₡', 9: '$', 10: 'RD$', 11: 'Q', 12: 'L', 13: '$', 14: 'C$',
+      15: 'B/.', 16: 'S/', 17: '₲', 18: 'Bs.S'
+    };
+    const currency = item.currencyType !== undefined ? item.currencyType : 0;
+    const symbol = currencySymbols[currency] || '$';
+
     img.src = item.imageUri || 'https://ooni.com/cdn/shop/articles/20220211142347-margherita-9920_ba86be55-674e-4f35-8094-2067ab41a671.jpg?v=1737104576&width=1080';
     img.alt = item.name;
     name.textContent = item.name;
     description.textContent = item.description || 'Un delicioso platillo que te encantará';
-    price.textContent = `$${item.price.toFixed(2)}`;
+    price.textContent = `${symbol}${item.price.toFixed(2)}`;
 
     surpriseItem.classList.remove('hidden');
 

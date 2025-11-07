@@ -1,0 +1,113 @@
+/* Minimalist Template - Limpio y minimalista */
+:root[data-template="minimalist"] {
+  --template-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  --template-secondary: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  --template-accent: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+  --template-bg: #ffffff;
+  --template-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --template-border: 1px solid #ecf0f1;
+  --template-border-radius: 8px;
+}
+
+[data-template="minimalist"] .menu-page {
+  background: var(--template-bg);
+}
+
+[data-template="minimalist"] .bg-decoration {
+  display: none;
+}
+
+[data-template="minimalist"] .hero-gradient {
+  background: var(--template-primary);
+}
+
+[data-template="minimalist"] .category-nav {
+  background: white;
+  border-bottom: var(--template-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+[data-template="minimalist"] .category-chip {
+  background: white;
+  border: var(--template-border);
+  border-radius: 6px;
+  color: #2c3e50;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+[data-template="minimalist"] .category-chip:hover,
+[data-template="minimalist"] .category-chip.active {
+  background: #2c3e50;
+  color: white;
+  border-color: #2c3e50;
+  transform: none;
+  box-shadow: none;
+}
+
+[data-template="minimalist"] .section-icon {
+  background: white;
+  border: 2px solid #2c3e50;
+  border-radius: 8px;
+  box-shadow: none;
+  color: #2c3e50;
+}
+
+[data-template="minimalist"] .section-header {
+  border-bottom: 2px solid #ecf0f1;
+}
+
+[data-template="minimalist"] .section-title {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+[data-template="minimalist"] .menu-item {
+  background: white;
+  border: var(--template-border);
+  border-radius: var(--template-border-radius);
+  box-shadow: var(--template-card-shadow);
+}
+
+[data-template="minimalist"] .menu-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+[data-template="minimalist"] .item-price-wrapper {
+  background: #2c3e50;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+[data-template="minimalist"] .item-image-overlay {
+  background: rgba(44, 62, 80, 0.85);
+}
+
+[data-template="minimalist"] .item-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+[data-template="minimalist"] .btn--primary {
+  background: #2c3e50;
+  border: 2px solid #2c3e50;
+  box-shadow: none;
+  border-radius: 6px;
+}
+
+[data-template="minimalist"] .btn--secondary {
+  background: white;
+  border: 2px solid #2c3e50;
+  color: #2c3e50;
+  box-shadow: none;
+  border-radius: 6px;
+}
+
+[data-template="minimalist"] .loading-card,
+[data-template="minimalist"] .error-card {
+  border: var(--template-border);
+  box-shadow: var(--template-card-shadow);
+  border-radius: 8px;
+}

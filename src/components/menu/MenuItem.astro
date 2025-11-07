@@ -6,6 +6,32 @@ const { item } = Astro.props;
 const safeImageUrl = sanitizeUrl(item?.imageUri, '');
 const safePrice = validatePrice(item?.price);
 const isAvailable = item?.isAvailable !== false;
+
+// Currency mapping from backend enum to symbols
+const currencySymbols = {
+	0: '$',      // USD
+	1: '$U',     // UYU
+	2: '£',      // GBP
+	3: '$',      // ARS
+	4: 'Bs',     // BOB
+	5: 'R$',     // BRL
+	6: '$',      // CLP
+	7: '$',      // COP
+	8: '₡',      // CRC
+	9: '$',      // CUP
+	10: 'RD$',   // DOP
+	11: 'Q',     // GTQ
+	12: 'L',     // HNL
+	13: '$',     // MXN
+	14: 'C$',    // NIO
+	15: 'B/.',   // PAB
+	16: 'S/',    // PEN
+	17: '₲',     // PYG
+	18: 'Bs.S'   // VES
+};
+
+const currencyType = item?.currencyType !== undefined ? item.currencyType : 0;
+const currencySymbol = currencySymbols[currencyType] || '$';
 ---
 
 <div
@@ -16,6 +42,7 @@ const isAvailable = item?.isAvailable !== false;
   data-item-description={item?.description || ''}
   data-item-image={safeImageUrl}
   data-item-available={isAvailable}
+  data-item-currency={currencyType}
   role="button"
   tabindex="0"
   aria-label={`View details for ${item?.name}`}
@@ -41,7 +68,7 @@ const isAvailable = item?.isAvailable !== false;
   <div class="menu-item__details">
     <div class="menu-item__header">
       <h3 class="menu-item__name">{item?.name || 'Unknown Item'}</h3>
-      <span class="menu-item__price">${safePrice.toFixed(2)}</span>
+      <span class="menu-item__price">{currencySymbol}{safePrice.toFixed(2)}</span>
     </div>
     {item?.description && (
       <p class="menu-item__description">{item.description}</p>

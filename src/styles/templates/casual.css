@@ -1,0 +1,87 @@
+/* Casual Template - Amigable para cafeterías y fast food */
+:root[data-template="casual"] {
+  --template-primary: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  --template-secondary: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+  --template-accent: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);
+  --template-bg: linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%);
+  --template-card-shadow: 5px 5px 0 #000;
+  --template-border: 3px solid #000;
+  --template-border-radius: 25px;
+}
+
+[data-template="casual"] .menu-page {
+  background: var(--template-bg);
+}
+
+[data-template="casual"] .hero-gradient {
+  background: var(--template-primary);
+}
+
+[data-template="casual"] .category-chip {
+  background: #feca57;
+  border: var(--template-border);
+  border-radius: 50px;
+  font-weight: 800;
+  box-shadow: 4px 4px 0 #000;
+}
+
+[data-template="casual"] .category-chip:hover,
+[data-template="casual"] .category-chip.active {
+  background: var(--template-primary);
+  color: white;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+[data-template="casual"] .section-icon {
+  background: var(--template-secondary);
+  border: var(--template-border);
+  border-radius: 25px;
+  box-shadow: 5px 5px 0 #000;
+  transform: rotate(-5deg);
+}
+
+[data-template="casual"] .section-header {
+  border-bottom: 4px dashed #000;
+}
+
+[data-template="casual"] .menu-item {
+  background: white;
+  border: var(--template-border);
+  border-radius: var(--template-border-radius);
+  box-shadow: var(--template-card-shadow);
+  transform: rotate(0.5deg);
+}
+
+[data-template="casual"] .menu-item:nth-child(even) {
+  transform: rotate(-0.5deg);
+}
+
+[data-template="casual"] .menu-item:hover {
+  transform: translate(-3px, -3px) rotate(0deg);
+  box-shadow: 8px 8px 0 #000;
+}
+
+[data-template="casual"] .item-price-wrapper {
+  background: var(--template-primary);
+  border: var(--template-border);
+  border-radius: 50px;
+  box-shadow: 3px 3px 0 #000;
+}
+
+[data-template="casual"] .item-image-overlay {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.9) 0%, rgba(238, 90, 111, 0.9) 100%);
+}
+
+[data-template="casual"] .btn--primary {
+  background: var(--template-primary);
+  border: var(--template-border);
+  box-shadow: 5px 5px 0 #000;
+}
+
+[data-template="casual"] .btn--secondary {
+  background: #feca57;
+  border: var(--template-border);
+  box-shadow: 5px 5px 0 #000;
+  color: #1a1a1a;
+}
