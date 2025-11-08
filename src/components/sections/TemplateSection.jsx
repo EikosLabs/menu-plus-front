@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
 
+const availableFonts = [
+	{ id: 'poppins', name: 'Poppins', family: "'Poppins', sans-serif", description: 'Moderna y legible', preview: 'Aa' },
+	{ id: 'playfair', name: 'Playfair Display', family: "'Playfair Display', serif", description: 'Elegante y sofisticada', preview: 'Aa' },
+	{ id: 'roboto', name: 'Roboto', family: "'Roboto', sans-serif", description: 'Limpia y profesional', preview: 'Aa' },
+	{ id: 'montserrat', name: 'Montserrat', family: "'Montserrat', sans-serif", description: 'Geométrica y moderna', preview: 'Aa' },
+	{ id: 'lora', name: 'Lora', family: "'Lora', serif", description: 'Clásica y legible', preview: 'Aa' },
+	{ id: 'opensans', name: 'Open Sans', family: "'Open Sans', sans-serif", description: 'Neutral y versátil', preview: 'Aa' },
+	{ id: 'raleway', name: 'Raleway', family: "'Raleway', sans-serif", description: 'Elegante y delgada', preview: 'Aa' },
+	{ id: 'merriweather', name: 'Merriweather', family: "'Merriweather', serif", description: 'Tradicional y cálida', preview: 'Aa' }
+];
+
 const templates = [
 	{
 		id: 0,
@@ -11,7 +22,8 @@ const templates = [
 			secondary: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
 			bg: "linear-gradient(135deg, #f8f5ff 0%, #fff5f5 100%)"
 		},
-		icon: "🎨"
+		icon: "🎨",
+		recommendedFont: 'poppins'
 	},
 	{
 		id: 1,
@@ -23,7 +35,8 @@ const templates = [
 			secondary: "linear-gradient(135deg, #c9a961 0%, #b8942a 100%)",
 			bg: "linear-gradient(135deg, #fdfcfa 0%, #f5f3ef 100%)"
 		},
-		icon: "👔"
+		icon: "👔",
+		recommendedFont: 'playfair'
 	},
 	{
 		id: 2,
@@ -35,7 +48,8 @@ const templates = [
 			secondary: "linear-gradient(135deg, #feca57 0%, #ff9ff3 100%)",
 			bg: "linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%)"
 		},
-		icon: "🍔"
+		icon: "🍔",
+		recommendedFont: 'montserrat'
 	},
 	{
 		id: 3,
@@ -47,7 +61,8 @@ const templates = [
 			secondary: "linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)",
 			bg: "#ffffff"
 		},
-		icon: "⚪"
+		icon: "⚪",
+		recommendedFont: 'roboto'
 	},
 	{
 		id: 4,
@@ -59,7 +74,8 @@ const templates = [
 			secondary: "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
 			bg: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)"
 		},
-		icon: "🌈"
+		icon: "🌈",
+		recommendedFont: 'poppins'
 	},
 	{
 		id: 5,
@@ -71,7 +87,8 @@ const templates = [
 			secondary: "linear-gradient(135deg, #DAA520 0%, #FFD700 100%)",
 			bg: "linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)"
 		},
-		icon: "🌙"
+		icon: "🌙",
+		recommendedFont: 'lora'
 	},
 	{
 		id: 6,
@@ -83,13 +100,16 @@ const templates = [
 			secondary: "linear-gradient(135deg, #CD853F 0%, #DEB887 100%)",
 			bg: "linear-gradient(135deg, #FDF5E6 0%, #FAF0E6 100%)"
 		},
-		icon: "📜"
+		icon: "📜",
+		recommendedFont: 'merriweather'
 	}
 ];
 
 const TemplateSection = ({ businesses }) => {
 	const [selectedTemplate, setSelectedTemplate] = useState(0);
 	const [currentTemplate, setCurrentTemplate] = useState(0);
+	const [selectedFont, setSelectedFont] = useState('poppins');
+	const [currentFont, setCurrentFont] = useState('poppins');
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState(null);
@@ -101,11 +121,33 @@ const TemplateSection = ({ businesses }) => {
 			setCurrentTemplate(business.template);
 			setSelectedTemplate(business.template);
 		}
+		if (business && business.fontFamily) {
+			setCurrentFont(business.fontFamily);
+			setSelectedFont(business.fontFamily);
+		} else if (business && business.template !== undefined) {
+			// Set recommended font for the template
+			const template = templates.find(t => t.id === business.template);
+			if (template) {
+				setCurrentFont(template.recommendedFont);
+				setSelectedFont(template.recommendedFont);
+			}
+		}
 	}, [business]);
 
 	const handleTemplateSelect = (templateId) => {
 		setSelectedTemplate(templateId);
+		// Auto-select recommended font when changing template
+		const template = templates.find(t => t.id === templateId);
+		if (template) {
+			setSelectedFont(template.recommendedFont);
+		}
 	};
+
+	const handleFontSelect = (fontId) => {
+		setSelectedFont(fontId);
+	};
+
+	const hasChanges = selectedTemplate !== currentTemplate || selectedFont !== currentFont;
 
 	const handleSaveTemplate = async () => {
 		if (!business) {
@@ -113,8 +155,8 @@ const TemplateSection = ({ businesses }) => {
 			return;
 		}
 
-		if (selectedTemplate === currentTemplate) {
-			setError("Este template ya está seleccionado");
+		if (!hasChanges) {
+			setError("No hay cambios para guardar");
 			return;
 		}
 
@@ -133,7 +175,8 @@ const TemplateSection = ({ businesses }) => {
 					"Authorization": `Bearer ${token}`
 				},
 				body: JSON.stringify({
-					template: selectedTemplate
+					template: selectedTemplate,
+					fontFamily: selectedFont
 				})
 			});
 
@@ -142,6 +185,7 @@ const TemplateSection = ({ businesses }) => {
 			}
 
 			setCurrentTemplate(selectedTemplate);
+			setCurrentFont(selectedFont);
 			setSuccess(true);
 			setTimeout(() => setSuccess(false), 3000);
 		} catch (err) {
@@ -181,7 +225,7 @@ const TemplateSection = ({ businesses }) => {
 					</p>
 				</div>
 
-				{selectedTemplate !== currentTemplate && (
+				{hasChanges && (
 					<button
 						onClick={handleSaveTemplate}
 						disabled={loading}
@@ -212,7 +256,7 @@ const TemplateSection = ({ businesses }) => {
 					<svg className="mr-3 h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
-					<p className="neo-text-bold">¡Template actualizado exitosamente! Los cambios se verán reflejados en tu menú.</p>
+					<p className="neo-text-bold">¡Template y fuente actualizados exitosamente! Los cambios se verán reflejados en tu menú.</p>
 				</div>
 			)}
 
@@ -281,6 +325,56 @@ const TemplateSection = ({ businesses }) => {
 				))}
 			</div>
 
+			{/* Font Selection Section */}
+			<div className="mt-8">
+				<h3 className="flex items-center neo-heading neo-h4 text-xl mb-4">
+					<svg className="mr-2 h-6 w-6 text-neo-flame" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+					</svg>
+					Tipografía
+				</h3>
+				<p className="neo-text text-neo-gray mb-4">
+					Selecciona la fuente que mejor represente tu marca. Cada template tiene una fuente recomendada, pero puedes elegir la que prefieras.
+				</p>
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+					{availableFonts.map((font) => {
+						const currentSelectedTemplate = templates.find(t => t.id === selectedTemplate);
+						const isRecommended = currentSelectedTemplate && currentSelectedTemplate.recommendedFont === font.id;
+						
+						return (
+							<div
+								key={font.id}
+								onClick={() => handleFontSelect(font.id)}
+								className={`neo-card-3d cursor-pointer p-4 text-center transition-all duration-300 hover:scale-105 ${
+									selectedFont === font.id ? "ring-4 ring-neo-flame ring-offset-4" : ""
+								} ${currentFont === font.id ? "border-4 border-green-500" : ""}`}
+							>
+								<div 
+									className="text-5xl mb-2 font-bold"
+									style={{ fontFamily: font.family }}
+								>
+									{font.preview}
+								</div>
+								<h4 className="neo-text-bold text-sm mb-1">{font.name}</h4>
+								<p className="neo-text text-xs text-neo-gray mb-2">{font.description}</p>
+								
+								<div className="flex gap-2 justify-center flex-wrap">
+									{currentFont === font.id && (
+										<span className="neo-badge neo-badge-success text-xs">Activa</span>
+									)}
+									{selectedFont === font.id && currentFont !== font.id && (
+										<span className="neo-badge neo-badge-primary text-xs">Seleccionada</span>
+									)}
+									{isRecommended && (
+										<span className="neo-badge neo-badge-warning text-xs">⭐ Recomendada</span>
+									)}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+
 			<div className="mt-6 neo-card-3d-sunset p-4">
 				<div className="flex items-start">
 					<svg className="mr-3 h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -289,7 +383,7 @@ const TemplateSection = ({ businesses }) => {
 					<div>
 						<p className="neo-text-bold mb-1">💡 Consejo Pro</p>
 						<p className="neo-text text-sm">
-							Elige un template que refleje la personalidad de tu negocio. Puedes cambiar de template en cualquier momento sin perder tu contenido.
+							Elige un template y una fuente que reflejen la personalidad de tu negocio. La tipografía recomendada para cada template ha sido seleccionada para complementar su estilo, pero puedes cambiarla en cualquier momento.
 						</p>
 					</div>
 				</div>
