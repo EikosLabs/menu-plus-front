@@ -121,7 +121,7 @@ const { qrCodeId } = Astro.params;
   </main>
 
   <script>
-    import { sanitizeMenuData, sanitizeHtml, sanitizeUrl } from '../../utils/security.js';
+    import { sanitizeMenuData, sanitizeHtml, sanitizeUrl, sanitizeColor } from '../../utils/security.js';
     import { renderBusinessInfo } from '../../utils/renderBusinessInfo.js';
     import { getCurrencySymbol } from '../../utils/currencies.js';
 
@@ -200,9 +200,9 @@ const { qrCodeId } = Astro.params;
           const fontFamilyValue = fontMap[fontFamily] || fontMap['poppins'];
 
           const customColors = {
-            primary: business.primaryColor || null,
-            secondary: business.secondaryColor || null,
-            accent: business.accentColor || null
+            primary: sanitizeColor(business.primaryColor) || null,
+            secondary: sanitizeColor(business.secondaryColor) || null,
+            accent: sanitizeColor(business.accentColor) || null
           };
 
           const styleEl = document.createElement('style');
@@ -324,14 +324,15 @@ const { qrCodeId } = Astro.params;
       html += '<div class="menu-sections">';
       menu.sections.forEach((section, index) => {
         const items = itemsBySection[String(section.id).toLowerCase()] || [];
-        html += renderSection(section, items, index);
+        html += renderSection(section, items, index, business);
       });
 
       if (itemsBySection['no-section']) {
         html += renderSection(
           { id: 'no-section', name: 'Other Items', description: 'Additional delicious options' },
           itemsBySection['no-section'],
-          menu.sections.length
+          menu.sections.length,
+          business
         );
       }
 
@@ -367,7 +368,7 @@ const { qrCodeId } = Astro.params;
       initializeInteractiveElements();
     }
 
-    function renderSection(section, items, index) {
+    function renderSection(section, items, index, business) {
       const emoji = getEmojiForSection(section.name, index);
 
       let html = `

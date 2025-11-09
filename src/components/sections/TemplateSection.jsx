@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { authService } from "../../services/authService";
 
 const availableFonts = [
 	{ id: 'poppins', name: 'Poppins', family: "'Poppins', sans-serif", description: 'Moderna y legible', preview: 'Aa' },
@@ -165,7 +166,7 @@ const TemplateSection = ({ businesses }) => {
 		setSuccess(false);
 
 		try {
-			const token = localStorage.getItem("token");
+			const token = authService.getToken();
 			const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
 
 			const response = await fetch(`${API_URL}/food-businesses/${business.id}`, {

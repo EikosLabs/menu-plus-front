@@ -126,3 +126,33 @@ export const addCsrfHeader = (headers = {}) => {
 
   return headers;
 };
+
+/**
+ * Validates and sanitizes CSS color values
+ * @param {string} color - Color value to validate
+ * @returns {string} Safe color value or empty string
+ */
+export const sanitizeColor = (color) => {
+  if (!color || typeof color !== 'string') return '';
+
+  // Remove any potential XSS attempts
+  const cleaned = color.trim();
+
+  // Validate common CSS color formats:
+  // - Hex: #RGB, #RRGGBB, #RRGGBBAA
+  // - RGB/RGBA: rgb(r, g, b), rgba(r, g, b, a)
+  // - HSL/HSLA: hsl(h, s%, l%), hsla(h, s%, l%, a)
+  // - Named colors: red, blue, etc.
+  const validColorPattern = /^(#[0-9A-Fa-f]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\)|[a-z]+)$/;
+
+  if (!validColorPattern.test(cleaned)) {
+    return '';
+  }
+
+  // Block any attempt to break out of CSS context
+  if (cleaned.includes(';') || cleaned.includes('}') || cleaned.includes('<') || cleaned.includes('>')) {
+    return '';
+  }
+
+  return cleaned;
+};
