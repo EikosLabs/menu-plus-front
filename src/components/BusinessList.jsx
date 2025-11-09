@@ -19,15 +19,17 @@ export default function BusinessList({
 	const [showSectionManager, setShowSectionManager] = useState(null);
 	const [selectedSection, setSelectedSection] = useState(null);
 	const [selectedMenuId, setSelectedMenuId] = useState(null);
+	const [selectedBusinessCurrency, setSelectedBusinessCurrency] = useState(0); // Default USD
 	const [showMenuCard, setShowMenuCard] = useState(null); // { businessId, menuId }
 	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null); // { businessId, menuId }
 	const [showSavedFlyers, setShowSavedFlyers] = useState(null); // { menuId }
 
-	const handleShowAddMenuItem = (menuId, sectionId = null) => {
+	const handleShowAddMenuItem = (menuId, sectionId = null, businessCurrency = 0) => {
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
 		setMenuItemToEdit(null);
 		setSelectedSection(sectionId);
 		setSelectedMenuId(menuId);
+		setSelectedBusinessCurrency(businessCurrency);
 	};
 
 	const handleCancelAddMenuItem = (menuId) => {
@@ -35,13 +37,14 @@ export default function BusinessList({
 		setSelectedMenuId(null);
 	};
 
-	const handleShowEditMenuItem = (menuItem, menuId) => {
+	const handleShowEditMenuItem = (menuItem, menuId, businessCurrency = 0) => {
 		setMenuItemToEdit({
 			...menuItem,
 			menuId: menuId,
 		});
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
 		setSelectedMenuId(menuId);
+		setSelectedBusinessCurrency(businessCurrency);
 	};
 
 	const handleCancelEditMenuItem = () => {
@@ -518,7 +521,7 @@ export default function BusinessList({
 											<button
 												onClick={() => {
 													setSelectedSection(null);
-													handleShowAddMenuItem(menu.id);
+													handleShowAddMenuItem(menu.id, null, business.defaultCurrency);
 												}}
 												className="neo-btn neo-btn-primary text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
 											>
@@ -570,7 +573,7 @@ export default function BusinessList({
 															<button
 																onClick={() => {
 																	setSelectedSection(section.id);
-																	handleShowAddMenuItem(menu.id, section.id);
+																	handleShowAddMenuItem(menu.id, section.id, business.defaultCurrency);
 																}}
 																className="neo-btn neo-btn-primary neo-btn-sm flex items-center"
 															>
@@ -637,6 +640,7 @@ export default function BusinessList({
 																							handleShowEditMenuItem(
 																								item,
 																								menu.id,
+																								business.defaultCurrency,
 																							)
 																						}
 																						className="text-blue-600 hover:text-blue-800 p-1"
@@ -748,6 +752,7 @@ export default function BusinessList({
 				<AddMenuItem
 					menuId={selectedMenuId}
 					sectionId={selectedSection}
+					businessCurrency={selectedBusinessCurrency}
 					onItemAdded={(newItem) => {
 						if (menuItemToEdit) {
 							handleItemUpdated(newItem);

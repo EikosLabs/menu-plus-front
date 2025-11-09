@@ -11,7 +11,6 @@
 
 [data-template="classic"] .menu-page {
   background: var(--template-bg);
-  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 [data-template="classic"] .hero-gradient {
@@ -19,7 +18,6 @@
 }
 
 [data-template="classic"] .hero-title-main {
-  font-family: 'Georgia', 'Times New Roman', serif;
   letter-spacing: 0.02em;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -36,7 +34,6 @@
   border-radius: 6px;
   color: #8B4513;
   box-shadow: 2px 2px 5px rgba(139, 69, 19, 0.2);
-  font-family: 'Georgia', 'Times New Roman', serif;
   font-weight: 600;
 }
 
@@ -61,14 +58,12 @@
 }
 
 [data-template="classic"] .section-title {
-  font-family: 'Georgia', 'Times New Roman', serif;
   color: #8B4513;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
 [data-template="classic"] .section-description {
-  font-family: 'Georgia', 'Times New Roman', serif;
   font-style: italic;
   color: #A0522D;
 }
@@ -87,13 +82,11 @@
 }
 
 [data-template="classic"] .item-name {
-  font-family: 'Georgia', 'Times New Roman', serif;
   color: #8B4513;
   font-weight: 700;
 }
 
 [data-template="classic"] .item-description {
-  font-family: 'Georgia', 'Times New Roman', serif;
   font-style: italic;
   color: #666;
 }
@@ -103,10 +96,6 @@
   border: 2px solid #8B4513;
   border-radius: 6px;
   box-shadow: 2px 2px 5px rgba(139, 69, 19, 0.2);
-}
-
-[data-template="classic"] .item-price {
-  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 [data-template="classic"] .item-image-overlay {
@@ -123,7 +112,6 @@
   border: 3px solid #8B4513;
   box-shadow: 3px 3px 10px rgba(139, 69, 19, 0.2);
   border-radius: 6px;
-  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 [data-template="classic"] .btn--secondary {
@@ -132,7 +120,6 @@
   color: #8B4513;
   box-shadow: 3px 3px 10px rgba(139, 69, 19, 0.2);
   border-radius: 6px;
-  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 [data-template="classic"] .loading-card,
@@ -144,7 +131,6 @@
 
 [data-template="classic"] .loading-title,
 [data-template="classic"] .error-title {
-  font-family: 'Georgia', 'Times New Roman', serif;
   color: #8B4513;
 }
 
@@ -156,7 +142,6 @@
 [data-template="classic"] .empty-state {
   background: #FFF8DC;
   border: 3px double #8B4513;
-  font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 [data-template="classic"] .empty-title {

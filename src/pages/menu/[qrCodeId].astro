@@ -123,6 +123,7 @@ const { qrCodeId } = Astro.params;
   <script>
     import { sanitizeMenuData } from '../../utils/security.js';
     import { renderBusinessInfo } from '../../utils/renderBusinessInfo.js';
+    import { getCurrencySymbol } from '../../utils/currencies.js';
 
     const pathParts = window.location.pathname.split('/');
     const qrCodeId = pathParts[pathParts.length - 1];
@@ -213,14 +214,15 @@ const { qrCodeId } = Astro.params;
               --font-display: ${fontFamilyValue};
             }
             
-            body, .menu-page {
-              font-family: ${fontFamilyValue};
+            body, .menu-page, * {
+              font-family: ${fontFamilyValue} !important;
             }
             
             .hero-title-main, .section-title, .item-name, .dish-modal-title,
             .loading-title, .error-title, .empty-title, .footer-logo,
-            .category-chip, .item-price {
-              font-family: ${fontFamilyValue};
+            .category-chip, .item-price, .category-name, .section-description,
+            .item-description, .dish-modal-description, .footer-text {
+              font-family: ${fontFamilyValue} !important;
             }
           `;
           document.head.appendChild(styleEl);
@@ -386,22 +388,28 @@ const { qrCodeId } = Astro.params;
           name: item.name,
           description: item.description || '',
           price: item.price,
+          currencyType: item.currencyType !== undefined ? item.currencyType : business.defaultCurrency,
           imageUrl: item.imageUrl || '',
           allergens: item.allergens || [],
           categoryId: item.menuItemCategoryId || null
         };
 
+        const hasImage = item.imageUrl && item.imageUrl.trim() !== '';
+
         html += `
           <article class="menu-item clickable-item"
                    data-item-id="${item.id}"
-                   data-item='${JSON.stringify(itemData).replace(/'/g, "&#39;")}'
+                   data-item='${JSON.stringify(itemData).replace(/'/g, "&#39;").replace(/"/g, "&quot;")}'
                    style="animation-delay: ${idx * 0.05}s">
-            ${item.imageUrl ? `
+            ${hasImage ? `
               <div class="item-image-wrapper">
-                <img src="${item.imageUrl}" alt="${item.name}" class="item-image" loading="lazy" />
+                <img src="${item.imageUrl}" alt="${item.name}" class="item-image" loading="lazy" onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';" />
                 <div class="item-image-overlay">
                   <span class="item-view-icon">👁️</span>
                 </div>
+              </div>
+              <div class="item-image-placeholder" style="display: none;">
+                <span class="placeholder-emoji">🍴</span>
               </div>
             ` : `
               <div class="item-image-placeholder">
@@ -412,7 +420,7 @@ const { qrCodeId } = Astro.params;
               <div class="item-header">
                 <h3 class="item-name">${item.name}</h3>
                 <div class="item-price-wrapper">
-                  <span class="item-price">$${item.price.toFixed(2)}</span>
+                  <span class="item-price">${getCurrencySymbol(item.currencyType !== undefined ? item.currencyType : business.defaultCurrency)}${item.price.toFixed(2)}</span>
                 </div>
               </div>
               ${item.description ? `<p class="item-description">${item.description}</p>` : ''}
@@ -567,7 +575,8 @@ const { qrCodeId } = Astro.params;
         const modalAllergens = document.getElementById('modal-dish-allergens');
 
         modalName.textContent = item.name;
-        modalPrice.textContent = `$${item.price.toFixed(2)}`;
+        const currencySymbol = getCurrencySymbol(item.currencyType);
+        modalPrice.textContent = `${currencySymbol}${item.price.toFixed(2)}`;
 
         if (item.description) {
           modalDescription.textContent = item.description;
@@ -576,10 +585,14 @@ const { qrCodeId } = Astro.params;
           modalDescription.style.display = 'none';
         }
 
-        if (item.imageUrl) {
+        if (item.imageUrl && item.imageUrl.trim() !== '') {
           modalImage.src = item.imageUrl;
           modalImage.alt = item.name;
           modalImage.style.display = 'block';
+          modalImage.onerror = function() {
+            this.style.display = 'none';
+            modalImageWrapper.querySelector('.dish-modal-image-placeholder').style.display = 'flex';
+          };
           modalImageWrapper.querySelector('.dish-modal-image-placeholder').style.display = 'none';
         } else {
           modalImage.style.display = 'none';

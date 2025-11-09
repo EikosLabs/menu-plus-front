@@ -1,255 +1,123 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import menuService from "../services/menuService";
-import { Currency, getAllCurrencies, getCurrencySymbol } from "../utils/currencies";
+import { getCurrencySymbol } from "../utils/currencies";
+import { useFormValidation } from "../hooks/useFormValidation";
+import { useImageUpload } from "../hooks/useImageUpload";
+import Modal from "./shared/Modal";
+import ImageUploader from "./shared/ImageUploader";
+import { FormField, TextAreaField, SelectField, CheckboxField } from "./shared/FormField";
+
+const validationRules = {
+	name: (value) => value?.trim() ? "" : "El nombre del plato es obligatorio",
+	price: (value) => value && parseFloat(value) > 0 ? "" : "El precio debe ser mayor que cero"
+};
 
 export default function AddMenuItem({
 	menuId,
 	sectionId,
+	businessCurrency = 0,
 	onItemAdded,
 	onCancel,
 	existingItem,
 	isEditing,
 }) {
-	const [formData, setFormData] = useState({
-		name: "",
-		description: "",
-		price: "",
-		currencyType: Currency.USD,
-		isAvailable: true,
-		menuItemCategoryId: null,
-		menuId: menuId,
-		sectionId: sectionId || null,
-		image: null,
-	});
-
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [message, setMessage] = useState(null);
-	const [imagePreview, setImagePreview] = useState(null);
 	const [categories, setCategories] = useState([]);
 	const [loadingCategories, setLoadingCategories] = useState(false);
 	const [sections, setSections] = useState([]);
 	const [loadingSections, setLoadingSections] = useState(false);
-	const [availableCurrencies] = useState(getAllCurrencies());
-	const fileInputRef = useRef(null);
-	const formRef = useRef(null);
-	const [touched, setTouched] = useState({
-		name: false,
-		price: false,
-	});
 
-	const isMounted = useRef(true);
+	const { values, errors, touched, handleChange, handleBlur, validateAll, resetForm } = useFormValidation(
+		{
+			name: "",
+			description: "",
+			price: "",
+			isAvailable: true,
+			menuItemCategoryId: null,
+			sectionId: sectionId || null,
+			menuId: menuId,
+		},
+		validationRules
+	);
 
+	const {
+		image,
+		preview,
+		error: imageError,
+		fileInputRef,
+		handleFileChange,
+		clearImage,
+		setExistingPreview
+	} = useImageUpload();
+
+	// Load categories and sections
 	useEffect(() => {
-		const handleEscapeKey = (e) => {
-			if (e.key === "Escape" && !loading) {
-				onCancel();
-			}
-		};
+		let mounted = true;
 
-		document.addEventListener("keydown", handleEscapeKey);
-		return () => {
-			document.removeEventListener("keydown", handleEscapeKey);
-		};
-	}, [loading, onCancel]);
-
-	// Bloquear scroll cuando el modal está abierto
-	useEffect(() => {
-		document.body.style.overflow = 'hidden';
-		return () => {
-			document.body.style.overflow = 'unset';
-		};
-	}, []);
-
-	useEffect(() => {
-		async function fetchCategories() {
-			if (!isMounted.current) {
-				return;
-			}
-			setLoadingCategories(true);
+		async function fetchData() {
 			try {
+				setLoadingCategories(true);
 				const categoriesData = await menuService.getMenuItemCategories();
-				if (isMounted.current) {
-					setCategories(categoriesData || []);
-				}
-			} catch (_err) {
-				if (isMounted.current) {
-					setError("No se pudieron cargar las categorías. Intente nuevamente.");
-				}
+				if (mounted) setCategories(categoriesData || []);
+			} catch {
+				if (mounted) setError("No se pudieron cargar las categorías");
 			} finally {
-				if (isMounted.current) {
-					setLoadingCategories(false);
+				if (mounted) setLoadingCategories(false);
+			}
+
+			if (menuId) {
+				try {
+					setLoadingSections(true);
+					const sectionsData = await menuService.getSections(menuId);
+					if (mounted) setSections(sectionsData || []);
+				} catch {
+					// Silent fail
+				} finally {
+					if (mounted) setLoadingSections(false);
 				}
 			}
 		}
 
-		async function fetchSections() {
-			if (!(isMounted.current && menuId)) {
-				return;
-			}
-			setLoadingSections(true);
-			try {
-				const sectionsData = await menuService.getSections(menuId);
-				if (isMounted.current) {
-					setSections(sectionsData || []);
-				}
-			} catch (_err) {
-				if (isMounted.current) {
-				}
-			} finally {
-				if (isMounted.current) {
-					setLoadingSections(false);
-				}
-			}
-		}
-
-		fetchCategories();
-		fetchSections();
+		fetchData();
+		return () => { mounted = false; };
 	}, [menuId]);
 
+	// Load existing item data
 	useEffect(() => {
-		if (!isMounted.current) {
-			return;
-		}
-
 		if (isEditing && existingItem) {
-			setFormData({
+			resetForm({
 				name: existingItem.name || "",
 				description: existingItem.description || "",
 				price: existingItem.price?.toString() || "",
-				currencyType: existingItem.currencyType !== undefined ? existingItem.currencyType : Currency.USD,
-				isAvailable:
-					existingItem.isAvailable !== undefined
-						? existingItem.isAvailable
-						: true,
+				isAvailable: existingItem.isAvailable !== undefined ? existingItem.isAvailable : true,
 				menuItemCategoryId: existingItem.menuItemCategoryId || null,
 				sectionId: existingItem.sectionId || sectionId || null,
 				menuId: existingItem.menuId || menuId,
-				image: null,
 			});
-			setImagePreview(existingItem.imageUri || null);
+			if (existingItem.imageUri) {
+				setExistingPreview(existingItem.imageUri);
+			}
 		} else {
-			setFormData({
+			resetForm({
 				name: "",
 				description: "",
 				price: "",
-				currencyType: Currency.USD,
 				isAvailable: true,
 				menuItemCategoryId: null,
 				sectionId: sectionId || null,
 				menuId: menuId,
-				image: null,
 			});
-			setImagePreview(null);
+			clearImage();
 		}
-	}, [isEditing, existingItem, menuId, sectionId]);
-
-	const handleChange = (e) => {
-		const { name, value, type, checked } = e.target;
-		setFormData((prev) => ({
-			...prev,
-			[name]:
-				type === "checkbox"
-					? checked
-					: name === "menuItemCategoryId" && value === ""
-						? null
-						: value,
-		}));
-
-		if (!touched[name]) {
-			setTouched((prev) => ({
-				...prev,
-				[name]: true,
-			}));
-		}
-
-		setError(null);
-		setMessage(null);
-	};
-
-	const handleBlur = (e) => {
-		const { name } = e.target;
-		setTouched((prev) => ({
-			...prev,
-			[name]: true,
-		}));
-	};
-
-	const validateField = (name, value) => {
-		switch (name) {
-			case "name":
-				return value.trim() ? "" : "El nombre del plato es obligatorio";
-			case "price":
-				return value && Number.parseFloat(value) > 0
-					? ""
-					: "El precio debe ser mayor que cero";
-			default:
-				return "";
-		}
-	};
-
-	const getFieldError = (fieldName) => {
-		if (!touched[fieldName]) {
-			return "";
-		}
-		return validateField(fieldName, formData[fieldName]);
-	};
-
-	const nameError = getFieldError("name");
-	const priceError = getFieldError("price");
-
-	const handleFileChange = (e) => {
-		if (!isMounted.current) {
-			return;
-		}
-
-		const file = e.target.files[0];
-		setImagePreview(null);
-		setFormData((prev) => ({ ...prev, image: null }));
-		if (fileInputRef.current) {
-			fileInputRef.current.value = null;
-		}
-
-		if (!file) {
-			return;
-		}
-
-		const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-		if (!validTypes.includes(file.type)) {
-			setError("El archivo debe ser una imagen (JPEG, PNG, WebP).");
-			return;
-		}
-
-		if (file.size > 5 * 1024 * 1024) {
-			setError("La imagen no debe exceder 5MB.");
-			return;
-		}
-
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			if (isMounted.current) {
-				setImagePreview(reader.result);
-			}
-		};
-		reader.readAsDataURL(file);
-
-		setFormData((prev) => ({
-			...prev,
-			image: file,
-		}));
-		setError(null);
-	};
+	}, [isEditing, existingItem, menuId, sectionId, resetForm, setExistingPreview, clearImage]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		if (!formData.name?.trim()) {
-			setError("El nombre del plato es obligatorio");
-			return;
-		}
-
-		if (!formData.price || Number.parseFloat(formData.price) <= 0) {
-			setError("El precio debe ser mayor que cero");
+		if (!validateAll()) {
+			setError("Por favor, corrija los errores del formulario");
 			return;
 		}
 
@@ -259,25 +127,15 @@ export default function AddMenuItem({
 
 		try {
 			const dataToSend = {
-				name: formData.name.trim(),
-				description: formData.description || "",
-				price: Number.parseFloat(formData.price),
-				currencyType: Number.parseInt(formData.currencyType),
+				name: values.name.trim(),
+				description: values.description || "",
+				price: parseFloat(values.price),
+				currencyType: businessCurrency,
 				menuId: menuId,
-				isAvailable: formData.isAvailable,
-				menuItemCategoryId:
-					formData.menuItemCategoryId === ""
-						? null
-						: formData.menuItemCategoryId
-							? Number.parseInt(formData.menuItemCategoryId)
-							: null,
-				sectionId:
-					formData.sectionId === ""
-						? null
-						: formData.sectionId
-							? Number.parseInt(formData.sectionId)
-							: null,
-				image: formData.image,
+				isAvailable: values.isAvailable,
+				menuItemCategoryId: values.menuItemCategoryId === "" ? null : values.menuItemCategoryId ? parseInt(values.menuItemCategoryId) : null,
+				sectionId: values.sectionId === "" ? null : values.sectionId ? parseInt(values.sectionId) : null,
+				image: image,
 			};
 
 			if (isEditing && existingItem) {
@@ -292,501 +150,215 @@ export default function AddMenuItem({
 					order: existingItem.order || 0,
 				};
 
-				const updatedItem = await menuService.updateMenuItem(existingItem.id, payload);
+				await menuService.updateMenuItem(existingItem.id, payload);
 
 				if (onItemAdded) {
-					try {
-						// Usar el resultado de la API o combinar con el existingItem
-						onItemAdded({
-							...existingItem,
-							...payload,
-							id: existingItem.id,
-							menuId: existingItem.menuId,
-						});
-					} catch (_e) {}
+					onItemAdded({
+						...existingItem,
+						...payload,
+						id: existingItem.id,
+						menuId: existingItem.menuId,
+					});
 				}
 
-				setLoading(false);
 				setMessage("¡Plato actualizado correctamente!");
-
-				setTimeout(() => {
-					try {
-						if (onCancel) {
-							onCancel();
-						}
-					} catch (_e) {}
-				}, 1500);
 			} else {
-				try {
-					const result = await menuService.createMenuItem(dataToSend);
-
-					if (onItemAdded) {
-						try {
-							onItemAdded(result);
-						} catch (_e) {}
-					}
-
-					setLoading(false);
-					setMessage("¡Plato agregado correctamente!");
-
-					setTimeout(() => {
-						try {
-							if (onCancel) {
-								onCancel();
-							}
-						} catch (_e) {}
-					}, 1500);
-				} catch (createError) {
-					setLoading(false);
-					setError(
-						createError.message ||
-							"Error al crear el plato. Inténtelo nuevamente.",
-					);
+				const result = await menuService.createMenuItem(dataToSend);
+				if (onItemAdded) {
+					onItemAdded(result);
 				}
+				setMessage("¡Plato agregado correctamente!");
 			}
+
+			setLoading(false);
+			setTimeout(() => {
+				if (onCancel) onCancel();
+			}, 1500);
 		} catch (err) {
 			setLoading(false);
-			setError(
-				err.message ||
-					"Ha ocurrido un error inesperado. Por favor, inténtelo nuevamente.",
-			);
+			setError(err.message || "Error al procesar el plato");
 		}
 	};
 
-	const handleModalClick = (e) => {
-		e.stopPropagation();
-	};
+	const categoryOptions = categories.map(cat => ({
+		value: cat.id,
+		label: cat.name
+	}));
+
+	const sectionOptions = sections.map(sec => ({
+		value: sec.id,
+		label: sec.name
+	}));
+
+	const icon = isEditing ? (
+		<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+				d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+		</svg>
+	) : (
+		<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+				d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+		</svg>
+	);
 
 	return (
-		<div
-			className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-all duration-300 p-4"
-			onClick={onCancel}
+		<Modal
+			isOpen={true}
+			onClose={onCancel}
+			title={isEditing ? "Editar Plato" : "Agregar Nuevo Plato"}
+			icon={icon}
+			iconBgColor={isEditing ? "bg-neo-sunset" : "bg-neo-flame"}
+			iconColor={isEditing ? "text-neo-sunset" : "text-neo-flame"}
+			onEscapeKey={!loading}
 		>
-			<div
-				className="w-full max-w-xl max-h-[85vh] transform animate-fadeInUp overflow-y-auto bg-white neo-border neo-shadow-2xl transition-all duration-300"
-				onClick={handleModalClick}
-			>
-				<div className="relative p-4 sm:p-5">
-					<button
-						onClick={() => {
-							if (!loading) {
-								onCancel();
-							}
-						}}
-						className="absolute top-3 right-3 neo-btn neo-btn-sm bg-neo-lavender hover:bg-neo-lavender-dark"
-						aria-label="Cerrar modal"
-						disabled={loading}
-					>
-						<svg
-							className="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
+			{error && (
+				<div className="mb-4 neo-alert neo-alert-error animate-fadeIn">
+					<div className="flex items-center">
+						<svg className="mr-2 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+								d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
-					</button>
-
-					<div className="mb-4 flex items-center">
-						<div
-							className={`${isEditing ? "bg-neo-sunset" : "bg-neo-flame"} mr-3 flex-shrink-0 rounded-lg bg-opacity-10 p-2.5`}
-						>
-							<svg
-								className={`h-6 w-6 ${isEditing ? "text-neo-sunset" : "text-neo-flame"}`}
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								{isEditing ? (
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth="2"
-										d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-									/>
-								) : (
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-									/>
-								)}
-							</svg>
-						</div>
-						<h2 className="neo-heading neo-h4 text-lg sm:text-xl">
-							{isEditing ? "Editar Plato" : "Agregar Nuevo Plato"}
-						</h2>
+						<span className="font-medium">Error:</span>&nbsp;
+						<span>{error}</span>
 					</div>
+				</div>
+			)}
 
-					{error && (
-						<div className="mb-4 neo-alert neo-alert-error animate-fadeIn">
-							<div className="flex items-center">
-								<svg
-									className="mr-2 h-5 w-5 flex-shrink-0"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-									/>
-								</svg>
-								<span className="font-medium">Error:</span>&nbsp;
-								<span>{error}</span>
-							</div>
-						</div>
-					)}
+			{message && (
+				<div className="mb-4 neo-alert neo-alert-success animate-fadeIn">
+					<div className="flex items-center">
+						<svg className="mr-2 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+						</svg>
+						<span className="font-medium">Éxito:</span>&nbsp;
+						<span>{message}</span>
+					</div>
+				</div>
+			)}
 
-					{message && (
-						<div className="mb-4 neo-alert neo-alert-success animate-fadeIn">
-							<div className="flex items-center">
-								<svg
-									className="mr-2 h-5 w-5 flex-shrink-0"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								<span className="font-medium">Éxito:</span>&nbsp;
-								<span>{message}</span>
-							</div>
-						</div>
-					)}
+			<form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+				<div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+					<ImageUploader
+						preview={preview}
+						onFileChange={handleFileChange}
+						onClearImage={clearImage}
+						fileInputRef={fileInputRef}
+						disabled={loading}
+						error={imageError}
+						label="Imagen del Plato"
+					/>
 
-					<form
-						ref={formRef}
-						onSubmit={handleSubmit}
-						className="space-y-3 sm:space-y-4"
-					>
-						<div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
-							<div className="space-y-3">
-								<div>
-									<label className="mb-1 block font-medium text-gray-700 text-sm">
-										Imagen del Plato
-									</label>
-
-									<div
-										className="group mt-1 flex cursor-pointer justify-center rounded-lg border-2 border-gray-300 border-dashed px-6 pt-5 pb-6 transition-colors hover:bg-gray-50"
-										onClick={() =>
-											!loading &&
-											fileInputRef.current &&
-											fileInputRef.current.click()
-										}
-									>
-										<div className="space-y-1 text-center">
-											{imagePreview ? (
-												<div className="relative">
-													<img
-														src={imagePreview}
-														alt="Vista previa"
-														className="mx-auto h-40 rounded-lg object-cover shadow-md transition-transform group-hover:scale-105"
-													/>
-													<button
-														type="button"
-														onClick={(e) => {
-															e.stopPropagation();
-															setImagePreview(null);
-															if (fileInputRef.current) {
-																fileInputRef.current.value = null;
-															}
-															setFormData((prev) => ({ ...prev, image: null }));
-														}}
-														className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-														disabled={loading}
-														aria-label="Eliminar imagen"
-													>
-														<svg
-															className="h-4 w-4"
-															fill="none"
-															viewBox="0 0 24 24"
-															stroke="currentColor"
-														>
-															<path
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth={2}
-																d="M6 18L18 6M6 6l12 12"
-															/>
-														</svg>
-													</button>
-												</div>
-											) : (
-												<>
-													<svg
-														className="mx-auto h-12 w-12 text-gray-400 transition-colors group-hover:text-gray-500"
-														stroke="currentColor"
-														fill="none"
-														viewBox="0 0 48 48"
-														aria-hidden="true"
-													>
-														<path
-															d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-															strokeWidth="2"
-															strokeLinecap="round"
-															strokeLinejoin="round"
-														/>
-													</svg>
-													<div className="flex justify-center text-gray-600 text-sm">
-														<span className="relative rounded-md font-medium text-[#1a1a1a] transition-colors hover:text-[#404040] focus:outline-none">
-															Subir una imagen
-														</span>
-														<p className="pl-1">o arrastrar y soltar</p>
-													</div>
-													<p className="text-gray-500 text-xs">
-														PNG, JPG, WebP hasta 5MB
-													</p>
-												</>
-											)}
-										</div>
-									</div>
-									<input
-										ref={fileInputRef}
-										type="file"
-										accept="image/*"
-										onChange={handleFileChange}
-										className="hidden"
-										disabled={loading}
-									/>
-								</div>
-							</div>
-
-							<div className="space-y-3">
-								<div>
-									<label
-										htmlFor="name"
-										className="mb-1 block neo-text neo-text-bold"
-									>
-										Nombre del Plato *
-									</label>
-									<input
-										type="text"
-										id="name"
-										name="name"
-										value={formData.name}
-										onChange={handleChange}
-										onBlur={handleBlur}
-										className={`neo-input ${
-											nameError
-												? "border-red-500"
-												: ""
-										}`}
-										placeholder="Ej: Pizza Margherita"
-										disabled={loading}
-										required
-									/>
-									{nameError && (
-										<p className="mt-1 text-red-600 text-sm">{nameError}</p>
-									)}
-								</div>
-
-								<div>
-									<label
-										htmlFor="price"
-										className="mb-1 block font-medium text-gray-700 text-sm"
-									>
-										Precio *
-									</label>
-									<div className="relative">
-										<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-											{getCurrencySymbol(formData.currencyType)}
-										</span>
-										<input
-											type="number"
-											id="price"
-											name="price"
-											value={formData.price}
-											onChange={handleChange}
-											onBlur={handleBlur}
-											step="0.01"
-											min="0"
-											className={`neo-input pl-8 ${
-												priceError
-													? "border-red-500"
-													: ""
-											}`}
-											placeholder="0.00"
-											disabled={loading}
-											required
-										/>
-									</div>
-									{priceError && (
-										<p className="mt-1 text-red-600 text-sm">{priceError}</p>
-									)}
-								</div>
-
-								<div>
-									<label
-										htmlFor="currencyType"
-										className="mb-1 block font-medium text-gray-700 text-sm"
-									>
-										Moneda *
-									</label>
-									<select
-										id="currencyType"
-										name="currencyType"
-										value={formData.currencyType}
-										onChange={handleChange}
-										className="neo-input neo-select"
-										disabled={loading}
-										required
-									>
-										{availableCurrencies.map((currency) => (
-											<option key={currency.value} value={currency.value}>
-												{currency.symbol} - {currency.code} ({currency.name})
-											</option>
-										))}
-									</select>
-								</div>
-
-								<div>
-									<label
-										htmlFor="menuItemCategoryId"
-										className="mb-1 block font-medium text-gray-700 text-sm"
-									>
-										Categoría
-									</label>
-									<select
-										id="menuItemCategoryId"
-										name="menuItemCategoryId"
-										value={formData.menuItemCategoryId || ""}
-										onChange={handleChange}
-										className="neo-input neo-select"
-										disabled={loading || loadingCategories}
-									>
-										<option value="">Sin categoría</option>
-										{categories.map((category) => (
-											<option key={category.id} value={category.id}>
-												{category.name}
-											</option>
-										))}
-									</select>
-								</div>
-
-								<div>
-									<label
-										htmlFor="sectionId"
-										className="mb-1 block font-medium text-gray-700 text-sm"
-									>
-										Sección
-									</label>
-									<select
-										id="sectionId"
-										name="sectionId"
-										value={formData.sectionId || ""}
-										onChange={handleChange}
-										className="neo-input neo-select"
-										disabled={loading || loadingSections}
-									>
-										<option value="">Sin sección</option>
-										{sections.map((section) => (
-											<option key={section.id} value={section.id}>
-												{section.name}
-											</option>
-										))}
-									</select>
-								</div>
-
-								<div className="flex items-center">
-									<input
-										type="checkbox"
-										id="isAvailable"
-										name="isAvailable"
-										checked={formData.isAvailable}
-										onChange={handleChange}
-										className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-										disabled={loading}
-									/>
-									<label
-										htmlFor="isAvailable"
-										className="ml-2 block font-medium text-gray-700 text-sm"
-									>
-										Disponible
-									</label>
-								</div>
-							</div>
-						</div>
+					<div className="space-y-3">
+						<FormField
+							label="Nombre del Plato"
+							name="name"
+							value={values.name}
+							onChange={handleChange}
+							onBlur={handleBlur}
+							error={touched.name ? errors.name : ""}
+							required
+							disabled={loading}
+							placeholder="Ej: Pizza Margherita"
+						/>
 
 						<div>
-							<label
-								htmlFor="description"
-								className="mb-1 block font-medium text-gray-700 text-sm"
-							>
-								Descripción
+							<label htmlFor="price" className="mb-1 block font-medium text-gray-700 text-sm">
+								Precio *
 							</label>
-							<textarea
-								id="description"
-								name="description"
-								value={formData.description}
-								onChange={handleChange}
-								rows={3}
-								className="neo-input neo-textarea"
-								placeholder="Describe los ingredientes y características del plato..."
-								disabled={loading}
-							/>
+							<div className="relative">
+								<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+									{getCurrencySymbol(businessCurrency)}
+								</span>
+								<input
+									type="number"
+									id="price"
+									name="price"
+									value={values.price}
+									onChange={handleChange}
+									onBlur={handleBlur}
+									step="0.01"
+									min="0"
+									className={`neo-input pl-8 ${touched.price && errors.price ? 'border-red-500' : ''}`}
+									placeholder="0.00"
+									disabled={loading}
+									required
+								/>
+							</div>
+							{touched.price && errors.price && (
+								<p className="mt-1 text-red-600 text-sm">{errors.price}</p>
+							)}
 						</div>
 
-						<div className="flex flex-col-reverse gap-3 pt-2 sm:pt-4 sm:flex-row sm:justify-end">
-							<button
-								type="button"
-								onClick={onCancel}
-								className="neo-btn neo-btn-white w-full sm:w-auto"
-								disabled={loading}
-							>
-								Cancelar
-							</button>
-							<button
-								type="submit"
-								className="neo-btn neo-btn-primary w-full sm:w-auto"
-								disabled={loading || !!nameError || !!priceError}
-							>
-								{loading ? (
-									<div className="flex items-center justify-center">
-										<svg
-											className="mr-2 h-4 w-4 animate-spin"
-											fill="none"
-											viewBox="0 0 24 24"
-										>
-											<circle
-												className="opacity-25"
-												cx="12"
-												cy="12"
-												r="10"
-												stroke="currentColor"
-												strokeWidth="4"
-											/>
-											<path
-												className="opacity-75"
-												fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-											/>
-										</svg>
-										{isEditing ? "Actualizando..." : "Agregando..."}
-									</div>
-								) : (
-									<span>
-										{isEditing ? "Actualizar Plato" : "Agregar Plato"}
-									</span>
-								)}
-							</button>
-						</div>
-					</form>
+						<SelectField
+							label="Categoría"
+							name="menuItemCategoryId"
+							value={values.menuItemCategoryId || ""}
+							onChange={handleChange}
+							options={categoryOptions}
+							disabled={loading || loadingCategories}
+							placeholder="Sin categoría"
+						/>
+
+						<SelectField
+							label="Sección"
+							name="sectionId"
+							value={values.sectionId || ""}
+							onChange={handleChange}
+							options={sectionOptions}
+							disabled={loading || loadingSections}
+							placeholder="Sin sección"
+						/>
+
+						<CheckboxField
+							label="Disponible"
+							name="isAvailable"
+							checked={values.isAvailable}
+							onChange={handleChange}
+							disabled={loading}
+						/>
+					</div>
 				</div>
-			</div>
-		</div>
+
+				<TextAreaField
+					label="Descripción"
+					name="description"
+					value={values.description}
+					onChange={handleChange}
+					rows={3}
+					disabled={loading}
+					placeholder="Describe los ingredientes y características del plato..."
+				/>
+
+				<div className="flex flex-col-reverse gap-3 pt-2 sm:pt-4 sm:flex-row sm:justify-end">
+					<button
+						type="button"
+						onClick={onCancel}
+						className="neo-btn neo-btn-white w-full sm:w-auto"
+						disabled={loading}
+					>
+						Cancelar
+					</button>
+					<button
+						type="submit"
+						className="neo-btn neo-btn-primary w-full sm:w-auto"
+						disabled={loading || (touched.name && errors.name) || (touched.price && errors.price)}
+					>
+						{loading ? (
+							<div className="flex items-center justify-center">
+								<svg className="mr-2 h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+									<path className="opacity-75" fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+								</svg>
+								{isEditing ? "Actualizando..." : "Agregando..."}
+							</div>
+						) : (
+							<span>{isEditing ? "Actualizar Plato" : "Agregar Plato"}</span>
+						)}
+					</button>
+				</div>
+			</form>
+		</Modal>
 	);
 }
