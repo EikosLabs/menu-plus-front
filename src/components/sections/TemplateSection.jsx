@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { authService } from "../../services/authService";
+import menuService from "../../services/menuService";
 
 const availableFonts = [
 	{ id: 'poppins', name: 'Poppins', family: "'Poppins', sans-serif", description: 'Moderna y legible', preview: 'Aa' },
@@ -106,7 +106,7 @@ const templates = [
 	}
 ];
 
-const TemplateSection = ({ businesses }) => {
+const TemplateSection = ({ businesses, onTemplateUpdated }) => {
 	const [selectedTemplate, setSelectedTemplate] = useState(0);
 	const [currentTemplate, setCurrentTemplate] = useState(0);
 	const [selectedFont, setSelectedFont] = useState('poppins');
@@ -166,28 +166,22 @@ const TemplateSection = ({ businesses }) => {
 		setSuccess(false);
 
 		try {
-			const token = authService.getToken();
-			const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
-
-			const response = await fetch(`${API_URL}/food-businesses/${business.id}`, {
-				method: "PATCH",
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`
-				},
-				body: JSON.stringify({
-					template: selectedTemplate,
-					fontFamily: selectedFont
-				})
+			// Usar menuService para actualizar el negocio
+			await menuService.updateFoodBusiness(business.id, {
+				template: selectedTemplate,
+				fontFamily: selectedFont
 			});
 
-			if (!response.ok) {
-				throw new Error("Error al actualizar el template");
-			}
-
+			// Actualizar estado local
 			setCurrentTemplate(selectedTemplate);
 			setCurrentFont(selectedFont);
 			setSuccess(true);
+
+			// Recargar los datos del servidor si hay callback
+			if (onTemplateUpdated) {
+				await onTemplateUpdated();
+			}
+
 			setTimeout(() => setSuccess(false), 3000);
 		} catch (err) {
 			console.error("Error:", err);
