@@ -118,13 +118,12 @@ export const cleanExpiredOnboardingData = () => {
 
 /**
  * Establece el flag de que el usuario necesita onboarding
+ * Nota: El parámetro userId se mantiene por compatibilidad pero ya no se almacena en localStorage por seguridad
  */
 export const setNeedsOnboarding = (userId) => {
   try {
     localStorage.setItem('needs_onboarding', 'true');
-    if (userId) {
-      localStorage.setItem('user_id', userId.toString());
-    }
+    // user_id ya no se almacena en localStorage por seguridad - se obtiene del token JWT
     return true;
   } catch (error) {
     console.error('Error al establecer flag de onboarding:', error);

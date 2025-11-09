@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "../i18n/utils";
 import menuService from "../services/menuService";
+import { useErrorHandler } from "../hooks/useErrorHandler";
+import ErrorAlert, { FieldError } from "./shared/ErrorAlert";
+import { AppError } from "../utils/AppError";
+import { ERROR_TYPES } from "../utils/errorTypes";
+import { errorLogger } from "../utils/errorLogger";
+import { validateRequired, validateEmail, validateUrl, validatePhone, validateFileType, validateFileSize } from "../utils/validation";
 
 export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, existingBusiness = null, isEditing = false }) {
 	const { t } = useTranslation();
@@ -23,18 +29,21 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 
 	const [categories, setCategories] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
 	const [loadingCategories, setLoadingCategories] = useState(true);
 
 	const [logoFile, setLogoFile] = useState(null);
 	const [logoPreview, setLogoPreview] = useState(null);
 	const [uploadingLogo, setUploadingLogo] = useState(false);
 
+	const { error, fieldErrors, clearError, clearFieldError, handleError } = useErrorHandler();
+	const [touched, setTouched] = useState({});
+
 	useEffect(() => {
 		const fetchCategories = async () => {
 			setLoadingCategories(true);
 			setCategories([]);
 			setFormData((prev) => ({ ...prev, businessCategoryId: "" }));
+			clearError();
 
 			try {
 				const backendCategories = await menuService.getBusinessCategories();
@@ -45,13 +54,23 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 						...prev,
 						businessCategoryId: backendCategories[0].id.toString(),
 					}));
+					errorLogger.info('Business categories loaded successfully', {
+						count: backendCategories.length
+					});
 				} else {
-					setError(t("business.noCategoriesAvailable"));
+					const noCategError = new AppError(
+						ERROR_TYPES.NOT_FOUND,
+						t("business.noCategoriesAvailable")
+					);
+					handleError(noCategError);
 				}
-			} catch (_error) {
-				setError(
-					`${t("business.categoryLoadError")}. ${t("business.noCategoriesAvailable")}`,
+			} catch (err) {
+				const appError = err instanceof AppError ? err : new AppError(
+					ERROR_TYPES.SERVER_ERROR,
+					`${t("business.categoryLoadError")}. ${t("business.noCategoriesAvailable")}`
 				);
+				errorLogger.error(appError, { context: 'fetchCategories' });
+				handleError(appError);
 				setCategories([]);
 			} finally {
 				setLoadingCategories(false);
@@ -67,36 +86,81 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 			...prev,
 			[name]: value,
 		}));
+
+		// Clear field error when user starts typing
+		if (touched[name] && fieldErrors[name]) {
+			clearFieldError(name);
+		}
+	};
+
+	const handleBlur = (field) => {
+		setTouched(prev => ({ ...prev, [field]: true }));
+	};
+
+	const getFieldError = (field) => {
+		// Show server errors immediately, client validation only after touch
+		if (fieldErrors[field]) return fieldErrors[field];
+		if (!touched[field]) return null;
+
+		const value = formData[field];
+
+		switch (field) {
+			case 'name':
+				return validateRequired(value, 'El nombre del negocio');
+			case 'email':
+				return value ? validateEmail(value) : null;
+			case 'phoneNumber':
+				return value ? validatePhone(value, 'El teléfono') : null;
+			case 'whatsAppNumber':
+				return value ? validatePhone(value, 'El WhatsApp') : null;
+			case 'facebookUrl':
+			case 'instagramUrl':
+			case 'twitterUrl':
+				return value ? validateUrl(value, 'La URL') : null;
+			default:
+				return null;
+		}
 	};
 
 	const handleLogoChange = (e) => {
-		let maxSize = 2097152 / 2;
 		const file = e.target.files[0];
-		if (file) {
-			const validTypes = [
-				"image/jpeg",
-				"image/jpg",
-				"image/png",
-				"image/gif",
-				"image/webp",
-			];
-			if (!validTypes.includes(file.type)) {
-				setError(t("business.invalidImageFormat"));
-				return;
-			}
-			if (file.size > maxSize) {
-				setError(t("business.imageSizeError"));
-				return;
-			}
+		if (!file) return;
 
-			setLogoFile(file);
+		clearError();
 
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				setLogoPreview(e.target.result);
-			};
-			reader.readAsDataURL(file);
+		// Validar tipo de archivo
+		const typeError = validateFileType(file, [
+			"image/jpeg",
+			"image/jpg",
+			"image/png",
+			"image/gif",
+			"image/webp",
+		]);
+		if (typeError) {
+			handleError(new AppError(ERROR_TYPES.VALIDATION_ERROR, typeError));
+			return;
 		}
+
+		// Validar tamaño (1MB max)
+		const sizeError = validateFileSize(file, 1);
+		if (sizeError) {
+			handleError(new AppError(ERROR_TYPES.VALIDATION_ERROR, sizeError));
+			return;
+		}
+
+		setLogoFile(file);
+
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			setLogoPreview(e.target.result);
+		};
+		reader.onerror = () => {
+			handleError(new AppError(
+				ERROR_TYPES.VALIDATION_ERROR,
+				'Error al leer el archivo de imagen'
+			));
+		};
+		reader.readAsDataURL(file);
 	};
 
 	const removeLogo = () => {
@@ -110,43 +174,96 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setError(null);
+		clearError();
 
+		// Marcar todos los campos como tocados para mostrar errores de validación
+		setTouched({
+			name: true,
+			email: true,
+			phoneNumber: true,
+			whatsAppNumber: true,
+			facebookUrl: true,
+			instagramUrl: true,
+			twitterUrl: true,
+		});
+
+		// Validar estado de carga
 		if (loadingCategories) {
-			setError(t("business.loadingCategories"));
+			handleError(new AppError(
+				ERROR_TYPES.VALIDATION_ERROR,
+				t("business.loadingCategories")
+			));
 			return;
 		}
 
 		if (categories.length === 0) {
-			setError(t("business.noCategoriesAvailable"));
+			handleError(new AppError(
+				ERROR_TYPES.NOT_FOUND,
+				t("business.noCategoriesAvailable")
+			));
+			return;
+		}
+
+		// Validar campos requeridos
+		const nameError = validateRequired(formData.name, 'El nombre del negocio');
+		const emailError = formData.email ? validateEmail(formData.email) : null;
+		const phoneError = formData.phoneNumber ? validatePhone(formData.phoneNumber, 'El teléfono') : null;
+
+		if (nameError || emailError || phoneError) {
+			handleError(new AppError(
+				ERROR_TYPES.VALIDATION_ERROR,
+				'Por favor corrige los errores en el formulario',
+				{
+					fieldErrors: {
+						...(nameError && { name: nameError }),
+						...(emailError && { email: emailError }),
+						...(phoneError && { phoneNumber: phoneError }),
+					}
+				}
+			));
+			return;
+		}
+
+		if (!userId) {
+			handleError(new AppError(
+				ERROR_TYPES.UNAUTHORIZED,
+				t("errors.unauthorized")
+			));
+			return;
+		}
+
+		if (!formData.businessCategoryId) {
+			handleError(new AppError(
+				ERROR_TYPES.VALIDATION_ERROR,
+				t("business.categoryRequired"),
+				{ fieldErrors: { businessCategoryId: t("business.categoryRequired") } }
+			));
 			return;
 		}
 
 		setLoading(true);
 
-		if (!userId) {
-			setError(t("errors.unauthorized"));
-			setLoading(false);
-			return;
-		}
-
-		if (!formData.businessCategoryId) {
-			setError(t("business.categoryRequired"));
-			setLoading(false);
-			return;
-		}
-
 		try {
 			let imageKey = existingBusiness?.imageKey || null;
 
+			// Subir logo si existe
 			if (logoFile) {
 				setUploadingLogo(true);
 				try {
 					imageKey = await menuService.uploadImage(logoFile);
-				} catch (_imageError) {
-					setError(t("business.logoUploadError"));
-					setLoading(false);
+					errorLogger.info('Logo uploaded successfully', { imageKey });
+				} catch (imageError) {
 					setUploadingLogo(false);
+					setLoading(false);
+
+					// El error de uploadImage ya es AppError con detalles específicos
+					const uploadError = imageError instanceof AppError
+						? imageError
+						: new AppError(ERROR_TYPES.UPLOAD_ERROR, t("business.logoUploadError"));
+
+					errorLogger.error(uploadError, { fileName: logoFile.name });
+					handleError(uploadError);
+					return;
 				} finally {
 					setUploadingLogo(false);
 				}
@@ -162,29 +279,28 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 			if (isEditing && existingBusiness) {
 				// Actualizar negocio existente
 				result = await menuService.updateFoodBusiness(existingBusiness.id, businessData);
+				errorLogger.info('Business updated successfully', { businessId: existingBusiness.id });
 			} else {
 				// Crear nuevo negocio
 				businessData.userId = Number.parseInt(userId, 10);
 				result = await menuService.createFoodBusiness(businessData);
+				errorLogger.info('Business created successfully', { businessId: result.id, userId });
 			}
 
 			onBusinessAdded(result);
 		} catch (err) {
-			if (err.message?.includes("categoría")) {
-				setError(t("business.categoryLoadError"));
-			} else if (err.message?.includes("UserId")) {
-				setError(t("errors.unauthorized"));
-			} else if (
-				err.message &&
-				(err.message.includes("NetworkError") ||
-					err.message.includes("conexión") ||
-					err.message.includes("Failed to fetch") ||
-					err.message.includes("CORS"))
-			) {
-				setError(t("errors.network"));
-			} else {
-				setError(`${t("errors.general")} ${err.message}`);
-			}
+			// El error ya es AppError desde menuService con tipos específicos
+			const appError = err instanceof AppError
+				? err
+				: new AppError(ERROR_TYPES.SERVER_ERROR, `${t("errors.general")} ${err.message}`);
+
+			errorLogger.error(appError, {
+				context: isEditing ? 'updateBusiness' : 'createBusiness',
+				businessId: existingBusiness?.id,
+				userId,
+			});
+
+			handleError(appError);
 		} finally {
 			setLoading(false);
 			setUploadingLogo(false);
@@ -194,22 +310,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 	return (
 		<form onSubmit={handleSubmit} className="animate-fadeIn space-y-4 sm:space-y-6">
 			{error && (
-				<div className="neo-alert neo-alert-error flex items-center text-sm sm:text-base">
-					<svg
-						className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-						/>
-					</svg>
-					<span>{error}</span>
-				</div>
+				<ErrorAlert error={error} onClose={clearError} />
 			)}
 
 			<div className="neo-surface neo-border neo-shadow-md p-4 sm:p-5 md:p-6">
@@ -258,9 +359,11 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							required={true}
 							value={formData.name}
 							onChange={handleChange}
-							className="neo-input"
+							onBlur={() => handleBlur('name')}
+							className={`neo-input ${getFieldError('name') ? 'border-red-500' : ''}`}
 							placeholder={t("business.namePlaceholder")}
 						/>
+						<FieldError error={getFieldError('name')} />
 					</div>
 
 					<div>
@@ -779,9 +882,11 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="phoneNumber"
 							value={formData.phoneNumber}
 							onChange={handleChange}
-							className="neo-input"
+							onBlur={() => handleBlur('phoneNumber')}
+							className={`neo-input ${getFieldError('phoneNumber') ? 'border-red-500' : ''}`}
 							placeholder={t("business.phonePlaceholder")}
 						/>
+						<FieldError error={getFieldError('phoneNumber')} />
 					</div>
 
 					<div>
@@ -810,9 +915,11 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							name="email"
 							value={formData.email}
 							onChange={handleChange}
-							className="neo-input"
+							onBlur={() => handleBlur('email')}
+							className={`neo-input ${getFieldError('email') ? 'border-red-500' : ''}`}
 							placeholder={t("business.emailPlaceholder")}
 						/>
+						<FieldError error={getFieldError('email')} />
 					</div>
 
 					<div>

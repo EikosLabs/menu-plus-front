@@ -13,8 +13,14 @@ export function initializeModal() {
 	// Open modal when clicking on a menu item
 	document.querySelectorAll('.clickable-item').forEach(item => {
 		item.addEventListener('click', function() {
-			const itemData = JSON.parse(this.getAttribute('data-item'));
-			openDishModal(itemData);
+			try {
+				const itemData = JSON.parse(this.getAttribute('data-item'));
+				if (itemData && typeof itemData === 'object') {
+					openDishModal(itemData);
+				}
+			} catch (error) {
+				console.error('Error parsing menu item data:', error);
+			}
 		});
 	});
 
@@ -70,12 +76,26 @@ function openDishModal(item) {
 	}
 
 	if (item.allergens && item.allergens.length > 0) {
-		modalAllergens.innerHTML = `
-			<h3 class="allergens-title">⚠️ Alérgenos:</h3>
-			<div class="allergens-list">
-				${item.allergens.map(allergen => `<span class="allergen-badge">${allergen}</span>`).join('')}
-			</div>
-		`;
+		// Limpiar contenido anterior
+		modalAllergens.textContent = '';
+
+		// Crear elementos de forma segura
+		const title = document.createElement('h3');
+		title.className = 'allergens-title';
+		title.textContent = '⚠️ Alérgenos:';
+
+		const list = document.createElement('div');
+		list.className = 'allergens-list';
+
+		item.allergens.forEach(allergen => {
+			const badge = document.createElement('span');
+			badge.className = 'allergen-badge';
+			badge.textContent = allergen;
+			list.appendChild(badge);
+		});
+
+		modalAllergens.appendChild(title);
+		modalAllergens.appendChild(list);
 		modalAllergens.style.display = 'block';
 	} else {
 		modalAllergens.style.display = 'none';

@@ -8,21 +8,17 @@ export const useBusinesses = (userId) => {
 
 	const fetchBusinesses = async () => {
 		if (!userId) return;
-		
+
 		setLoading(true);
 		try {
-			console.log("🔍 Dashboard - obteniendo negocios para userId:", userId);
 			const userBusinesses = await menuService.getUserBusinesses(userId);
-			console.log("🔍 Dashboard - negocios obtenidos:", userBusinesses);
 			setBusinesses(userBusinesses);
 			setError(null);
 		} catch (error) {
-			console.log("🔍 Dashboard - error al cargar datos:", error.message);
 			setError("No se pudieron cargar los datos del dashboard. Por favor, verifique su conexión e intente de nuevo.");
 			setBusinesses([]);
 		} finally {
 			setLoading(false);
-			console.log("🔍 Dashboard - carga completada");
 		}
 	};
 

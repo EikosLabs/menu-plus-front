@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import authService from "../services/authService";
+import { useErrorHandler } from "../hooks/useErrorHandler";
+import ErrorAlert, { SuccessAlert, FieldError } from "./shared/ErrorAlert";
+import { validateEmail, validateRequired, validatePassword } from "../utils/validation";
 
 export default function RegisterForm() {
 	const [formData, setFormData] = useState({
@@ -9,8 +12,14 @@ export default function RegisterForm() {
 		password: "",
 	});
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
 	const [success, setSuccess] = useState(false);
+	const [touched, setTouched] = useState({
+		fullName: false,
+		email: false,
+		password: false,
+	});
+
+	const { error, clearError, handleError } = useErrorHandler();
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -18,11 +27,54 @@ export default function RegisterForm() {
 			...prev,
 			[name]: value,
 		}));
+
+		// Limpiar error del campo al cambiar
+		if (touched[name]) {
+			clearError();
+		}
+	};
+
+	const handleBlur = (field) => {
+		setTouched(prev => ({ ...prev, [field]: true }));
+	};
+
+	const getFieldError = (field) => {
+		if (!touched[field]) return null;
+
+		const value = formData[field];
+
+		switch (field) {
+			case 'fullName':
+				return validateRequired(value, 'El nombre completo');
+			case 'email':
+				return validateEmail(value);
+			case 'password':
+				return validatePassword(value, { minLength: 8 });
+			default:
+				return null;
+		}
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setError(null);
+		clearError();
+
+		// Marcar todos como tocados
+		setTouched({
+			fullName: true,
+			email: true,
+			password: true,
+		});
+
+		// Validar todos los campos
+		const fullNameError = validateRequired(formData.fullName, 'El nombre completo');
+		const emailError = validateEmail(formData.email);
+		const passwordError = validatePassword(formData.password, { minLength: 8 });
+
+		if (fullNameError || emailError || passwordError) {
+			return; // Los errores se muestran automáticamente
+		}
+
 		setLoading(true);
 
 		try {
@@ -32,7 +84,7 @@ export default function RegisterForm() {
 			};
 
 			// 1. Registrar el usuario
-			const registeredUser = await authService.register(
+			await authService.register(
 				userData.fullName,
 				userData.email,
 				userData.userName,
@@ -43,20 +95,16 @@ export default function RegisterForm() {
 			await authService.login(userData.email, userData.password);
 
 			// 3. Establecer flag de que el usuario necesita onboarding
+			// Nota: user_id se obtiene del token JWT, no se almacena en localStorage por seguridad
 			localStorage.setItem('needs_onboarding', 'true');
-			if (registeredUser && registeredUser.id) {
-				localStorage.setItem('user_id', registeredUser.id.toString());
-			}
 
 			setSuccess(true);
 			setTimeout(() => {
 				// Redirigir a onboarding
 				window.location.href = "/onboarding";
 			}, 2000);
-		} catch (_err) {
-			setError(
-				"Error en el registro. Por favor, verifica tus datos e intenta de nuevo.",
-			);
+		} catch (err) {
+			handleError(err);
 		} finally {
 			setLoading(false);
 		}
@@ -64,20 +112,23 @@ export default function RegisterForm() {
 
 	if (success) {
 		return (
-			<div className="neo-alert neo-alert-success">
-				¡Registro exitoso! Serás redirigido a configurar tu negocio en
-				unos momentos...
-			</div>
+			<SuccessAlert
+				message="¡Registro exitoso! Serás redirigido a configurar tu negocio en unos momentos..."
+			/>
 		);
 	}
 
 	return (
 		<form className="neo-space-md" onSubmit={handleSubmit}>
+			{/* Error Alert */}
 			{error && (
-				<div className="neo-alert neo-alert-error">
-					{error}
-				</div>
+				<ErrorAlert
+					error={error}
+					onClose={clearError}
+				/>
 			)}
+
+			{/* Full Name Field */}
 			<div>
 				<label
 					htmlFor="fullName"
@@ -89,13 +140,16 @@ export default function RegisterForm() {
 					type="text"
 					name="fullName"
 					id="fullName"
-					required={true}
-					className="neo-input"
+					className={`neo-input ${getFieldError('fullName') ? 'border-red-500' : ''}`}
 					placeholder="Tu Nombre Completo"
 					value={formData.fullName}
 					onChange={handleChange}
+					onBlur={() => handleBlur('fullName')}
 				/>
+				<FieldError error={getFieldError('fullName')} />
 			</div>
+
+			{/* Email Field */}
 			<div>
 				<label
 					htmlFor="email"
@@ -107,19 +161,22 @@ export default function RegisterForm() {
 					type="email"
 					name="email"
 					id="email"
-					required={true}
-					className="neo-input"
+					className={`neo-input ${getFieldError('email') ? 'border-red-500' : ''}`}
 					placeholder="tu@correo.com"
 					value={formData.email}
 					onChange={handleChange}
+					onBlur={() => handleBlur('email')}
 				/>
+				<FieldError error={getFieldError('email')} />
 			</div>
+
+			{/* Username Field (Optional) */}
 			<div>
 				<label
 					htmlFor="userName"
 					className="neo-text-bold block mb-2"
 				>
-					Nombre de Usuario (opcional)
+					Nombre de Usuario <span className="neo-text text-neo-gray text-sm">(opcional)</span>
 				</label>
 				<input
 					type="text"
@@ -131,6 +188,8 @@ export default function RegisterForm() {
 					onChange={handleChange}
 				/>
 			</div>
+
+			{/* Password Field */}
 			<div>
 				<label
 					htmlFor="password"
@@ -142,13 +201,16 @@ export default function RegisterForm() {
 					type="password"
 					name="password"
 					id="password"
-					required={true}
-					className="neo-input"
-					placeholder="Crea una contraseña segura"
+					className={`neo-input ${getFieldError('password') ? 'border-red-500' : ''}`}
+					placeholder="Crea una contraseña segura (mínimo 8 caracteres)"
 					value={formData.password}
 					onChange={handleChange}
+					onBlur={() => handleBlur('password')}
 				/>
+				<FieldError error={getFieldError('password')} />
 			</div>
+
+			{/* Submit Button */}
 			<div>
 				<button
 					type="submit"

@@ -7,19 +7,14 @@ export const useAuth = () => {
 	const [loading, setLoading] = useState(true);
 
 	const loadUserData = useCallback(async () => {
-		console.log("🔍 Dashboard - iniciando verificación de autenticación");
-
 		if (!authService.isAuthenticated()) {
-			console.log("🔍 Dashboard - no autenticado, redirigiendo a login");
 			window.location.href = "/login";
 			return;
 		}
 
 		const currentUserId = authService.getUserId();
-		console.log("🔍 Dashboard - userId obtenido:", currentUserId);
 
 		if (!currentUserId) {
-			console.log("🔍 Dashboard - no se pudo obtener userId del token, redirigiendo a login");
 			window.location.href = "/login";
 			return;
 		}
@@ -27,7 +22,7 @@ export const useAuth = () => {
 		try {
 			const userBusinesses = await menuService.getUserBusinesses(currentUserId);
 			const businessName = userBusinesses.length > 0 ? userBusinesses[0].name : "Mi Negocio";
-			
+
 			setUserData({
 				id: currentUserId,
 				name: businessName,
@@ -35,7 +30,7 @@ export const useAuth = () => {
 				role: "Owner",
 			});
 		} catch (error) {
-			console.log("🔍 Dashboard - error al cargar nombre del negocio, usando nombre por defecto");
+			// Usar nombre por defecto si hay error al cargar
 			setUserData({
 				id: currentUserId,
 				name: "Mi Negocio",

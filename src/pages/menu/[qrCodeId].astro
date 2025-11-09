@@ -121,7 +121,7 @@ const { qrCodeId } = Astro.params;
   </main>
 
   <script>
-    import { sanitizeMenuData } from '../../utils/security.js';
+    import { sanitizeMenuData, sanitizeHtml, sanitizeUrl } from '../../utils/security.js';
     import { renderBusinessInfo } from '../../utils/renderBusinessInfo.js';
     import { getCurrencySymbol } from '../../utils/currencies.js';
 
@@ -276,14 +276,14 @@ const { qrCodeId } = Astro.params;
               ${business.logoUrl ? `
                 <div class="hero-logo-wrapper">
                   <div class="hero-logo-ring"></div>
-                  <img src="${business.logoUrl}" alt="${business.name}" class="hero-logo" />
+                  <img src="${sanitizeUrl(business.logoUrl)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" />
                 </div>
               ` : `
                 <div class="hero-icon">🍽️</div>
               `}
               <h1 class="hero-title">
-                <span class="hero-title-main">${business.name}</span>
-                ${business.description ? `<span class="hero-subtitle">${business.description}</span>` : ''}
+                <span class="hero-title-main">${sanitizeHtml(business.name)}</span>
+                ${business.description ? `<span class="hero-subtitle">${sanitizeHtml(business.description)}</span>` : ''}
               </h1>
             </div>
             <div class="hero-wave">
@@ -305,7 +305,7 @@ const { qrCodeId } = Astro.params;
           html += `
             <a href="#section-${section.id}" class="category-chip">
               <span class="category-emoji">${emoji}</span>
-              <span class="category-name">${section.name}</span>
+              <span class="category-name">${sanitizeHtml(section.name)}</span>
             </a>
           `;
         });
@@ -375,8 +375,8 @@ const { qrCodeId } = Astro.params;
           <div class="section-header">
             <div class="section-icon">${emoji}</div>
             <div class="section-header-content">
-              <h2 class="section-title">${section.name}</h2>
-              ${section.description ? `<p class="section-description">${section.description}</p>` : ''}
+              <h2 class="section-title">${sanitizeHtml(section.name)}</h2>
+              ${section.description ? `<p class="section-description">${sanitizeHtml(section.description)}</p>` : ''}
             </div>
           </div>
           <div class="menu-grid">
@@ -403,7 +403,7 @@ const { qrCodeId } = Astro.params;
                    style="animation-delay: ${idx * 0.05}s">
             ${hasImage ? `
               <div class="item-image-wrapper">
-                <img src="${item.imageUrl}" alt="${item.name}" class="item-image" loading="lazy" onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';" />
+                <img src="${sanitizeUrl(item.imageUrl)}" alt="${sanitizeHtml(item.name)}" class="item-image" loading="lazy" onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';" />
                 <div class="item-image-overlay">
                   <span class="item-view-icon">👁️</span>
                 </div>
@@ -418,15 +418,15 @@ const { qrCodeId } = Astro.params;
             `}
             <div class="item-content">
               <div class="item-header">
-                <h3 class="item-name">${item.name}</h3>
+                <h3 class="item-name">${sanitizeHtml(item.name)}</h3>
                 <div class="item-price-wrapper">
                   <span class="item-price">${getCurrencySymbol(item.currencyType !== undefined ? item.currencyType : business.defaultCurrency)}${item.price.toFixed(2)}</span>
                 </div>
               </div>
-              ${item.description ? `<p class="item-description">${item.description}</p>` : ''}
+              ${item.description ? `<p class="item-description">${sanitizeHtml(item.description)}</p>` : ''}
               ${item.allergens && item.allergens.length > 0 ? `
                 <div class="item-allergens">
-                  ${item.allergens.map(allergen => `<span class="allergen-badge">${allergen}</span>`).join('')}
+                  ${item.allergens.map(allergen => `<span class="allergen-badge">${sanitizeHtml(allergen)}</span>`).join('')}
                 </div>
               ` : ''}
             </div>
@@ -549,8 +549,14 @@ const { qrCodeId } = Astro.params;
       // Open modal when clicking on a menu item
       document.querySelectorAll('.clickable-item').forEach(item => {
         item.addEventListener('click', function() {
-          const itemData = JSON.parse(this.getAttribute('data-item'));
-          openDishModal(itemData);
+          try {
+            const itemData = JSON.parse(this.getAttribute('data-item'));
+            if (itemData && typeof itemData === 'object') {
+              openDishModal(itemData);
+            }
+          } catch (error) {
+            console.error('Error parsing menu item data:', error);
+          }
         });
       });
 

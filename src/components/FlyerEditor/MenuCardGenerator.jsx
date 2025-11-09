@@ -118,13 +118,6 @@ export default function MenuCardGenerator({
 
   const template = CARTA_TEMPLATES[selectedTemplate];
 
-  // Debug log
-  useEffect(() => {
-    console.log('MenuCardGenerator - menuItems:', menuItems);
-    console.log('MenuCardGenerator - business:', business);
-    console.log('MenuCardGenerator - menu:', menu);
-  }, [menuItems, business, menu]);
-
   // Block body scroll when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';

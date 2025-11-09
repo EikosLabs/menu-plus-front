@@ -152,9 +152,21 @@ export default function BusinessList({
 	const handleLoadFlyer = (flyer, businessId, menuId) => {
 		setShowSavedFlyers(null);
 
-		// Parse the data
-		const selectedItemIds = flyer.selectedItemIds ? JSON.parse(flyer.selectedItemIds) : [];
-		const itemsOrder = flyer.itemsOrder ? JSON.parse(flyer.itemsOrder) : [];
+		// Parse the data with error handling
+		let selectedItemIds = [];
+		let itemsOrder = [];
+
+		try {
+			selectedItemIds = flyer.selectedItemIds ? JSON.parse(flyer.selectedItemIds) : [];
+		} catch (error) {
+			console.error('Error parsing selectedItemIds:', error);
+		}
+
+		try {
+			itemsOrder = flyer.itemsOrder ? JSON.parse(flyer.itemsOrder) : [];
+		} catch (error) {
+			console.error('Error parsing itemsOrder:', error);
+		}
 
 		// Open the appropriate editor with the saved configuration
 		if (flyer.type === 'carta') {

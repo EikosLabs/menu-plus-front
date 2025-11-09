@@ -82,3 +82,47 @@ export const sanitizeMenuData = (menu) => {
     business: menu.business || null,
   };
 };
+
+/**
+ * Gets CSRF token from meta tag or cookie
+ * @returns {string|null} CSRF token or null if not found
+ */
+export const getCsrfToken = () => {
+  // Try to get from meta tag first
+  const metaTag = document.querySelector('meta[name="csrf-token"]');
+  if (metaTag) {
+    return metaTag.getAttribute('content');
+  }
+
+  // Try to get from cookie
+  const cookies = document.cookie.split(';');
+  const csrfCookie = cookies.find(cookie =>
+    cookie.trim().startsWith('XSRF-TOKEN=') ||
+    cookie.trim().startsWith('csrf_token=')
+  );
+
+  if (csrfCookie) {
+    return decodeURIComponent(csrfCookie.split('=')[1]);
+  }
+
+  return null;
+};
+
+/**
+ * Adds CSRF token to request headers
+ * @param {Object} headers - Existing headers object
+ * @returns {Object} Headers with CSRF token added
+ */
+export const addCsrfHeader = (headers = {}) => {
+  const csrfToken = getCsrfToken();
+
+  if (csrfToken) {
+    return {
+      ...headers,
+      'X-CSRF-Token': csrfToken,
+      'X-XSRF-TOKEN': csrfToken
+    };
+  }
+
+  return headers;
+};

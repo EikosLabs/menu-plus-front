@@ -3,6 +3,11 @@ import menuService from "../services/menuService";
 import { getCurrencySymbol } from "../utils/currencies";
 import { useFormValidation } from "../hooks/useFormValidation";
 import { useImageUpload } from "../hooks/useImageUpload";
+import { useErrorHandler } from "../hooks/useErrorHandler";
+import ErrorAlert, { SuccessAlert } from "./shared/ErrorAlert";
+import { AppError } from "../utils/AppError";
+import { ERROR_TYPES } from "../utils/errorTypes";
+import { errorLogger } from "../utils/errorLogger";
 import Modal from "./shared/Modal";
 import ImageUploader from "./shared/ImageUploader";
 import { FormField, TextAreaField, SelectField, CheckboxField } from "./shared/FormField";
@@ -22,12 +27,13 @@ export default function AddMenuItem({
 	isEditing,
 }) {
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
 	const [message, setMessage] = useState(null);
 	const [categories, setCategories] = useState([]);
 	const [loadingCategories, setLoadingCategories] = useState(false);
 	const [sections, setSections] = useState([]);
 	const [loadingSections, setLoadingSections] = useState(false);
+
+	const { error, clearError, handleError } = useErrorHandler();
 
 	const { values, errors, touched, handleChange, handleBlur, validateAll, resetForm } = useFormValidation(
 		{
@@ -60,9 +66,18 @@ export default function AddMenuItem({
 			try {
 				setLoadingCategories(true);
 				const categoriesData = await menuService.getMenuItemCategories();
-				if (mounted) setCategories(categoriesData || []);
-			} catch {
-				if (mounted) setError("No se pudieron cargar las categorías");
+				if (mounted) {
+					setCategories(categoriesData || []);
+					errorLogger.info('Menu item categories loaded', { count: categoriesData.length });
+				}
+			} catch (err) {
+				if (mounted) {
+					const appError = err instanceof AppError
+						? err
+						: new AppError(ERROR_TYPES.SERVER_ERROR, "No se pudieron cargar las categorías");
+					errorLogger.error(appError, { context: 'loadCategories' });
+					handleError(appError);
+				}
 			} finally {
 				if (mounted) setLoadingCategories(false);
 			}
@@ -71,9 +86,15 @@ export default function AddMenuItem({
 				try {
 					setLoadingSections(true);
 					const sectionsData = await menuService.getSections(menuId);
-					if (mounted) setSections(sectionsData || []);
-				} catch {
-					// Silent fail
+					if (mounted) {
+						setSections(sectionsData || []);
+						errorLogger.info('Menu sections loaded', { menuId, count: sectionsData.length });
+					}
+				} catch (err) {
+					// Sections are optional, just log the error
+					if (mounted && err instanceof AppError && err.type !== ERROR_TYPES.NOT_FOUND) {
+						errorLogger.warn('Failed to load sections', { menuId, error: err.message });
+					}
 				} finally {
 					if (mounted) setLoadingSections(false);
 				}
@@ -82,7 +103,7 @@ export default function AddMenuItem({
 
 		fetchData();
 		return () => { mounted = false; };
-	}, [menuId]);
+	}, [menuId, handleError]);
 
 	// Load existing item data
 	useEffect(() => {
@@ -117,12 +138,15 @@ export default function AddMenuItem({
 		e.preventDefault();
 
 		if (!validateAll()) {
-			setError("Por favor, corrija los errores del formulario");
+			handleError(new AppError(
+				ERROR_TYPES.VALIDATION_ERROR,
+				"Por favor, corrija los errores del formulario"
+			));
 			return;
 		}
 
 		setLoading(true);
-		setError(null);
+		clearError();
 		setMessage(null);
 
 		try {
@@ -152,6 +176,11 @@ export default function AddMenuItem({
 
 				await menuService.updateMenuItem(existingItem.id, payload);
 
+				errorLogger.info('Menu item updated successfully', {
+					itemId: existingItem.id,
+					menuId: existingItem.menuId,
+				});
+
 				if (onItemAdded) {
 					onItemAdded({
 						...existingItem,
@@ -164,6 +193,12 @@ export default function AddMenuItem({
 				setMessage("¡Plato actualizado correctamente!");
 			} else {
 				const result = await menuService.createMenuItem(dataToSend);
+
+				errorLogger.info('Menu item created successfully', {
+					itemId: result.id,
+					menuId: menuId,
+				});
+
 				if (onItemAdded) {
 					onItemAdded(result);
 				}
@@ -176,7 +211,19 @@ export default function AddMenuItem({
 			}, 1500);
 		} catch (err) {
 			setLoading(false);
-			setError(err.message || "Error al procesar el plato");
+
+			// El error ya es AppError desde menuService con detalles específicos
+			const appError = err instanceof AppError
+				? err
+				: new AppError(ERROR_TYPES.SERVER_ERROR, err.message || "Error al procesar el plato");
+
+			errorLogger.error(appError, {
+				context: isEditing ? 'updateMenuItem' : 'createMenuItem',
+				itemId: existingItem?.id,
+				menuId,
+			});
+
+			handleError(appError);
 		}
 	};
 
@@ -213,27 +260,14 @@ export default function AddMenuItem({
 			onEscapeKey={!loading}
 		>
 			{error && (
-				<div className="mb-4 neo-alert neo-alert-error animate-fadeIn">
-					<div className="flex items-center">
-						<svg className="mr-2 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-								d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-						</svg>
-						<span className="font-medium">Error:</span>&nbsp;
-						<span>{error}</span>
-					</div>
+				<div className="mb-4">
+					<ErrorAlert error={error} onClose={clearError} />
 				</div>
 			)}
 
 			{message && (
-				<div className="mb-4 neo-alert neo-alert-success animate-fadeIn">
-					<div className="flex items-center">
-						<svg className="mr-2 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-						</svg>
-						<span className="font-medium">Éxito:</span>&nbsp;
-						<span>{message}</span>
-					</div>
+				<div className="mb-4">
+					<SuccessAlert message={message} />
 				</div>
 			)}
 

@@ -24,7 +24,6 @@ export default function SectionManager({
 			setError(null);
 			const fetchedSections = await menuService.getSections(menuId);
 			setSections(fetchedSections || []);
-			console.log(fetchedSections);
 		} catch (error) {
 			setError(`Error al cargar las secciones: ${error.message}`);
 		} finally {
@@ -71,7 +70,6 @@ export default function SectionManager({
 		
 		// Verificar si ya está en la primera posición
 		if (currentIndex <= 0) {
-			console.log('No se puede mover hacia arriba: la sección ya está en la primera posición');
 			return;
 		}
 
@@ -101,7 +99,6 @@ export default function SectionManager({
 		
 		// Verificar si ya está en la última posición
 		if (currentIndex >= sortedSections.length - 1 || currentIndex === -1) {
-			console.log('No se puede mover hacia abajo: la sección ya está en la última posición');
 			return;
 		}
 

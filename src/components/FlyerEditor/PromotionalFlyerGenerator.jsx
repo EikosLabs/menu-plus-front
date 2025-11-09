@@ -34,13 +34,6 @@ export default function PromotionalFlyerGenerator({
   const template = FOLLETO_TEMPLATES[selectedTemplate];
   const maxItems = template.maxItems;
 
-  // Debug log
-  useEffect(() => {
-    console.log('PromotionalFlyerGenerator - menuItems:', menuItems);
-    console.log('PromotionalFlyerGenerator - business:', business);
-    console.log('PromotionalFlyerGenerator - menu:', menu);
-  }, [menuItems, business, menu]);
-
   // Block body scroll when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
