@@ -59,6 +59,7 @@ export const useBusinesses = (userId) => {
 		error,
 		setError,
 		addBusiness,
-		addMenu
+		addMenu,
+		fetchBusinesses
 	};
 };

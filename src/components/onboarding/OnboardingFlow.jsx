@@ -108,6 +108,7 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
         primaryColor: formData.primaryColor,
         secondaryColor: formData.secondaryColor,
         accentColor: formData.accentColor,
+        defaultCurrency: formData.defaultCurrency ?? 0,
         userId: userId
       };
 

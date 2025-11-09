@@ -7,6 +7,7 @@ import { AppError } from "../utils/AppError";
 import { ERROR_TYPES } from "../utils/errorTypes";
 import { errorLogger } from "../utils/errorLogger";
 import { validateRequired, validateEmail, validateUrl, validatePhone, validateFileType, validateFileSize } from "../utils/validation";
+import { getAllCurrencies } from "../utils/currencies";
 
 export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, existingBusiness = null, isEditing = false }) {
 	const { t } = useTranslation();
@@ -25,6 +26,7 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 		secondaryColor: existingBusiness?.secondaryColor || "#004E71",
 		accentColor: existingBusiness?.accentColor || "#0A3342",
 		businessCategoryId: existingBusiness?.businessCategoryId?.toString() || "",
+		defaultCurrency: existingBusiness?.defaultCurrency ?? 0,
 	});
 
 	const [categories, setCategories] = useState([]);
@@ -992,6 +994,29 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 							</div>
 						)}
 					</div>
+				</div>
+
+				{/* Currency Selection */}
+				<div>
+					<label htmlFor="defaultCurrency" className="neo-label">
+						Moneda Predeterminada
+					</label>
+					<select
+						id="defaultCurrency"
+						name="defaultCurrency"
+						value={formData.defaultCurrency}
+						onChange={handleChange}
+						className="neo-input neo-select"
+					>
+						{getAllCurrencies().map((currency) => (
+							<option key={currency.value} value={currency.value}>
+								{currency.symbol} {currency.name} ({currency.code})
+							</option>
+						))}
+					</select>
+					<p className="neo-text text-xs text-neo-gray mt-1">
+						Esta será la moneda mostrada en tu menú
+					</p>
 				</div>
 			</div>
 

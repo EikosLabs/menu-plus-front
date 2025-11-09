@@ -3,6 +3,7 @@ import OnboardingStep from '../OnboardingStep';
 import { FormField, TextAreaField, SelectField } from '../FormField';
 import { validateStepBasicInfo } from '../../../utils/onboardingValidation';
 import menuService from '../../../services/menuService';
+import { getAllCurrencies } from '../../../utils/currencies';
 
 /**
  * Paso 1: Información Básica del Negocio
@@ -120,6 +121,20 @@ export default function StepBasicInfo({
         required={true}
         placeholder={loadingCategories ? 'Cargando categorías...' : 'Selecciona una categoría'}
         disabled={loadingCategories}
+      />
+
+      <SelectField
+        label="Moneda Predeterminada"
+        name="defaultCurrency"
+        value={formData.defaultCurrency ?? 0}
+        onChange={updateFormData}
+        options={getAllCurrencies().map(curr => ({
+          id: curr.value,
+          name: `${curr.symbol} ${curr.name} (${curr.code})`
+        }))}
+        error={errors.defaultCurrency}
+        required={false}
+        placeholder="Selecciona la moneda de tu negocio"
       />
     </OnboardingStep>
   );
