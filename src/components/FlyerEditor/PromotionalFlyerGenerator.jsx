@@ -186,15 +186,15 @@ export default function PromotionalFlyerGenerator({
         {/* Content */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Configuration */}
-          <div className="w-full md:w-80 lg:w-96 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-3 sm:p-4 space-y-3">
+          <div className="w-full md:w-80 lg:w-96 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto p-2.5 sm:p-3 md:p-4 space-y-2 sm:space-y-3">
             {/* Folleto Name */}
             <div>
-              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Nombre del Folleto</h3>
+              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Nombre del Folleto</h3>
               <input
                 type="text"
                 value={folletoName}
                 onChange={(e) => setFolletoName(e.target.value)}
-                className="w-full neo-border rounded-lg px-2 sm:px-3 py-2 neo-text text-xs sm:text-sm"
+                className="w-full neo-border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 neo-text text-xs sm:text-sm"
                 placeholder="Ej: Especiales de la Semana"
               />
               {savedId && (
@@ -206,8 +206,8 @@ export default function PromotionalFlyerGenerator({
 
             {/* Template Selection */}
             <div>
-              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Tipo de Folleto</h3>
-              <div className="space-y-2">
+              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Tipo de Folleto</h3>
+              <div className="space-y-1.5 sm:space-y-2">
                 {Object.values(FOLLETO_TEMPLATES).map((tmpl) => (
                   <button
                     key={tmpl.id}
@@ -241,7 +241,7 @@ export default function PromotionalFlyerGenerator({
 
             {/* Selected Items */}
             <div>
-              <h3 className="neo-h5 mb-2 text-sm sm:text-base">
+              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">
                 Platos Seleccionados ({selectedItems.length}/{maxItems})
               </h3>
 
@@ -309,12 +309,12 @@ export default function PromotionalFlyerGenerator({
 
             {/* Available Items */}
             <div>
-              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Todos los Platos ({menuItems.length})</h3>
-              <p className="neo-text text-xs opacity-70 mb-2">
+              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Todos los Platos ({menuItems.length})</h3>
+              <p className="neo-text text-xs opacity-70 mb-1.5 sm:mb-2">
                 Haz clic para agregar
               </p>
 
-              <div className="space-y-1 max-h-[250px] sm:max-h-[300px] overflow-auto">
+              <div className="space-y-1 max-h-[200px] sm:max-h-[250px] md:max-h-[300px] overflow-auto">
                 {menuItems.map((item) => {
                   const isSelected = selectedItems.find(i => i.id === item.id);
                   return (

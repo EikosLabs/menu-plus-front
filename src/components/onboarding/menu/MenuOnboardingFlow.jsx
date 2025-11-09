@@ -252,21 +252,21 @@ export default function MenuOnboardingFlow({ businessId: propBusinessId, busines
       />
 
       {submitError && (
-        <div className="max-w-2xl mx-auto mt-3 px-3">
-          <div className="neo-alert neo-alert-error flex items-start gap-2 sm:gap-3 text-sm sm:text-base">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="max-w-2xl mx-auto mt-2 sm:mt-3 px-2 sm:px-3">
+          <div className="neo-alert neo-alert-error flex items-start gap-2 text-xs sm:text-sm">
+            <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="flex-1">
-              <h3 className="neo-text neo-text-bold mb-1">Error al crear menú</h3>
-              <p className="neo-text">{submitError}</p>
+              <h3 className="neo-text neo-text-bold mb-0.5 text-xs sm:text-sm">Error al crear menú</h3>
+              <p className="neo-text text-xs">{submitError}</p>
             </div>
             <button
               onClick={() => setSubmitError(null)}
               className="text-red-600 hover:text-red-800"
               aria-label="Cerrar alerta"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -274,7 +274,7 @@ export default function MenuOnboardingFlow({ businessId: propBusinessId, busines
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-6">
         <StepCreateMenu
           formData={menuData}
           updateField={(field, value) => updateField(1, field, value)}
@@ -306,7 +306,7 @@ export default function MenuOnboardingFlow({ businessId: propBusinessId, busines
           sectionName={sectionData.name}
         />
 
-        <div className="max-w-2xl mx-auto px-4">
+        <div className="max-w-2xl mx-auto px-2 sm:px-3 md:px-4">
           <OnboardingNavigation
             currentStep={currentStep}
             totalSteps={totalSteps}

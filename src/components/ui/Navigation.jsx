@@ -53,7 +53,7 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 	];
 
 	return (
-		<nav className="sticky top-0 z-20 bg-white border-b-neo-extra border-neo-black shadow-lg">
+		<nav className="sticky top-0 z-50 bg-white border-b-neo-extra border-neo-black shadow-lg">
 			<div className="container mx-auto flex items-center justify-between p-4">
 				<div className="flex items-center space-x-3">
 					<div className="neo-icon-3d neo-icon-3d-flame w-10 h-10">

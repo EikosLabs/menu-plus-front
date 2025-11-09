@@ -61,16 +61,16 @@ export default function StepCreateSection({
       icon={icon}
       isActive={isActive}
     >
-      <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
-        <div className="flex gap-3">
+      <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 md:p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
+        <div className="flex gap-2 sm:gap-3">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xl">📁</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-base sm:text-lg md:text-xl">📁</span>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-1">Organiza tu menú</h3>
-            <p className="text-sm text-gray-600">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-800 mb-0.5 sm:mb-1 text-xs sm:text-sm md:text-base">Organiza tu menú</h3>
+            <p className="text-xs sm:text-sm text-gray-600">
               Las secciones ayudan a organizar tus platos (Entradas, Principales, Postres, etc.)
             </p>
           </div>
@@ -101,19 +101,19 @@ export default function StepCreateSection({
         showCharCount={true}
       />
 
-      <div className="mt-6">
-        <p className="text-sm font-medium text-gray-700 mb-3">Sugerencias populares:</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="mt-3 sm:mt-4 md:mt-6">
+        <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Sugerencias populares:</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
               type="button"
               onClick={() => handleSuggestionClick(suggestion)}
-              className="p-3 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left"
+              className="p-2 sm:p-2.5 md:p-3 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left"
             >
-              <div className="text-2xl mb-1">{suggestion.emoji}</div>
-              <p className="text-sm font-medium text-gray-800">{suggestion.name}</p>
-              <p className="text-xs text-gray-500">{suggestion.desc}</p>
+              <div className="text-lg sm:text-xl md:text-2xl mb-0.5 sm:mb-1">{suggestion.emoji}</div>
+              <p className="text-xs sm:text-sm font-medium text-gray-800 truncate">{suggestion.name}</p>
+              <p className="text-xs text-gray-500 hidden sm:block">{suggestion.desc}</p>
             </button>
           ))}
         </div>

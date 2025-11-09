@@ -99,16 +99,16 @@ export default function StepCreateFirstItem({
       icon={icon}
       isActive={isActive}
     >
-      <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
-        <div className="flex gap-3">
+      <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 md:p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
+        <div className="flex gap-2 sm:gap-3">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xl">🍽️</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-base sm:text-lg md:text-xl">🍽️</span>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-1">¡Último paso!</h3>
-            <p className="text-sm text-gray-600">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-800 mb-0.5 sm:mb-1 text-xs sm:text-sm md:text-base">¡Último paso!</h3>
+            <p className="text-xs sm:text-sm text-gray-600">
               Agrega tu primer plato con foto para que tus clientes lo vean delicioso
             </p>
           </div>
@@ -162,8 +162,8 @@ export default function StepCreateFirstItem({
       />
 
       {uploading && (
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mt-4">
-          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+        <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-600 mt-2 sm:mt-3">
+          <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
           </svg>
@@ -171,13 +171,13 @@ export default function StepCreateFirstItem({
         </div>
       )}
 
-      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <div className="mt-3 sm:mt-4 md:mt-6 p-2.5 sm:p-3 md:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <div className="flex gap-2">
-          <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <div className="text-sm text-yellow-800">
-            <p className="font-medium mb-1">💡 Consejo profesional</p>
+          <div className="text-xs sm:text-sm text-yellow-800">
+            <p className="font-medium mb-0.5 sm:mb-1">💡 Consejo profesional</p>
             <p>Las fotos aumentan las ventas hasta un 30%. ¡Usa buena iluminación natural!</p>
           </div>
         </div>

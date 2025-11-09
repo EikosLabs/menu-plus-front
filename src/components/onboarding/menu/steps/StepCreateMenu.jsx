@@ -47,16 +47,16 @@ export default function StepCreateMenu({
       icon={icon}
       isActive={isActive}
     >
-      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
-        <div className="flex gap-3">
+      <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 md:p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
+        <div className="flex gap-2 sm:gap-3">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xl">🎉</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-base sm:text-lg md:text-xl">🎉</span>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-1">¡Bienvenido a tu menú digital!</h3>
-            <p className="text-sm text-gray-600">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-800 mb-0.5 sm:mb-1 text-xs sm:text-sm md:text-base">¡Bienvenido a tu menú digital!</h3>
+            <p className="text-xs sm:text-sm text-gray-600">
               Vamos a crear tu primer menú paso a paso. Es rápido y fácil.
             </p>
           </div>
@@ -87,21 +87,21 @@ export default function StepCreateMenu({
         showCharCount={true}
       />
 
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-          <div className="text-3xl mb-2">📋</div>
-          <p className="text-sm font-medium text-gray-700">Paso 1</p>
-          <p className="text-xs text-gray-500">Crear menú</p>
+      <div className="mt-3 sm:mt-4 md:mt-6 grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+        <div className="text-center p-2 sm:p-3 md:p-4 bg-white rounded-lg border border-gray-200">
+          <div className="text-xl sm:text-2xl md:text-3xl mb-1 sm:mb-2">📋</div>
+          <p className="text-xs sm:text-sm font-medium text-gray-700">Paso 1</p>
+          <p className="text-xs text-gray-500 hidden sm:block">Crear menú</p>
         </div>
-        <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="text-3xl mb-2">📁</div>
-          <p className="text-sm font-medium text-gray-500">Paso 2</p>
-          <p className="text-xs text-gray-400">Crear sección</p>
+        <div className="text-center p-2 sm:p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="text-xl sm:text-2xl md:text-3xl mb-1 sm:mb-2">📁</div>
+          <p className="text-xs sm:text-sm font-medium text-gray-500">Paso 2</p>
+          <p className="text-xs text-gray-400 hidden sm:block">Crear sección</p>
         </div>
-        <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="text-3xl mb-2">🍽️</div>
-          <p className="text-sm font-medium text-gray-500">Paso 3</p>
-          <p className="text-xs text-gray-400">Primer plato</p>
+        <div className="text-center p-2 sm:p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="text-xl sm:text-2xl md:text-3xl mb-1 sm:mb-2">🍽️</div>
+          <p className="text-xs sm:text-sm font-medium text-gray-500">Paso 3</p>
+          <p className="text-xs text-gray-400 hidden sm:block">Primer plato</p>
         </div>
       </div>
     </OnboardingStep>

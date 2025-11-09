@@ -111,10 +111,10 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="menu-form animate-fadeIn neo-space-lg"
+			className="menu-form animate-fadeIn neo-space-lg px-2 sm:px-0"
 		>
 			{error && (
-				<div className="neo-alert neo-alert-error flex items-center">
+				<div className="neo-alert neo-alert-error flex items-center text-xs sm:text-sm">
 					<svg
 						className="mr-2 h-5 w-5 flex-shrink-0"
 						fill="none"
@@ -133,7 +133,7 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 			)}
 
 			{status && !error && (
-				<div className="neo-alert neo-alert-info flex items-center">
+				<div className="neo-alert neo-alert-info flex items-center text-xs sm:text-sm">
 					<svg
 						className="mr-2 h-5 w-5 flex-shrink-0"
 						fill="none"
@@ -151,11 +151,11 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 				</div>
 			)}
 
-			<div className="neo-card neo-shadow-lg bg-white p-6">
-				<div className="mb-6 flex items-center">
-					<div className="mr-3 rounded-lg bg-neo-lavender p-2.5">
+			<div className="neo-card neo-shadow-lg bg-white p-3 sm:p-4 md:p-6">
+				<div className="mb-4 sm:mb-6 flex items-center">
+					<div className="mr-2 sm:mr-3 rounded-lg bg-neo-lavender p-2 sm:p-2.5">
 						<svg
-							className="h-6 w-6 text-neo-black"
+							className="h-5 w-5 sm:h-6 sm:w-6 text-neo-black"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -168,19 +168,19 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							/>
 						</svg>
 					</div>
-					<h3 className="neo-heading neo-h3">
+					<h3 className="neo-heading neo-h3 text-base sm:text-lg md:text-xl">
 						Crear Nuevo Menú
 					</h3>
 				</div>
 
-				<div className="neo-space-md">
+				<div className="neo-space-md space-y-3 sm:space-y-4">
 					<div>
 						<label
 							htmlFor="name"
-							className="neo-text neo-text-bold mb-2 block flex items-center"
+							className="neo-text neo-text-bold mb-1.5 sm:mb-2 block flex items-center text-xs sm:text-sm"
 						>
 							<svg
-								className="mr-1 h-4 w-4 text-neo-black"
+								className="mr-1 h-3.5 w-3.5 sm:h-4 sm:w-4 text-neo-black"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -201,7 +201,7 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							required={true}
 							value={formData.name}
 							onChange={handleChange}
-							className="neo-input w-full"
+							className="neo-input w-full text-sm sm:text-base"
 							placeholder="Ej. Menú de Desayunos, Carta Principal, etc."
 						/>
 					</div>
@@ -209,10 +209,10 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 					<div>
 						<label
 							htmlFor="description"
-							className="neo-text neo-text-bold mb-2 block flex items-center"
+							className="neo-text neo-text-bold mb-1.5 sm:mb-2 block flex items-center text-xs sm:text-sm"
 						>
 							<svg
-								className="mr-1 h-4 w-4 text-neo-black"
+								className="mr-1 h-3.5 w-3.5 sm:h-4 sm:w-4 text-neo-black"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -231,18 +231,18 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							name="description"
 							value={formData.description}
 							onChange={handleChange}
-							rows="4"
-							className="neo-textarea w-full"
+							rows="3"
+							className="neo-textarea w-full text-sm sm:text-base"
 							placeholder="Describe brevemente este menú"
 						/>
 					</div>
 				</div>
 
-				<div className="mt-8 neo-border-top pt-6">
-					<div className="flex flex-col items-center justify-between md:flex-row">
-						<p className="neo-text text-sm mb-4 md:mb-0 opacity-70">
+				<div className="mt-4 sm:mt-6 md:mt-8 neo-border-top pt-3 sm:pt-4 md:pt-6">
+					<div className="flex flex-col items-center justify-between md:flex-row gap-3 sm:gap-4">
+						<p className="neo-text text-xs sm:text-sm mb-0 opacity-70 text-center md:text-left">
 							<svg
-								className="mr-1 inline h-4 w-4 text-neo-black"
+								className="mr-1 inline h-3.5 w-3.5 sm:h-4 sm:w-4 text-neo-black"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -257,14 +257,14 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							Después de crear el menú, podrás añadir platos y categorías.
 						</p>
 
-						<div className="flex neo-space-sm">
+						<div className="flex neo-space-sm w-full md:w-auto">
 							<button
 								type="button"
 								onClick={onCancel}
-								className="neo-btn neo-btn-outline flex items-center"
+								className="neo-btn neo-btn-outline flex items-center justify-center flex-1 md:flex-initial text-sm sm:text-base"
 							>
 								<svg
-									className="mr-1 h-5 w-5"
+									className="mr-1 h-4 w-4 sm:h-5 sm:w-5"
 									fill="none"
 									viewBox="0 0 24 24"
 									stroke="currentColor"
@@ -281,12 +281,12 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 							<button
 								type="submit"
 								disabled={loading}
-								className="neo-btn neo-btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+								className="neo-btn neo-btn-primary flex items-center justify-center flex-1 md:flex-initial disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
 							>
 								{loading ? (
 									<>
 										<svg
-											className="-ml-1 mr-2 h-5 w-5 animate-spin text-white"
+											className="-ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin text-white"
 											fill="none"
 											viewBox="0 0 24 24"
 										>
@@ -309,7 +309,7 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 								) : (
 									<>
 										<svg
-											className="mr-1 h-5 w-5"
+											className="mr-1 h-4 w-4 sm:h-5 sm:w-5"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"

@@ -280,16 +280,16 @@ export default function FlyerEditor({
   }, [selectedElement, showTemplateSelector]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-full max-w-7xl max-h-[95vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+      <div className="bg-white neo-border neo-shadow-2xl rounded-lg w-full h-full max-w-7xl max-h-[98vh] sm:max-h-[95vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b-2 border-black">
-          <div className="flex items-center gap-4">
-            <h2 className="neo-h3 m-0">Editor de Folletos</h2>
+        <div className="flex items-center justify-between p-2 sm:p-4 border-b-2 border-black">
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+            <h2 className="neo-h3 m-0 text-base sm:text-lg md:text-xl truncate">Editor de Folletos</h2>
             {!showTemplateSelector && (
               <button
                 onClick={() => setShowTemplateSelector(true)}
-                className="neo-btn neo-btn-sm"
+                className="neo-btn neo-btn-sm text-xs hidden sm:inline-flex"
               >
                 Cambiar Template
               </button>
@@ -297,7 +297,7 @@ export default function FlyerEditor({
           </div>
           <button
             onClick={onClose}
-            className="neo-btn neo-btn-sm"
+            className="neo-btn neo-btn-sm flex-shrink-0 ml-2"
             aria-label="Cerrar"
           >
             ✕
@@ -305,10 +305,10 @@ export default function FlyerEditor({
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {showTemplateSelector ? (
             /* Template Selector */
-            <div className="flex-1 overflow-auto p-6">
+            <div className="flex-1 overflow-auto p-3 sm:p-6">
               <TemplateSelector
                 selectedTemplate={selectedTemplate}
                 onSelectTemplate={handleTemplateChange}
@@ -318,7 +318,7 @@ export default function FlyerEditor({
           ) : (
             <>
               {/* Toolbar */}
-              <div className="w-64 border-r-2 border-black overflow-auto">
+              <div className="w-full md:w-64 lg:w-80 border-b-2 md:border-b-0 md:border-r-2 border-black overflow-auto max-h-[40vh] md:max-h-none">
                 <FlyerToolbar
                   elements={elements}
                   selectedElement={selectedElement}
@@ -336,7 +336,7 @@ export default function FlyerEditor({
               </div>
 
               {/* Canvas */}
-              <div className="flex-1 overflow-auto bg-gray-100 p-8">
+              <div className="flex-1 overflow-auto bg-gray-100 p-2 sm:p-4 md:p-8">
                 <FlyerCanvas
                   ref={canvasRef}
                   elements={elements}
@@ -355,39 +355,41 @@ export default function FlyerEditor({
 
         {/* Footer with Export Options */}
         {!showTemplateSelector && (
-          <div className="flex items-center justify-between p-4 border-t-2 border-black bg-gray-50">
-            <div className="flex items-center gap-2">
-              <span className="neo-text-bold text-sm">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-2 sm:p-3 md:p-4 border-t-2 border-black bg-gray-50 gap-2">
+            <div className="flex flex-col sm:flex-row items-center gap-1 text-center sm:text-left">
+              <span className="neo-text-bold text-xs sm:text-sm truncate">
                 {business?.name} - {menu?.name}
               </span>
-              <span className="text-gray-500 text-sm">
+              <span className="text-gray-500 text-xs sm:text-sm">
                 • {menuItems.length} items
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
               <button
                 onClick={handlePreview}
                 disabled={isExporting}
-                className="neo-btn neo-btn-white"
+                className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
               >
-                👁️ Previsualizar
+                <span className="sm:hidden">👁️</span>
+                <span className="hidden sm:inline">👁️ Previsualizar</span>
               </button>
 
               <button
                 onClick={() => handleExportImage('png')}
                 disabled={isExporting}
-                className="neo-btn neo-btn-white"
+                className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
               >
-                📷 PNG
+                📷 <span className="hidden sm:inline ml-1">PNG</span>
               </button>
 
               <button
                 onClick={handleExportPDF}
                 disabled={isExporting}
-                className="neo-btn neo-btn-primary"
+                className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
               >
-                {isExporting ? '⏳ Generando...' : '📄 Descargar PDF'}
+                {isExporting ? '⏳' : '📄'}
+                <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
               </button>
             </div>
           </div>
