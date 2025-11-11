@@ -44,6 +44,13 @@ export default function QRCodeComponent({
 				setLoading(true);
 				setError(null);
 
+				// Primero obtener el menú para extraer el QrCodeId
+				const menu = await menuService.getMenu();
+				
+				if (isMounted && menu && menu.qrCodeId) {
+					setBusinessQrCodeId(menu.qrCodeId);
+				}
+
 				// Obtener el código QR del negocio actual (el backend obtiene el businessId del token)
 				const url = await menuService.getBusinessQRCode();
 

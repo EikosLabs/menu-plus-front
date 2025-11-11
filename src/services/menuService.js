@@ -592,13 +592,29 @@ class BusinessService {
 		}
 
 		try {
+			// Primero obtenemos el menú del negocio para obtener su ID
+			const menuResponse = await retryOperation(
+				() => this.apiClient.get(`/menus/food-business`),
+				{ maxRetries: 2 }
+			);
+
+			if (menuResponse.isEmpty || !menuResponse.data || !menuResponse.data.id) {
+				throw new AppError(
+					ERROR_TYPES.NOT_FOUND,
+					'No se encontró un menú para este negocio'
+				);
+			}
+
+			const menuId = menuResponse.data.id;
+
+			// Ahora obtenemos el QR del menú usando el endpoint existente
 			const blob = await retryOperation(
-				() => this.apiClient.fetchBinary(`/food-businesses/qr-code`),
+				() => this.apiClient.fetchBinary(`/menu/${menuId}/qr-code`),
 				{ maxRetries: 2 }
 			);
 
 			const qrUrl = URL.createObjectURL(blob);
-			errorLogger.info('QR Code generated successfully', { businessId });
+			errorLogger.info('QR Code generated successfully', { businessId, menuId });
 			return qrUrl;
 		} catch (error) {
 			errorLogger.error(error, { businessId, operation: 'getQRCode' });

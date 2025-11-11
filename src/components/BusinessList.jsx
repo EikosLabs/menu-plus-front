@@ -783,9 +783,17 @@ export default function BusinessList({
 				/>
 			)}
 
-			{showQr && (
-				<QRCodeComponent onClose={() => setShowQr(null)} />
-			)}
+			{showQr && (() => {
+				const business = businesses.find(b => b.id === showQr);
+				const qrCodeId = business?.menus?.[0]?.qrCodeId;
+				return (
+					<QRCodeComponent 
+						businessName={business?.name}
+						qrCodeId={qrCodeId}
+						onClose={() => setShowQr(null)} 
+					/>
+				);
+			})()}
 
 			{showSectionManager && (
 				<SectionManager
