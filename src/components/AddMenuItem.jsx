@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import menuService from "../services/menuService";
 import { getCurrencySymbol } from "../utils/currencies";
 import { useFormValidation } from "../hooks/useFormValidation";
@@ -11,11 +11,6 @@ import { errorLogger } from "../utils/errorLogger";
 import Modal from "./shared/Modal";
 import ImageUploader from "./shared/ImageUploader";
 import { FormField, TextAreaField, SelectField, CheckboxField } from "./shared/FormField";
-
-const validationRules = {
-	name: (value) => value?.trim() ? "" : "El nombre del plato es obligatorio",
-	price: (value) => value && parseFloat(value) > 0 ? "" : "El precio debe ser mayor que cero"
-};
 
 export default function AddMenuItem({
 	menuId,
@@ -34,6 +29,12 @@ export default function AddMenuItem({
 	const [loadingSections, setLoadingSections] = useState(false);
 
 	const { error, clearError, handleError } = useErrorHandler();
+
+	// Memoize validation rules to prevent re-creation on every render
+	const validationRules = useMemo(() => ({
+		name: (value) => value?.trim() ? "" : "El nombre del plato es obligatorio",
+		price: (value) => value && parseFloat(value) > 0 ? "" : "El precio debe ser mayor que cero"
+	}), []);
 
 	const { values, errors, touched, handleChange, handleBlur, validateAll, resetForm } = useFormValidation(
 		{
