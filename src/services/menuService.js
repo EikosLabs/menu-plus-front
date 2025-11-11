@@ -523,20 +523,17 @@ class BusinessService {
 	}
 
 	async getByUserId() {
-		// Ya no necesitamos userId ya que el businessId está en el token
+		// El backend obtiene el businessId del token automáticamente
 		try {
-			// Como el businessId está en el token, obtenemos el negocio directamente
-			// sin necesidad de buscar por userId
-			const businessId = authService.getBusinessIdFromToken();
-			if (!businessId) {
+			// Usar el endpoint correcto para Owner: GET /food-businesses (sin ID)
+			// Este endpoint extrae el FoodBusinessId del token en el backend
+			const response = await this.apiClient.get('/food-businesses');
+
+			if (response.isEmpty || !response.data) {
 				return [];
 			}
 
-			// Obtener el negocio directamente por ID
-			const business = await this.getById(businessId);
-			if (!business) {
-				return [];
-			}
+			const business = response.data;
 
 			// Cargar menús del negocio
 			try {
