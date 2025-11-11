@@ -102,7 +102,6 @@ const BusinessSection = ({
 			{showAddBusiness && (
 				<div className="mb-4 sm:mb-6 animate-fadeInUp">
 					<AddBusinessForm
-						userId={userData?.id}
 						onBusinessAdded={onBusinessAdded}
 						onCancel={() => {
 							setShowAddBusiness(false);
@@ -126,7 +125,6 @@ const BusinessSection = ({
 			{showAddMenu && (
 				<div className="mb-4 sm:mb-6 animate-fadeInUp">
 					<AddMenuForm
-						businessId={selectedBusinessId}
 						onMenuAdded={onMenuAdded}
 						onCancel={() => setShowAddMenu(false)}
 					/>

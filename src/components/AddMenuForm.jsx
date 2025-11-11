@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import menuService from "../services/menuService";
 
-export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
+export default function AddMenuForm({ onMenuAdded, onCancel }) {
 	const [formData, setFormData] = useState({
 		name: "",
 		description: "",
-		foodBusinessId: businessId,
 	});
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
@@ -16,18 +15,25 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 		const checkBusiness = async () => {
 			setStatus("Verificando el negocio...");
 			try {
-				const businessData = await menuService.getFoodBusiness(businessId);
-				setBusiness(businessData);
+				// Obtener el negocio actual del backend (el backend obtiene el businessId del token)
+				const userBusinesses = await menuService.getUserBusinesses();
+				if (userBusinesses && userBusinesses.length > 0) {
+					const businessData = userBusinesses[0];
+					setBusiness(businessData);
 
-				if (businessData.menus && businessData.menus.length > 0) {
-					setError(
-						"Este negocio ya tiene un menú. No se pueden crear más menús.",
-					);
-					setStatus("Este negocio ya tiene un menú.");
+					if (businessData.menus && businessData.menus.length > 0) {
+						setError(
+							"Este negocio ya tiene un menú. No se pueden crear más menús.",
+						);
+						setStatus("Este negocio ya tiene un menú.");
+					} else {
+						setStatus(
+							"Negocio verificado correctamente. Puede crear un nuevo menú.",
+						);
+					}
 				} else {
-					setStatus(
-						"Negocio verificado correctamente. Puede crear un nuevo menú.",
-					);
+					setError("No se encontró ningún negocio asociado a su cuenta");
+					setStatus("Error: No hay negocio asociado");
 				}
 			} catch (_err) {
 				setError("Error al verificar el negocio. Por favor, intente de nuevo.");
@@ -35,13 +41,8 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 			}
 		};
 
-		if (businessId) {
-			checkBusiness();
-		} else {
-			setError("No se ha especificado un negocio válido");
-			setStatus("Error: No hay negocio seleccionado");
-		}
-	}, [businessId]);
+		checkBusiness();
+	}, []);
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -61,9 +62,9 @@ export default function AddMenuForm({ businessId, onMenuAdded, onCancel }) {
 			return false;
 		}
 
-		if (!businessId) {
-			setError("No se ha especificado un negocio válido");
-			setStatus("Error: No hay negocio seleccionado");
+		if (!business) {
+			setError("No se encontró ningún negocio asociado a su cuenta");
+			setStatus("Error: No hay negocio asociado");
 			return false;
 		}
 

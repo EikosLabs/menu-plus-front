@@ -784,7 +784,7 @@ export default function BusinessList({
 			)}
 
 			{showQr && (
-				<QRCodeComponent businessId={showQr} onClose={() => setShowQr(null)} />
+				<QRCodeComponent onClose={() => setShowQr(null)} />
 			)}
 
 			{showSectionManager && (

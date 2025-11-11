@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
 import menuService from "../services/menuService";
 
-export const useBusinesses = (userId) => {
+export const useBusinesses = () => {
 	const [businesses, setBusinesses] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
 	const fetchBusinesses = async () => {
-		if (!userId) return;
-
 		setLoading(true);
 		try {
-			const userBusinesses = await menuService.getUserBusinesses(userId);
+			// El backend obtiene el userId del token
+			const userBusinesses = await menuService.getUserBusinesses();
 			setBusinesses(userBusinesses);
 			setError(null);
 		} catch (error) {
@@ -24,7 +23,7 @@ export const useBusinesses = (userId) => {
 
 	useEffect(() => {
 		fetchBusinesses();
-	}, [userId]);
+	}, []);
 
 	const addBusiness = async (newBusiness) => {
 		try {
@@ -37,18 +36,17 @@ export const useBusinesses = (userId) => {
 		}
 	};
 
-	const addMenu = (newMenu) => {
+	const addMenu = async (newMenu) => {
 		try {
-			setBusinesses(prevBusinesses =>
-				prevBusinesses.map(business =>
-					business.id === newMenu.foodBusinessId
-						? { ...business, menus: [newMenu], hasMenu: true }
-						: business
-				)
-			);
+			// Re-load businesses from backend to ensure state is consistent
+			await fetchBusinesses();
 			setError(null);
+			return newMenu;
 		} catch (error) {
 			setError("Se agregó el menú pero ocurrió un error al actualizar la vista. Por favor, recarga la página.");
+			// Fallback: if there is at least one business, mark the first as having a menu
+			setBusinesses(prev => prev.length > 0 ? prev.map((b, idx) => idx === 0 ? { ...b, menus: [newMenu], hasMenu: true } : b) : prev);
+			throw error;
 		}
 	};
 

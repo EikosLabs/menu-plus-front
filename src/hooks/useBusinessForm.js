@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import menuService from "../services/menuService";
 
-export const useBusinessForm = (userId, onBusinessAdded, onCancel) => {
+export const useBusinessForm = (onBusinessAdded, onCancel) => {
 	const [formData, setFormData] = useState({
 		name: "",
 		description: "",
@@ -83,7 +83,6 @@ export const useBusinessForm = (userId, onBusinessAdded, onCancel) => {
 		try {
 			const businessData = {
 				...formData,
-				userId: userId,
 				businessCategoryId: parseInt(formData.businessCategoryId),
 			};
 

@@ -3,7 +3,6 @@ import { useTranslation } from "../i18n/utils";
 import menuService from "../services/menuService";
 
 export default function QRCodeComponent({
-	businessId,
 	businessName,
 	qrCodeId,
 	onClose,
@@ -36,12 +35,6 @@ export default function QRCodeComponent({
 		let timeoutId = null;
 
 		const fetchQrCode = async () => {
-			if (!businessId || typeof businessId !== "number") {
-				setError("ID de negocio no válido");
-				setLoading(false);
-				return;
-			}
-
 			if (isLoadingRef.current) {
 				return;
 			}
@@ -51,12 +44,8 @@ export default function QRCodeComponent({
 				setLoading(true);
 				setError(null);
 
-				const businessResponse = await menuService.getFoodBusiness(businessId);
-				if (isMounted && businessResponse?.qrCodeId) {
-					setBusinessQrCodeId(businessResponse.qrCodeId);
-				}
-
-				const url = await menuService.getBusinessQRCode(businessId);
+				// Obtener el código QR del negocio actual (el backend obtiene el businessId del token)
+				const url = await menuService.getBusinessQRCode();
 
 				if (isMounted) {
 					setQrUrl(url);
@@ -96,7 +85,7 @@ export default function QRCodeComponent({
 			}
 			document.removeEventListener("keydown", handleEscape);
 		};
-	}, [businessId, onClose]);
+	}, [onClose]);
 
 	const handleCopyUrl = async () => {
 		try {

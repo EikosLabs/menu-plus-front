@@ -203,6 +203,79 @@ export const authService = {
 		return null;
 	},
 
+	getBusinessIdFromToken() {
+		const token = this.getToken();
+		if (!token) return null;
+
+		try {
+			// Decodificar el payload del JWT (segunda parte)
+			const base64Url = token.split('.')[1];
+			const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+			const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join(''));
+			
+			const payload = JSON.parse(jsonPayload);
+			return payload.businessId || payload.foodBusinessId || null;
+		} catch (error) {
+			errorLogger.error('Error decoding JWT token', error);
+			return null;
+		}
+	},
+
+	getUserIdFromToken() {
+		const token = this.getToken();
+		if (!token) return null;
+
+		try {
+			const base64Url = token.split('.')[1];
+			const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+			const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join(''));
+			
+			const payload = JSON.parse(jsonPayload);
+			return payload.sub || payload.userId || null;
+		} catch (error) {
+			errorLogger.error('Error decoding JWT token for userId', error);
+			return null;
+		}
+	},
+
+	isTokenExpired() {
+		const token = this.getToken();
+		if (!token) return true;
+
+		try {
+			const base64Url = token.split('.')[1];
+			const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+			const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join(''));
+			
+			const payload = JSON.parse(jsonPayload);
+			const currentTime = Date.now() / 1000;
+			return payload.exp < currentTime;
+		} catch (error) {
+			errorLogger.error('Error checking token expiration', error);
+			return true;
+		}
+	},
+
+	getAuthHeaders() {
+		const token = this.getToken();
+		if (!token) {
+			throw new AppError(
+				ERROR_TYPES.UNAUTHORIZED,
+				'Por favor inicia sesión para continuar'
+			);
+		}
+		return addCsrfHeader({
+			'Authorization': `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		});
+	},
+
 	isAuthenticated() {
 		return !!this.getToken();
 	},

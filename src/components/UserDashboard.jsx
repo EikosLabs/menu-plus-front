@@ -13,7 +13,7 @@ import TemplateSection from "./sections/TemplateSection";
 
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
-	const { businesses, setBusinesses, loading: businessLoading, error, setError, addBusiness, addMenu, fetchBusinesses } = useBusinesses(userData?.id);
+	const { businesses, setBusinesses, loading: businessLoading, error, setError, addBusiness, addMenu, fetchBusinesses } = useBusinesses();
 	
 	const [showAddBusiness, setShowAddBusiness] = useState(false);
 	const [showAddMenu, setShowAddMenu] = useState(false);

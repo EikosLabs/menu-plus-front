@@ -9,7 +9,7 @@ import { errorLogger } from "../utils/errorLogger";
 import { validateRequired, validateEmail, validateUrl, validatePhone, validateFileType, validateFileSize } from "../utils/validation";
 import { getAllCurrencies } from "../utils/currencies";
 
-export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, existingBusiness = null, isEditing = false }) {
+export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBusiness = null, isEditing = false }) {
 	const { t } = useTranslation();
 	const [formData, setFormData] = useState({
 		name: existingBusiness?.name || "",
@@ -226,14 +226,6 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 			return;
 		}
 
-		if (!userId) {
-			handleError(new AppError(
-				ERROR_TYPES.UNAUTHORIZED,
-				t("errors.unauthorized")
-			));
-			return;
-		}
-
 		if (!formData.businessCategoryId) {
 			handleError(new AppError(
 				ERROR_TYPES.VALIDATION_ERROR,
@@ -283,10 +275,9 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 				result = await menuService.updateFoodBusiness(existingBusiness.id, businessData);
 				errorLogger.info('Business updated successfully', { businessId: existingBusiness.id });
 			} else {
-				// Crear nuevo negocio
-				businessData.userId = Number.parseInt(userId, 10);
+				// Crear nuevo negocio - el backend obtiene el userId del token
 				result = await menuService.createFoodBusiness(businessData);
-				errorLogger.info('Business created successfully', { businessId: result.id, userId });
+				errorLogger.info('Business created successfully', { businessId: result.id });
 			}
 
 			onBusinessAdded(result);
@@ -299,7 +290,6 @@ export default function AddBusinessForm({ userId, onBusinessAdded, onCancel, exi
 			errorLogger.error(appError, {
 				context: isEditing ? 'updateBusiness' : 'createBusiness',
 				businessId: existingBusiness?.id,
-				userId,
 			});
 
 			handleError(appError);

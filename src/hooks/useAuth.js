@@ -20,7 +20,8 @@ export const useAuth = () => {
 		}
 
 		try {
-			const userBusinesses = await menuService.getUserBusinesses(currentUserId);
+			// El backend obtiene el userId del token
+			const userBusinesses = await menuService.getUserBusinesses();
 			const businessName = userBusinesses.length > 0 ? userBusinesses[0].name : "Mi Negocio";
 
 			setUserData({

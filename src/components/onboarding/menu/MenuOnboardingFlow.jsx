@@ -32,13 +32,8 @@ export default function MenuOnboardingFlow({ businessId: propBusinessId, busines
     if (!propBusinessId) {
       const fetchBusinessData = async () => {
         try {
-          const userId = authService.getUserId();
-          if (!userId) {
-            window.location.href = '/login';
-            return;
-          }
-
-          const businesses = await menuService.getUserBusinesses(userId);
+          // El backend obtiene el userId del token
+          const businesses = await menuService.getUserBusinesses();
           if (businesses && businesses.length > 0) {
             setBusinessId(businesses[0].id);
             setBusinessName(businesses[0].name);
@@ -126,8 +121,8 @@ export default function MenuOnboardingFlow({ businessId: propBusinessId, busines
     try {
       const menu = await menuService.createMenu({
         name: menuData.name,
-        description: menuData.description,
-        foodBusinessId: businessId
+        description: menuData.description
+        // El backend obtiene el foodBusinessId del token
       });
 
       setCreatedMenuId(menu.id);

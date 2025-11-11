@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
  * Custom hook para gestionar el flujo de onboarding
  * Maneja navegación, validación, persistencia y estado del formulario
  */
-export const useOnboarding = (userId, totalSteps = 5) => {
+export const useOnboarding = (userId = null, totalSteps = 5) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -22,8 +22,7 @@ export const useOnboarding = (userId, totalSteps = 5) => {
     whatsAppNumber: '',
     primaryColor: '#1a1a1a',
     secondaryColor: '#004E71',
-    accentColor: '#0A3342',
-    userId: userId
+    accentColor: '#0A3342'
   });
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
@@ -202,8 +201,7 @@ export const useOnboarding = (userId, totalSteps = 5) => {
       whatsAppNumber: '',
       primaryColor: '#1a1a1a',
       secondaryColor: '#004E71',
-      accentColor: '#0A3342',
-      userId: userId
+      accentColor: '#0A3342'
     });
     setErrors({});
     setIsValid(false);

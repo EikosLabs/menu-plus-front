@@ -377,13 +377,12 @@ class BusinessService {
 			return { ...businessPayload, id: Date.now() };
 		}
 
-		if (response.data?.id) {
-			StorageHelper.saveBusinessForUser(businessData.userId, response.data.id);
-			errorLogger.info('Business created successfully', {
-				businessId: response.data.id,
-				userId: businessData.userId,
-			});
-		}
+        if (response.data?.id) {
+            // Ya no necesitamos guardar el businessId localmente ya que está en el token
+            errorLogger.info('Business created successfully', {
+                businessId: response.data.id
+            });
+        }
 
 		return response.data;
 	}
@@ -453,68 +452,34 @@ class BusinessService {
 		return business;
 	}
 
-	async getByUserId(userId) {
-		if (!userId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID de usuario es requerido');
-		}
-
+	async getByUserId() {
+		// Ya no necesitamos userId ya que el businessId está en el token
 		try {
-			const response = await this.apiClient.get(
-				`/food-businesses/user/${userId}`,
-			);
-
-			if (response.isEmpty || !response.data) {
+			// Como el businessId está en el token, obtenemos el negocio directamente
+			// sin necesidad de buscar por userId
+			const businessId = authService.getBusinessIdFromToken();
+			if (!businessId) {
 				return [];
 			}
 
-			const business = Array.isArray(response.data)
-				? response.data[0]
-				: response.data;
-
+			// Obtener el negocio directamente por ID
+			const business = await this.getById(businessId);
 			if (!business) {
 				return [];
 			}
 
-			business.menus = [];
-
-			// Intentar cargar menús
+			// Cargar menús del negocio
 			try {
-				const menuResponse = await this.apiClient.get(
-					`/menus/food-business/${business.id}`,
-				);
-
+				const menuResponse = await this.apiClient.get(`/menus`);
 				if (!menuResponse.isEmpty && menuResponse.data) {
-					const menuData = menuResponse.data;
-
-					// Cargar items del menú si no están incluidos
-					if (!(menuData.menuItems && Array.isArray(menuData.menuItems))) {
-						try {
-							const menuItemsResponse = await this.apiClient.get(
-								`/menu-item/${menuData.id}`,
-							);
-							menuData.menuItems =
-								!menuItemsResponse.isEmpty &&
-								Array.isArray(menuItemsResponse.data)
-									? menuItemsResponse.data
-									: [];
-						} catch (error) {
-							if (error instanceof AppError && error.type !== ERROR_TYPES.NOT_FOUND) {
-								errorLogger.warn('Failed to load menu items', {
-									menuId: menuData.id,
-									error: error.message,
-								});
-							}
-							menuData.menuItems = [];
-						}
-					}
-
-					business.menus = [menuData];
+					business.menus = Array.isArray(menuResponse.data) ? menuResponse.data : [menuResponse.data];
+				} else {
+					business.menus = [];
 				}
 			} catch (error) {
 				if (error instanceof AppError && error.type !== ERROR_TYPES.NOT_FOUND) {
-					errorLogger.warn('Failed to load menus for user business', {
+					errorLogger.warn('Failed to load menus for business', {
 						businessId: business.id,
-						userId,
 						error: error.message,
 					});
 				}
@@ -530,9 +495,8 @@ class BusinessService {
 				throw error;
 			}
 
-			// Para otros errores (como 404), retornar array vacío pero registrar
+			// Para otros errores, retornar array vacío pero registrar
 			errorLogger.warn('Failed to load businesses for user', {
-				userId,
 				error: error instanceof AppError ? error.message : error.message,
 			});
 			return [];
@@ -550,14 +514,19 @@ class BusinessService {
 		}
 	}
 
-	async getQRCode(businessId) {
+	async getQRCode() {
+		// El businessId ahora se obtiene del token, no necesitamos parámetro
+		const businessId = authService.getBusinessIdFromToken();
 		if (!businessId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del negocio es requerido');
+			throw new AppError(
+				ERROR_TYPES.UNAUTHORIZED,
+				'No se encontró el ID del negocio en el token'
+			);
 		}
 
 		try {
 			const blob = await retryOperation(
-				() => this.apiClient.fetchBinary(`/food-businesses/${businessId}/qr-code`),
+				() => this.apiClient.fetchBinary(`/food-businesses/qr-code`),
 				{ maxRetries: 2 }
 			);
 
@@ -580,13 +549,12 @@ class MenuService {
 	async create(menuData) {
 		// Validaciones con errores específicos por campo
 		const nameError = validateRequired(menuData.name, 'El nombre del menú');
-		const businessIdError = validateRequired(menuData.foodBusinessId, 'El ID del negocio');
-
-		if (nameError || businessIdError) {
+		
+		// Ya no validamos foodBusinessId ya que el backend lo obtiene del token
+		if (nameError) {
 			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'Por favor completa todos los campos requeridos', {
 				fieldErrors: {
 					...(nameError && { name: nameError }),
-					...(businessIdError && { foodBusinessId: businessIdError }),
 				}
 			});
 		}
@@ -594,21 +562,32 @@ class MenuService {
 		const menuPayload = {
 			name: menuData.name,
 			description: menuData.description || "",
-			foodBusinessId: Number.parseInt(menuData.foodBusinessId, 10),
+			// Ya no enviamos foodBusinessId ya que el backend lo obtiene del token
 		};
 
-		const response = await retryOperation(
-			() => this.apiClient.post("/menus", menuPayload),
-			{ maxRetries: 2 }
-		);
+		try {
+			const response = await retryOperation(
+				() => this.apiClient.post("/menus", menuPayload),
+				{ maxRetries: 2 }
+			);
 
-		if (response.isEmpty) {
-			errorLogger.warn('Menu creation returned empty response', { menuData });
-			return { ...menuPayload, id: Date.now() };
+			if (response.isEmpty) {
+				errorLogger.warn('Menu creation returned empty response', { menuData });
+				return {
+					...menuPayload,
+					id: Date.now(),
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString(),
+				};
+			}
+
+			errorLogger.info('Menu created successfully', { menuId: response.data.id });
+			return response.data;
+		} catch (error) {
+			const appError = AppError.fromError(error, { menuData });
+			errorLogger.error(appError, { menuData });
+			throw appError;
 		}
-
-		errorLogger.info('Menu created successfully', { menuId: response.data.id });
-		return response.data;
 	}
 
 	async getById(id) {
@@ -646,8 +625,9 @@ class MenuService {
 		const nameError = validateRequired(menuItemData.name, 'El nombre');
 		if (nameError) errors.name = nameError;
 
-		const menuIdError = validateRequired(menuItemData.menuId, 'El ID del menú');
-		if (menuIdError) errors.menuId = menuIdError;
+		// Ya no validamos menuId ya que el backend lo obtiene del token
+		// const menuIdError = validateRequired(menuItemData.menuId, 'El ID del menú');
+		// if (menuIdError) errors.menuId = menuIdError;
 
 		const priceError = validatePrice(menuItemData.price, 'El precio');
 		if (priceError) errors.price = priceError;
@@ -666,15 +646,12 @@ class MenuService {
 			name: menuItemData.name,
 			description: menuItemData.description || "",
 			price: Number.parseFloat(menuItemData.price),
-			currencyType: menuItemData.currencyType !== undefined ? Number.parseInt(menuItemData.currencyType) : 0,
-			menuId: menuItemData.menuId,
-			isAvailable:
-				menuItemData.isAvailable === undefined
-					? true
-					: menuItemData.isAvailable,
-			menuItemCategoryId: menuItemData.menuItemCategoryId || null,
+			menuItemCategoryId: menuItemData.categoryId || null,
 			sectionId: menuItemData.sectionId || null,
 			order: menuItemData.order || 0,
+			// Ya no enviamos menuId ya que el backend lo obtiene del token
+			// menuId: Number.parseInt(menuItemData.menuId, 10),
+			isAvailable: menuItemData.isAvailable !== false,
 			...(imageKey && { imageKey }),
 		};
 	}
@@ -798,19 +775,16 @@ class MenuService {
 		}
 	}
 
-	async getMenuItems(menuId) {
-		if (!menuId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú es requerido');
-		}
-
+	async getMenuItems() {
+		// Ya no necesitamos menuId ya que el backend lo obtiene del token
 		try {
-			const response = await this.apiClient.get(`/menu-items?menuId=${menuId}`);
+			const response = await this.apiClient.get(`/menu-items`);
 			return response.isEmpty ? [] : response.data;
 		} catch (error) {
 			if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
 				return [];
 			}
-			errorLogger.error(error, { menuId, operation: 'getMenuItems' });
+			errorLogger.error(error, { operation: 'getMenuItems' });
 			throw error;
 		}
 	}
@@ -843,84 +817,39 @@ class MenuService {
 		};
 
 		const response = await retryOperation(
-			() => this.apiClient.post(`/menus/${menuId}/section`, sectionPayload),
+			() => this.apiClient.post(`/sections`, sectionPayload),
 			{ maxRetries: 2 }
 		);
 
 		if (response.isEmpty) {
-			errorLogger.warn('Section creation returned empty response', { menuId, sectionData });
+			errorLogger.warn('Section creation returned empty response', { sectionData });
 			return {
 				...sectionPayload,
 				id: Date.now(),
-				menuId,
 				order: 0,
 			};
 		}
 
-		errorLogger.info('Section created successfully', { menuId, sectionId: response.data.id });
+		errorLogger.info('Section created successfully', { sectionId: response.data.id });
 		return response.data;
 	}
 
-	async moveSectionUp(menuId, sectionId) {
-		if (!menuId || !sectionId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú y de la sección son requeridos');
-		}
-
+	async getSections() {
+		// Ya no necesitamos menuId ya que el backend lo obtiene del token
 		try {
-			const response = await this.apiClient.put(
-				`/menus/${menuId}/section/${sectionId}/move-up`,
-			);
-			errorLogger.info('Section moved up', { menuId, sectionId });
-			return response.data;
-		} catch (error) {
-			errorLogger.error(error, { menuId, sectionId, operation: 'moveSectionUp' });
-			throw error;
-		}
-	}
-
-	async moveSectionDown(menuId, sectionId) {
-		if (!menuId || !sectionId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú y de la sección son requeridos');
-		}
-
-		try {
-			const response = await this.apiClient.put(
-				`/menus/${menuId}/section/${sectionId}/move-down`,
-			);
-			errorLogger.info('Section moved down', { menuId, sectionId });
-			return response.data;
-		} catch (error) {
-			errorLogger.error(error, { menuId, sectionId, operation: 'moveSectionDown' });
-			throw error;
-		}
-	}
-
-	async getSections(menuId) {
-		if (!menuId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú es requerido');
-		}
-
-		try {
-			const menuResponse = await this.apiClient.get(`/menus/${menuId}`);
-			if (menuResponse.isEmpty || !menuResponse.data) {
-				return [];
-			}
-
-			return menuResponse.data.sections || [];
+			const response = await this.apiClient.get(`/sections`);
+			return response.isEmpty ? [] : response.data;
 		} catch (error) {
 			if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
 				return [];
 			}
-			errorLogger.error(error, { menuId, operation: 'getSections' });
+			errorLogger.error(error, { operation: 'getSections' });
 			throw error;
 		}
 	}
 
-	async createFlyer(menuId, flyerData) {
-		if (!menuId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú es requerido');
-		}
-
+	async createFlyer(flyerData) {
+		// Ya no necesitamos menuId ya que el backend lo obtiene del token
 		const nameError = validateRequired(flyerData.name, 'El nombre del folleto/carta');
 		if (nameError) {
 			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, nameError, {
@@ -935,16 +864,17 @@ class MenuService {
 			selectedItemIds: flyerData.selectedItemIds || "",
 			itemsOrder: flyerData.itemsOrder || "",
 			paperSize: flyerData.paperSize || "A4",
-			menuId: menuId,
+			// Ya no enviamos menuId ya que el backend lo obtiene del token
+			// menuId: menuId,
 		};
 
 		const response = await retryOperation(
-			() => this.apiClient.post(`/menus/${menuId}/flyers`, flyerPayload),
+			() => this.apiClient.post(`/flyers`, flyerPayload),
 			{ maxRetries: 2 }
 		);
 
 		if (response.isEmpty) {
-			errorLogger.warn('Flyer creation returned empty response', { menuId, flyerData });
+			errorLogger.warn('Flyer creation returned empty response', { flyerData });
 			return {
 				...flyerPayload,
 				id: Date.now(),
@@ -952,7 +882,7 @@ class MenuService {
 			};
 		}
 
-		errorLogger.info('Flyer created successfully', { menuId, flyerId: response.data.id });
+		errorLogger.info('Flyer created successfully', { flyerId: response.data.id });
 		return response.data;
 	}
 
@@ -985,13 +915,10 @@ class MenuService {
 		}
 	}
 
-	async getFlyersByMenu(menuId) {
-		if (!menuId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú es requerido');
-		}
-
+	async getFlyersByMenu() {
+		// Ya no necesitamos menuId ya que el backend lo obtiene del token
 		try {
-			const response = await this.apiClient.get(`/menus/${menuId}/flyers`);
+			const response = await this.apiClient.get(`/flyers`);
 
 			if (response.isEmpty) {
 				return [];
@@ -1002,7 +929,7 @@ class MenuService {
 			if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
 				return [];
 			}
-			errorLogger.error(error, { menuId, operation: 'getFlyersByMenu' });
+			errorLogger.error(error, { operation: 'getFlyersByMenu' });
 			throw error;
 		}
 	}
@@ -1078,9 +1005,9 @@ export default {
 	createFoodBusiness: (data) => businessService.create(data),
 	updateFoodBusiness: (id, data) => businessService.update(id, data),
 	getFoodBusiness: (id) => businessService.getById(id),
-	getUserBusinesses: (userId) => businessService.getByUserId(userId),
+	getUserBusinesses: () => businessService.getByUserId(), // Ya no requiere userId
 	getBusinessCategories: () => businessService.getCategories(),
-	getBusinessQRCode: (id) => businessService.getQRCode(id),
+	getBusinessQRCode: () => businessService.getQRCode(), // Ya no requiere ID
 
 	createMenu: (data) => menuService.create(data),
 	getMenu: (id) => menuService.getById(id),
@@ -1088,19 +1015,17 @@ export default {
 	createMenuItem: (data) => menuService.createMenuItem(data),
 	updateMenuItem: (itemId, data) => menuService.updateMenuItem(itemId, data),
 	deleteMenuItem: (itemId) => menuService.deleteMenuItem(itemId),
-	getMenuItems: (menuId) => menuService.getMenuItems(menuId),
+	getMenuItems: () => menuService.getMenuItems(), // Ya no requiere menuId
 	getMenuItemCategories: () => menuService.getMenuItemCategories(),
 
-	createSection: (menuId, data) => menuService.createSection(menuId, data),
-	getSections: (menuId) => menuService.getSections(menuId),
-	moveSectionUp: (menuId, sectionId) =>
-		menuService.moveSectionUp(menuId, sectionId),
-	moveSectionDown: (menuId, sectionId) =>
-		menuService.moveSectionDown(menuId, sectionId),
+	createSection: (data) => menuService.createSection(data), // Ya no requiere menuId
+	getSections: () => menuService.getSections(), // Ya no requiere menuId
+	moveSectionUp: (sectionId) => menuService.moveSectionUp(sectionId), // Ya no requiere menuId
+	moveSectionDown: (sectionId) => menuService.moveSectionDown(sectionId), // Ya no requiere menuId
 
-	createFlyer: (menuId, data) => menuService.createFlyer(menuId, data),
+	createFlyer: (data) => menuService.createFlyer(data), // Ya no requiere menuId
 	getFlyer: (flyerId) => menuService.getFlyer(flyerId),
-	getFlyersByMenu: (menuId) => menuService.getFlyersByMenu(menuId),
+	getFlyersByMenu: () => menuService.getFlyersByMenu(), // Ya no requiere menuId
 	updateFlyer: (flyerId, data) => menuService.updateFlyer(flyerId, data),
 	deleteFlyer: (flyerId) => menuService.deleteFlyer(flyerId),
 
@@ -1111,3 +1036,39 @@ export default {
 	_getBusinessIdsForUser: (userId) =>
 		StorageHelper.getBusinessesForUser(userId),
 };
+
+	async moveSectionUp(sectionId) {
+		// Ya no necesitamos menuId ya que el backend lo obtiene del token
+		if (!sectionId) {
+			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID de la sección es requerido');
+		}
+
+		try {
+			const response = await this.apiClient.put(
+				`/sections/${sectionId}/move-up`,
+			);
+			errorLogger.info('Section moved up', { sectionId });
+			return response.data;
+		} catch (error) {
+			errorLogger.error(error, { sectionId, operation: 'moveSectionUp' });
+			throw error;
+		}
+	}
+
+	async moveSectionDown(sectionId) {
+		// Ya no necesitamos menuId ya que el backend lo obtiene del token
+		if (!sectionId) {
+			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID de la sección es requerido');
+		}
+
+		try {
+			const response = await this.apiClient.put(
+				`/sections/${sectionId}/move-down`,
+			);
+			errorLogger.info('Section moved down', { sectionId });
+			return response.data;
+		} catch (error) {
+			errorLogger.error(error, { sectionId, operation: 'moveSectionDown' });
+			throw error;
+		}
+	}

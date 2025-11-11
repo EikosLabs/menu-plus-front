@@ -16,7 +16,7 @@ import StepColors from './steps/StepColors';
  * Componente principal del flujo de onboarding
  * Orquesta todos los pasos y maneja la lógica de navegación
  */
-export default function OnboardingFlow({ userId: propUserId, onComplete }) {
+export default function OnboardingFlow({ userId: propUserId = null, onComplete }) {
   const totalSteps = 5;
   const stepLabels = ['Básico', 'Logo', 'Contacto', 'Social', 'Colores'];
   const [userId, setUserId] = useState(propUserId);
@@ -91,7 +91,7 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
     setSubmitError(null);
 
     try {
-      // Preparar los datos del negocio
+      // Preparar los datos del negocio - el backend obtiene el userId del token
       const businessData = {
         name: formData.name,
         description: formData.description || '',
@@ -108,8 +108,7 @@ export default function OnboardingFlow({ userId: propUserId, onComplete }) {
         primaryColor: formData.primaryColor,
         secondaryColor: formData.secondaryColor,
         accentColor: formData.accentColor,
-        defaultCurrency: formData.defaultCurrency ?? 0,
-        userId: userId
+        defaultCurrency: formData.defaultCurrency ?? 0
       };
 
       // Crear el negocio
