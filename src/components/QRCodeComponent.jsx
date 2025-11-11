@@ -25,10 +25,10 @@ export default function QRCodeComponent({
 	}, [qrCodeId]);
 
 	const menuUrl = useMemo(() => {
-		return businessQrCodeId
-			? `${window.location.origin}/menu/${businessQrCodeId}`
+		return qrCodeId
+			? `${window.location.origin}/menu/${qrCodeId}`
 			: "";
-	}, [businessQrCodeId]);
+	}, [qrCodeId]);
 
 	// Bloquear scroll cuando el modal está abierto
 	useEffect(() => {

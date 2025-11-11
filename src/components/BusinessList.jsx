@@ -785,9 +785,16 @@ export default function BusinessList({
 
 			{showQr && (() => {
 				const business = businesses.find(b => b.id === showQr);
-				// Obtener qrCodeId del menú (puede estar en qrCodeId o qrCode)
 				const menu = business?.menus?.[0];
-				const qrCodeId = menu?.qrCodeId || menu?.qrCode || menu?.id;
+				// Buscar qrCodeId en diferentes formatos (camelCase y PascalCase por si acaso)
+				const qrCodeId = menu?.qrCodeId || menu?.QrCodeId || menu?.qrCode || menu?.QrCode;
+				
+				console.log('DEBUG QR Modal:', {
+					business,
+					menu,
+					qrCodeId,
+					menuKeys: menu ? Object.keys(menu) : []
+				});
 				
 				return (
 					<QRCodeComponent 
