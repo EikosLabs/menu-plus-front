@@ -44,11 +44,9 @@ export default function QRCodeComponent({
 				setLoading(true);
 				setError(null);
 
-				// Primero obtener el menú para extraer el QrCodeId
-				const menu = await menuService.getMenu();
-				
-				if (isMounted && menu && menu.qrCodeId) {
-					setBusinessQrCodeId(menu.qrCodeId);
+				// Si se pasó qrCodeId como prop, usarlo directamente
+				if (qrCodeId && isMounted) {
+					setBusinessQrCodeId(qrCodeId);
 				}
 
 				// Obtener el código QR del negocio actual (el backend obtiene el businessId del token)
@@ -92,7 +90,7 @@ export default function QRCodeComponent({
 			}
 			document.removeEventListener("keydown", handleEscape);
 		};
-	}, [onClose]);
+	}, [onClose, qrCodeId]);
 
 	const handleCopyUrl = async () => {
 		try {
