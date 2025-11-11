@@ -113,14 +113,22 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
 
       // Crear el negocio
       const result = await menuService.createFoodBusiness(businessData);
-      
+
+      // Refrescar el token para obtener uno nuevo con el FoodBusinessId actualizado
+      try {
+        await authService.refreshToken();
+      } catch (refreshError) {
+        console.error('Error al refrescar token:', refreshError);
+        // No es crítico, continuar de todas formas
+      }
+
       // Limpiar el progreso guardado
       clearProgress();
       localStorage.removeItem('needs_onboarding');
-      
+
       // Mostrar pantalla de éxito
       setIsComplete(true);
-      
+
       // Notificar al componente padre si existe callback
       if (onComplete) {
         onComplete(result);

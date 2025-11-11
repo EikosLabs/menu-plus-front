@@ -392,9 +392,26 @@ class BusinessService {
 			});
 		}
 
+		// Convertir a PascalCase para el backend
 		const businessPayload = {
-			...businessData,
-			businessCategoryId: businessData.businessCategoryId || 1,
+			Name: businessData.name,
+			Description: businessData.description || '',
+			Slogan: businessData.slogan || '',
+			Address: businessData.address || '',
+			PhoneNumber: businessData.phoneNumber || '',
+			Email: businessData.email || '',
+			BusinessCategoryId: businessData.businessCategoryId || 1,
+			ImageKey: businessData.imageKey || null,
+			FacebookUrl: businessData.facebookUrl || '',
+			InstagramUrl: businessData.instagramUrl || '',
+			TwitterUrl: businessData.twitterUrl || '',
+			WhatsAppNumber: businessData.whatsAppNumber || '',
+			PrimaryColor: businessData.primaryColor || '',
+			SecondaryColor: businessData.secondaryColor || '',
+			AccentColor: businessData.accentColor || '',
+			DefaultCurrency: businessData.defaultCurrency ?? 0,
+			Template: businessData.template ?? 0,
+			FontFamily: businessData.fontFamily || ''
 		};
 
 		// Usar retry para operaciones críticas de creación
@@ -423,10 +440,32 @@ class BusinessService {
 			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del negocio es requerido');
 		}
 
+		// Convertir a PascalCase para el backend
 		const businessPayload = {
-			...businessData,
-			businessCategoryId: businessData.businessCategoryId || 1,
+			Name: businessData.name,
+			Description: businessData.description,
+			Slogan: businessData.slogan,
+			Address: businessData.address,
+			PhoneNumber: businessData.phoneNumber,
+			Email: businessData.email,
+			BusinessCategoryId: businessData.businessCategoryId || 1,
+			ImageKey: businessData.imageKey,
+			FacebookUrl: businessData.facebookUrl,
+			InstagramUrl: businessData.instagramUrl,
+			TwitterUrl: businessData.twitterUrl,
+			WhatsAppNumber: businessData.whatsAppNumber,
+			PrimaryColor: businessData.primaryColor,
+			SecondaryColor: businessData.secondaryColor,
+			AccentColor: businessData.accentColor,
+			DefaultCurrency: businessData.defaultCurrency,
+			Template: businessData.template,
+			FontFamily: businessData.fontFamily
 		};
+
+		// Remover campos undefined
+		Object.keys(businessPayload).forEach(
+			(key) => businessPayload[key] === undefined && delete businessPayload[key]
+		);
 
 		const response = await retryOperation(
 			() => this.apiClient.patch(`/food-businesses/${businessId}`, businessPayload),
