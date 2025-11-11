@@ -436,9 +436,8 @@ class BusinessService {
 	}
 
 	async update(businessId, businessData) {
-		if (!businessId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del negocio es requerido');
-		}
+		// Ya no necesitamos businessId porque el backend lo obtiene del token
+		// Pero lo mantenemos en la firma por compatibilidad
 
 		// Convertir a PascalCase para el backend
 		const businessPayload = {
@@ -467,17 +466,18 @@ class BusinessService {
 			(key) => businessPayload[key] === undefined && delete businessPayload[key]
 		);
 
+		// El backend obtiene el businessId del token, no necesitamos pasarlo en la URL
 		const response = await retryOperation(
-			() => this.apiClient.patch(`/food-businesses/${businessId}`, businessPayload),
+			() => this.apiClient.patch('/food-businesses', businessPayload),
 			{ maxRetries: 2 }
 		);
 
 		if (response.isEmpty) {
-			errorLogger.warn('Business update returned empty response', { businessId, businessData });
+			errorLogger.warn('Business update returned empty response', { businessData });
 			return { ...businessPayload, id: businessId };
 		}
 
-		errorLogger.info('Business updated successfully', { businessId });
+		errorLogger.info('Business updated successfully');
 		return response.data;
 	}
 

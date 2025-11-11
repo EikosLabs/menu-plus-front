@@ -5,6 +5,7 @@ import menuService from "../services/menuService";
 export default function QRCodeComponent({
 	businessName,
 	qrCodeId,
+	menuId,
 	onClose,
 }) {
 	const { t } = useTranslation();
@@ -15,6 +16,13 @@ export default function QRCodeComponent({
 	const [showShareMenu, setShowShareMenu] = useState(false);
 	const [businessQrCodeId, setBusinessQrCodeId] = useState(qrCodeId || null);
 	const isLoadingRef = useRef(false);
+
+	// Actualizar businessQrCodeId cuando cambie el prop qrCodeId
+	useEffect(() => {
+		if (qrCodeId) {
+			setBusinessQrCodeId(qrCodeId);
+		}
+	}, [qrCodeId]);
 
 	const menuUrl = useMemo(() => {
 		return businessQrCodeId
@@ -44,8 +52,17 @@ export default function QRCodeComponent({
 				setLoading(true);
 				setError(null);
 
-				// Si se pasó qrCodeId como prop, usarlo directamente
-				if (qrCodeId && isMounted) {
+				// Si no tenemos qrCodeId pero tenemos menuId, obtener el menú completo
+				if (!qrCodeId && menuId && isMounted) {
+					try {
+						const menu = await menuService.getMenu(menuId);
+						if (menu && menu.qrCodeId) {
+							setBusinessQrCodeId(menu.qrCodeId);
+						}
+					} catch (err) {
+						console.error('Error fetching menu for qrCodeId:', err);
+					}
+				} else if (qrCodeId && isMounted) {
 					setBusinessQrCodeId(qrCodeId);
 				}
 
@@ -90,7 +107,7 @@ export default function QRCodeComponent({
 			}
 			document.removeEventListener("keydown", handleEscape);
 		};
-	}, [onClose, qrCodeId]);
+	}, [onClose, qrCodeId, menuId]);
 
 	const handleCopyUrl = async () => {
 		try {

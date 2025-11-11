@@ -106,7 +106,7 @@ export default function AddMenuItem({
 		return () => { mounted = false; };
 	}, [menuId, handleError]);
 
-	// Load existing item data
+	// Load existing item data - only run once on mount or when editing changes
 	useEffect(() => {
 		if (isEditing && existingItem) {
 			resetForm({
@@ -121,7 +121,7 @@ export default function AddMenuItem({
 			if (existingItem.imageUri) {
 				setExistingPreview(existingItem.imageUri);
 			}
-		} else {
+		} else if (!isEditing) {
 			resetForm({
 				name: "",
 				description: "",
@@ -133,7 +133,8 @@ export default function AddMenuItem({
 			});
 			clearImage();
 		}
-	}, [isEditing, existingItem, menuId, sectionId, resetForm, setExistingPreview, clearImage]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isEditing, existingItem?.id, menuId, sectionId]); // Only re-run when these specific values change
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();

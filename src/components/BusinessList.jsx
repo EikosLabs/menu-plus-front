@@ -785,11 +785,15 @@ export default function BusinessList({
 
 			{showQr && (() => {
 				const business = businesses.find(b => b.id === showQr);
-				const qrCodeId = business?.menus?.[0]?.qrCodeId;
+				// Obtener qrCodeId del menú (puede estar en qrCodeId o qrCode)
+				const menu = business?.menus?.[0];
+				const qrCodeId = menu?.qrCodeId || menu?.qrCode || menu?.id;
+				
 				return (
 					<QRCodeComponent 
 						businessName={business?.name}
 						qrCodeId={qrCodeId}
+						menuId={menu?.id}
 						onClose={() => setShowQr(null)} 
 					/>
 				);
