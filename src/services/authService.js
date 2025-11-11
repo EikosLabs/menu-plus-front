@@ -3,6 +3,8 @@ import { AppError } from '../utils/AppError';
 import { ERROR_TYPES } from '../utils/errorTypes';
 import { errorLogger } from '../utils/errorLogger';
 import { validateEmail, validateRequired } from '../utils/validation';
+import { cookieManager } from '../utils/cookieManager.js';
+import { jwtHelper } from '../utils/jwtHelper.js';
 
 const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
 
@@ -55,13 +57,16 @@ export const authService = {
 			// Extraer token de la respuesta
 			const contentType = response.headers.get("content-type");
 			let token;
+			let refreshToken;
 
 			if (contentType?.includes("application/json")) {
 				const data = await response.json();
-				token =
-					typeof data === "object"
-						? data.token || data.accessToken || data.access_token
-						: data;
+				if (typeof data === "object") {
+					token = data.token || data.Token || data.accessToken || data.access_token;
+					refreshToken = data.refreshToken || data.RefreshToken;
+				} else {
+					token = data;
+				}
 			} else {
 				token = await response.text();
 			}
@@ -80,13 +85,12 @@ export const authService = {
 
 			token = token.trim();
 
-			// Guardar solo en cookies con flags de seguridad
-			document.cookie = `auth_token=${token}; path=/; max-age=7200; SameSite=Strict; Secure`;
-			document.cookie = `token=${token}; path=/; max-age=7200; SameSite=Strict; Secure`;
+			// Guardar tokens usando el método centralizado
+			this._storeTokens(token, refreshToken);
 
 			errorLogger.info('Login successful', { email });
 
-			return { success: true, token };
+			return { success: true, token, refreshToken };
 
 		} catch (error) {
 			// Si ya es AppError, re-lanzar
@@ -119,10 +123,10 @@ export const authService = {
 		}
 
 		const requestBody = {
-			fullName: fullName.trim(),
-			email: email.trim(),
-			userName: userName ? userName.trim() : email.split("@")[0],
-			password,
+			FullName: fullName.trim(),
+			Email: email.trim(),
+			UserName: userName ? userName.trim() : email.split("@")[0],
+			Password: password,
 		};
 
 		try {
@@ -181,85 +185,148 @@ export const authService = {
 		}
 	},
 
+	async refreshToken() {
+		const refreshToken = this.getRefreshToken();
+
+		if (!refreshToken) {
+			errorLogger.warn('No refresh token found');
+			throw new AppError(
+				ERROR_TYPES.UNAUTHORIZED,
+				'No se encontró el refresh token. Por favor inicia sesión nuevamente.'
+			);
+		}
+
+		try {
+			const response = await fetch(`${API_URL}/auth/refreshToken`, {
+				method: 'POST',
+				headers: addCsrfHeader({
+					'Content-Type': 'application/json'
+				}),
+				body: JSON.stringify({ refreshToken }),
+				credentials: 'include'
+			});
+
+			if (!response.ok) {
+				if (response.status === 401 || response.status === 400) {
+					// Limpiar cookies si el refresh token es inválido
+					cookieManager.clearAuthCookies();
+					throw new AppError(
+						ERROR_TYPES.UNAUTHORIZED,
+						'El refresh token ha expirado. Por favor inicia sesión nuevamente.'
+					);
+				}
+
+				throw await AppError.fromResponse(response);
+			}
+
+			const data = await response.json();
+			const newToken = data.token || data.Token;
+			const newRefreshToken = data.refreshToken || data.RefreshToken;
+
+			if (!newToken) {
+				throw new AppError(
+					ERROR_TYPES.SERVER_ERROR,
+					'El servidor no devolvió un token válido.'
+				);
+			}
+
+			// Almacenar los nuevos tokens
+			this._storeTokens(newToken, newRefreshToken);
+
+			errorLogger.info('Token refreshed successfully');
+
+			return { token: newToken, refreshToken: newRefreshToken };
+		} catch (error) {
+			if (error instanceof AppError) {
+				errorLogger.error(error, { endpoint: '/auth/refreshToken' });
+				throw error;
+			}
+
+			errorLogger.error(error, { endpoint: '/auth/refreshToken' });
+			throw AppError.fromNetworkError(error, { endpoint: '/auth/refreshToken' });
+		}
+	},
+
 	logout() {
-		// Limpiar cookies de autenticación
-		document.cookie =
-			"auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-		document.cookie =
-			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		// Limpiar todas las cookies de autenticación
+		cookieManager.clearAuthCookies();
+
+		// Limpiar localStorage si hay datos relacionados con auth
+		try {
+			localStorage.removeItem('userBusinesses');
+		} catch (error) {
+			errorLogger.warn('Error clearing localStorage', error);
+		}
 
 		errorLogger.info('Logout successful');
 	},
 
 	getToken() {
-		// Obtener token solo de cookies (más seguro)
-		const cookies = document.cookie.split(";");
-		const authCookie = cookies.find((cookie) =>
-			cookie.trim().startsWith("auth_token="),
+		return cookieManager.get(cookieManager.COOKIE_OPTIONS.AUTH_TOKEN.name);
+	},
+
+	getRefreshToken() {
+		return cookieManager.get(cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name);
+	},
+
+	_storeTokens(token, refreshToken) {
+		// Almacenar auth_token
+		cookieManager.set(
+			cookieManager.COOKIE_OPTIONS.AUTH_TOKEN.name,
+			token,
+			cookieManager.COOKIE_OPTIONS.AUTH_TOKEN
 		);
-		if (authCookie) {
-			return authCookie.split("=")[1];
+
+		// Almacenar token (compatibilidad)
+		cookieManager.set(
+			cookieManager.COOKIE_OPTIONS.TOKEN.name,
+			token,
+			cookieManager.COOKIE_OPTIONS.TOKEN
+		);
+
+		// Almacenar refresh_token si existe
+		if (refreshToken) {
+			cookieManager.set(
+				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name,
+				refreshToken,
+				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN
+			);
 		}
-		return null;
 	},
 
 	getBusinessIdFromToken() {
 		const token = this.getToken();
 		if (!token) return null;
 
-		try {
-			// Decodificar el payload del JWT (segunda parte)
-			const base64Url = token.split('.')[1];
-			const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-			const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-			}).join(''));
-			
-			const payload = JSON.parse(jsonPayload);
-			return payload.businessId || payload.foodBusinessId || null;
-		} catch (error) {
-			errorLogger.error('Error decoding JWT token', error);
-			return null;
+		// Usar jwtHelper para extraer el claim correcto: FoodBusinessId
+		const businessId = jwtHelper.getBusinessIdFromToken(token);
+		
+		if (!businessId) {
+			errorLogger.warn('FoodBusinessId not found in token');
 		}
+
+		return businessId;
 	},
 
 	getUserIdFromToken() {
 		const token = this.getToken();
 		if (!token) return null;
 
-		try {
-			const base64Url = token.split('.')[1];
-			const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-			const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-			}).join(''));
-			
-			const payload = JSON.parse(jsonPayload);
-			return payload.sub || payload.userId || null;
-		} catch (error) {
-			errorLogger.error('Error decoding JWT token for userId', error);
-			return null;
+		// Usar jwtHelper para extraer el claim correcto: UserId
+		const userId = jwtHelper.getUserIdFromToken(token);
+		
+		if (!userId) {
+			errorLogger.warn('UserId not found in token');
 		}
+
+		return userId;
 	},
 
 	isTokenExpired() {
 		const token = this.getToken();
 		if (!token) return true;
 
-		try {
-			const base64Url = token.split('.')[1];
-			const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-			const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-			}).join(''));
-			
-			const payload = JSON.parse(jsonPayload);
-			const currentTime = Date.now() / 1000;
-			return payload.exp < currentTime;
-		} catch (error) {
-			errorLogger.error('Error checking token expiration', error);
-			return true;
-		}
+		return jwtHelper.isTokenExpired(token);
 	},
 
 	getAuthHeaders() {
@@ -281,36 +348,16 @@ export const authService = {
 	},
 
 	getUserId() {
-		try {
-			const token = this.getToken();
-			if (!token) {
-				return null;
+		const userId = this.getUserIdFromToken();
+		
+		if (userId) {
+			const numericUserId = Number.parseInt(userId, 10);
+			if (!Number.isNaN(numericUserId)) {
+				return numericUserId;
 			}
-
-			const base64Url = token.split(".")[1];
-			if (!base64Url) {
-				errorLogger.warn('Invalid token format: missing payload');
-				return null;
-			}
-
-			const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-			const payload = JSON.parse(window.atob(base64));
-
-			const userIdFromToken = payload["UserId"] || payload.userId || payload.sub;
-
-			if (userIdFromToken) {
-				const numericUserId = Number.parseInt(userIdFromToken, 10);
-				if (!Number.isNaN(numericUserId)) {
-					return numericUserId;
-				}
-			}
-
-			errorLogger.warn('UserId not found in token payload', { payload });
-			return null;
-		} catch (error) {
-			errorLogger.error(error, { context: 'getUserId' });
-			return null;
 		}
+
+		return null;
 	},
 };
 

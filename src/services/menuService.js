@@ -1,6 +1,7 @@
 const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
 
 import authService from "./authService";
+import { TokenInterceptor } from "./tokenInterceptor.js";
 import { addCsrfHeader } from "../utils/security.js";
 import { AppError } from '../utils/AppError';
 import { ERROR_TYPES } from '../utils/errorTypes';
@@ -46,8 +47,9 @@ async function retryOperation(operation, options = {}) {
 }
 
 class ApiClient {
-	constructor(baseUrl) {
+	constructor(baseUrl, tokenInterceptor = null) {
 		this.baseUrl = baseUrl;
+		this.tokenInterceptor = tokenInterceptor;
 	}
 
 	getAuthToken() {
@@ -63,86 +65,103 @@ class ApiClient {
 
 	async makeRequest(endpoint, options = {}) {
 		const { method = "GET", body = null, timeout = 10000 } = options;
-		const url = `${this.baseUrl}${endpoint}`;
 
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), timeout);
+		// Función que ejecuta el request real
+		const executeRequest = async () => {
+			const url = `${this.baseUrl}${endpoint}`;
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-		try {
-			const token = this.getAuthToken();
+			try {
+				const token = this.getAuthToken();
 
-			const headers = addCsrfHeader({
-				Authorization: `Bearer ${token}`,
-				...(body && { "Content-Type": "application/json" }),
-			});
+				const headers = addCsrfHeader({
+					Authorization: `Bearer ${token}`,
+					...(body && { "Content-Type": "application/json" }),
+				});
 
-			const fetchOptions = {
-				method,
-				headers,
-				credentials: "include",
-				signal: controller.signal,
-				...(body && { body: JSON.stringify(body) }),
-			};
+				const fetchOptions = {
+					method,
+					headers,
+					credentials: "include",
+					signal: controller.signal,
+					...(body && { body: JSON.stringify(body) }),
+				};
 
-			const response = await fetch(url, fetchOptions);
-			clearTimeout(timeoutId);
+				const response = await fetch(url, fetchOptions);
+				clearTimeout(timeoutId);
 
-			const responseText = await response.text();
-			let data = null;
+				const responseText = await response.text();
+				let data = null;
 
-			if (responseText?.trim()) {
-				try {
-					data = JSON.parse(responseText);
-				} catch (_error) {
-					if (!response.ok) {
-						errorLogger.error(new AppError(
-							ERROR_TYPES.SERVER_ERROR,
-							'El servidor devolvió una respuesta inválida'
-						), { endpoint, method, responseText });
+				// Mejorar manejo de respuestas vacías
+				if (responseText?.trim()) {
+					try {
+						data = JSON.parse(responseText);
+					} catch (_error) {
+						if (!response.ok) {
+							errorLogger.error(new AppError(
+								ERROR_TYPES.SERVER_ERROR,
+								'El servidor devolvió una respuesta inválida'
+							), { endpoint, method, responseText });
 
-						throw new AppError(
-							ERROR_TYPES.SERVER_ERROR,
-							'El servidor devolvió una respuesta inválida'
-						);
+							throw new AppError(
+								ERROR_TYPES.SERVER_ERROR,
+								'El servidor devolvió una respuesta inválida'
+							);
+						}
+						data = responseText;
 					}
-					data = responseText;
+				} else if (response.ok) {
+					// Respuesta vacía pero exitosa
+					errorLogger.warn('Empty response from server', { endpoint, method, status: response.status });
 				}
+
+				if (!response.ok) {
+					// Crear error con status para que el interceptor lo detecte
+					const error = await AppError.fromResponse(response, null, { endpoint, method });
+					error.status = response.status;
+					throw error;
+				}
+
+				return {
+					data,
+					status: response.status,
+					isEmpty: !responseText || responseText.trim() === "",
+				};
+			} catch (error) {
+				clearTimeout(timeoutId);
+
+				// Si ya es AppError, re-lanzar con logging
+				if (error instanceof AppError) {
+					errorLogger.error(error, { endpoint, method });
+					throw error;
+				}
+
+				// Timeout error
+				if (error.name === "AbortError") {
+					const timeoutError = new AppError(
+						ERROR_TYPES.TIMEOUT_ERROR,
+						'La operación excedió el tiempo límite. Por favor intenta nuevamente.'
+					);
+					errorLogger.error(timeoutError, { endpoint, method, timeout });
+					throw timeoutError;
+				}
+
+				// Network error
+				const networkError = AppError.fromNetworkError(error, { endpoint, method });
+				errorLogger.error(networkError, { endpoint, method });
+				throw networkError;
 			}
+		};
 
-			if (!response.ok) {
-				// Usar AppError.fromResponse para manejar errores HTTP
-				throw await AppError.fromResponse(response, null, { endpoint, method });
-			}
-
-			return {
-				data,
-				status: response.status,
-				isEmpty: !responseText || responseText.trim() === "",
-			};
-		} catch (error) {
-			clearTimeout(timeoutId);
-
-			// Si ya es AppError, re-lanzar con logging
-			if (error instanceof AppError) {
-				errorLogger.error(error, { endpoint, method });
-				throw error;
-			}
-
-			// Timeout error
-			if (error.name === "AbortError") {
-				const timeoutError = new AppError(
-					ERROR_TYPES.TIMEOUT_ERROR,
-					'La operación excedió el tiempo límite. Por favor intenta nuevamente.'
-				);
-				errorLogger.error(timeoutError, { endpoint, method, timeout });
-				throw timeoutError;
-			}
-
-			// Network error
-			const networkError = AppError.fromNetworkError(error, { endpoint, method });
-			errorLogger.error(networkError, { endpoint, method });
-			throw networkError;
+		// Si hay interceptor, usarlo para manejar renovación automática de tokens
+		if (this.tokenInterceptor) {
+			return this.tokenInterceptor.executeRequest(executeRequest);
 		}
+
+		// Si no hay interceptor, ejecutar directamente
+		return executeRequest();
 	}
 
 	async get(endpoint, options = {}) {
@@ -179,48 +198,60 @@ class ApiClient {
 
 	async fetchBinary(endpoint, options = {}) {
 		const { timeout = 15000 } = options;
-		const url = `${this.baseUrl}${endpoint}`;
 
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), timeout);
+		// Función que ejecuta el request binario
+		const executeRequest = async () => {
+			const url = `${this.baseUrl}${endpoint}`;
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-		try {
-			const token = this.getAuthToken();
+			try {
+				const token = this.getAuthToken();
 
-			const response = await fetch(url, {
-				headers: { Authorization: `Bearer ${token}` },
-				credentials: "include",
-				signal: controller.signal,
-			});
+				const response = await fetch(url, {
+					headers: { Authorization: `Bearer ${token}` },
+					credentials: "include",
+					signal: controller.signal,
+				});
 
-			clearTimeout(timeoutId);
+				clearTimeout(timeoutId);
 
-			if (!response.ok) {
-				throw await AppError.fromResponse(response, null, { endpoint, method: 'GET' });
+				if (!response.ok) {
+					const error = await AppError.fromResponse(response, null, { endpoint, method: 'GET' });
+					error.status = response.status;
+					throw error;
+				}
+
+				return await response.blob();
+			} catch (error) {
+				clearTimeout(timeoutId);
+
+				if (error instanceof AppError) {
+					errorLogger.error(error, { endpoint, method: 'GET', isBinary: true });
+					throw error;
+				}
+
+				if (error.name === "AbortError") {
+					const timeoutError = new AppError(
+						ERROR_TYPES.TIMEOUT_ERROR,
+						'La descarga excedió el tiempo límite.'
+					);
+					errorLogger.error(timeoutError, { endpoint, timeout });
+					throw timeoutError;
+				}
+
+				const networkError = AppError.fromNetworkError(error, { endpoint, isBinary: true });
+				errorLogger.error(networkError, { endpoint });
+				throw networkError;
 			}
+		};
 
-			return await response.blob();
-		} catch (error) {
-			clearTimeout(timeoutId);
-
-			if (error instanceof AppError) {
-				errorLogger.error(error, { endpoint, method: 'GET', isBinary: true });
-				throw error;
-			}
-
-			if (error.name === "AbortError") {
-				const timeoutError = new AppError(
-					ERROR_TYPES.TIMEOUT_ERROR,
-					'La descarga excedió el tiempo límite.'
-				);
-				errorLogger.error(timeoutError, { endpoint, timeout });
-				throw timeoutError;
-			}
-
-			const networkError = AppError.fromNetworkError(error, { endpoint, isBinary: true });
-			errorLogger.error(networkError, { endpoint });
-			throw networkError;
+		// Si hay interceptor, usarlo
+		if (this.tokenInterceptor) {
+			return this.tokenInterceptor.executeRequest(executeRequest);
 		}
+
+		return executeRequest();
 	}
 }
 
@@ -470,7 +501,7 @@ class BusinessService {
 
 			// Cargar menús del negocio
 			try {
-				const menuResponse = await this.apiClient.get(`/menus`);
+				const menuResponse = await this.apiClient.get(`/menus/food-business`);
 				if (!menuResponse.isEmpty && menuResponse.data) {
 					business.menus = Array.isArray(menuResponse.data) ? menuResponse.data : [menuResponse.data];
 				} else {
@@ -560,9 +591,8 @@ class MenuService {
 		}
 
 		const menuPayload = {
-			name: menuData.name,
-			description: menuData.description || "",
-			// Ya no enviamos foodBusinessId ya que el backend lo obtiene del token
+			Name: menuData.name,
+			Description: menuData.description || "",
 		};
 
 		try {
@@ -643,16 +673,14 @@ class MenuService {
 
 	prepareMenuItemPayload(menuItemData, imageKey = null) {
 		return {
-			name: menuItemData.name,
-			description: menuItemData.description || "",
-			price: Number.parseFloat(menuItemData.price),
-			menuItemCategoryId: menuItemData.categoryId || null,
-			sectionId: menuItemData.sectionId || null,
-			order: menuItemData.order || 0,
-			// Ya no enviamos menuId ya que el backend lo obtiene del token
-			// menuId: Number.parseInt(menuItemData.menuId, 10),
-			isAvailable: menuItemData.isAvailable !== false,
-			...(imageKey && { imageKey }),
+			MenuId: Number.parseInt(menuItemData.menuId, 10),
+			Name: menuItemData.name,
+			Description: menuItemData.description || "",
+			Price: Number.parseFloat(menuItemData.price),
+			MenuItemCategoryId: menuItemData.categoryId || null,
+			SectionId: menuItemData.sectionId || null,
+			IsAvailable: menuItemData.isAvailable !== false,
+			...(imageKey && { ImageKey: imageKey }),
 		};
 	}
 
@@ -709,18 +737,19 @@ class MenuService {
 		}
 
 		const payload = {
-			name: menuItemData.name,
-			description: menuItemData.description,
-			price: Number.parseFloat(menuItemData.price),
-			currencyType: menuItemData.currencyType !== undefined ? Number.parseInt(menuItemData.currencyType) : undefined,
-			isAvailable:
+			Name: menuItemData.name,
+			Description: menuItemData.description,
+			Price: menuItemData.price !== undefined ? Number.parseFloat(menuItemData.price) : undefined,
+			CurrencyType: menuItemData.currencyType !== undefined ? Number.parseInt(menuItemData.currencyType) : undefined,
+			IsAvailable:
 				menuItemData.isAvailable === undefined
 					? true
 					: menuItemData.isAvailable,
-			menuItemCategoryId: menuItemData.menuItemCategoryId || null,
-			sectionId: menuItemData.sectionId,
-			order: menuItemData.order,
-			...(menuItemData.imageKey && { imageKey: menuItemData.imageKey }),
+			MenuItemCategoryId: menuItemData.menuItemCategoryId || null,
+			SectionId: menuItemData.sectionId,
+			Order: menuItemData.order,
+			MenuId: menuItemData.menuId ? Number.parseInt(menuItemData.menuId, 10) : undefined,
+			...(menuItemData.imageKey && { ImageKey: menuItemData.imageKey }),
 		};
 
 		Object.keys(payload).forEach(
@@ -776,10 +805,24 @@ class MenuService {
 	}
 
 	async getMenuItems() {
-		// Ya no necesitamos menuId ya que el backend lo obtiene del token
+		// El backend devuelve menuItems dentro del menú completo en /menus/food-business
 		try {
-			const response = await this.apiClient.get(`/menu-items`);
-			return response.isEmpty ? [] : response.data;
+			const response = await this.apiClient.get(`/menus/food-business`);
+			if (response.isEmpty || !response.data) {
+				return [];
+			}
+
+			// Extraer todos los menuItems de todas las secciones
+			const menu = response.data;
+			const allMenuItems = [];
+			if (menu.sections && Array.isArray(menu.sections)) {
+				menu.sections.forEach(section => {
+					if (section.menuItems && Array.isArray(section.menuItems)) {
+						allMenuItems.push(...section.menuItems);
+					}
+				});
+			}
+			return allMenuItems;
 		} catch (error) {
 			if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
 				return [];
@@ -812,12 +855,12 @@ class MenuService {
 		}
 
 		const sectionPayload = {
-			name: sectionData.name,
-			description: sectionData.description || "",
+			Name: sectionData.name,
+			Description: sectionData.description || "",
 		};
 
 		const response = await retryOperation(
-			() => this.apiClient.post(`/sections`, sectionPayload),
+			() => this.apiClient.post(`/menus/${menuId}/section`, sectionPayload),
 			{ maxRetries: 2 }
 		);
 
@@ -835,10 +878,15 @@ class MenuService {
 	}
 
 	async getSections() {
-		// Ya no necesitamos menuId ya que el backend lo obtiene del token
+		// El backend devuelve sections dentro del menú completo en /menus/food-business
 		try {
-			const response = await this.apiClient.get(`/sections`);
-			return response.isEmpty ? [] : response.data;
+			const response = await this.apiClient.get(`/menus/food-business`);
+			if (response.isEmpty || !response.data) {
+				return [];
+			}
+
+			const menu = response.data;
+			return menu.sections || [];
 		} catch (error) {
 			if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
 				return [];
@@ -849,7 +897,10 @@ class MenuService {
 	}
 
 	async createFlyer(flyerData) {
-		// Ya no necesitamos menuId ya que el backend lo obtiene del token
+		if (!flyerData.menuId) {
+			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú es requerido');
+		}
+
 		const nameError = validateRequired(flyerData.name, 'El nombre del folleto/carta');
 		if (nameError) {
 			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, nameError, {
@@ -858,18 +909,16 @@ class MenuService {
 		}
 
 		const flyerPayload = {
-			name: flyerData.name,
-			type: flyerData.type || "folleto",
-			templateId: flyerData.templateId || "elegante",
-			selectedItemIds: flyerData.selectedItemIds || "",
-			itemsOrder: flyerData.itemsOrder || "",
-			paperSize: flyerData.paperSize || "A4",
-			// Ya no enviamos menuId ya que el backend lo obtiene del token
-			// menuId: menuId,
+			Name: flyerData.name,
+			Type: flyerData.type || "folleto",
+			TemplateId: flyerData.templateId || "elegante",
+			SelectedItemIds: flyerData.selectedItemIds || "",
+			ItemsOrder: flyerData.itemsOrder || "",
+			PaperSize: flyerData.paperSize || "A4",
 		};
 
 		const response = await retryOperation(
-			() => this.apiClient.post(`/flyers`, flyerPayload),
+			() => this.apiClient.post(`/menus/${flyerData.menuId}/flyers`, flyerPayload),
 			{ maxRetries: 2 }
 		);
 
@@ -915,10 +964,18 @@ class MenuService {
 		}
 	}
 
-	async getFlyersByMenu() {
-		// Ya no necesitamos menuId ya que el backend lo obtiene del token
+	async getFlyersByMenu(menuId = null) {
 		try {
-			const response = await this.apiClient.get(`/flyers`);
+			// Si no se proporciona menuId, obtenerlo del menú del negocio
+			if (!menuId) {
+				const menuResponse = await this.apiClient.get(`/menus/food-business`);
+				if (menuResponse.isEmpty || !menuResponse.data || !menuResponse.data.id) {
+					return [];
+				}
+				menuId = menuResponse.data.id;
+			}
+
+			const response = await this.apiClient.get(`/menus/${menuId}/flyers`);
 
 			if (response.isEmpty) {
 				return [];
@@ -929,7 +986,7 @@ class MenuService {
 			if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
 				return [];
 			}
-			errorLogger.error(error, { operation: 'getFlyersByMenu' });
+			errorLogger.error(error, { operation: 'getFlyersByMenu', menuId });
 			throw error;
 		}
 	}
@@ -940,13 +997,13 @@ class MenuService {
 		}
 
 		const flyerPayload = {
-			name: flyerData.name,
-			type: flyerData.type,
-			templateId: flyerData.templateId,
-			selectedItemIds: flyerData.selectedItemIds,
-			itemsOrder: flyerData.itemsOrder,
-			paperSize: flyerData.paperSize,
-			pdfKey: flyerData.pdfKey,
+			Name: flyerData.name,
+			Type: flyerData.type,
+			TemplateId: flyerData.templateId,
+			SelectedItemIds: flyerData.selectedItemIds,
+			ItemsOrder: flyerData.itemsOrder,
+			PaperSize: flyerData.paperSize,
+			PdfKey: flyerData.pdfKey,
 		};
 
 		Object.keys(flyerPayload).forEach(
@@ -994,9 +1051,55 @@ class MenuService {
 			throw error;
 		}
 	}
+
+	async moveSectionUp(menuId, sectionId) {
+		if (!menuId) {
+			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú es requerido');
+		}
+		if (!sectionId) {
+			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID de la sección es requerido');
+		}
+
+		try {
+			const response = await this.apiClient.put(
+				`/menus/${menuId}/section/${sectionId}/move-up`,
+			);
+			errorLogger.info('Section moved up', { sectionId });
+			return response.data;
+		} catch (error) {
+			errorLogger.error(error, { sectionId, operation: 'moveSectionUp' });
+			throw error;
+		}
+	}
+
+	async moveSectionDown(menuId, sectionId) {
+		if (!menuId) {
+			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del menú es requerido');
+		}
+		if (!sectionId) {
+			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID de la sección es requerido');
+		}
+
+		try {
+			const response = await this.apiClient.put(
+				`/menus/${menuId}/section/${sectionId}/move-down`,
+			);
+			errorLogger.info('Section moved down', { sectionId });
+			return response.data;
+		} catch (error) {
+			errorLogger.error(error, { sectionId, operation: 'moveSectionDown' });
+			throw error;
+		}
+	}
 }
 
-const apiClient = new ApiClient(API_URL);
+// Crear instancia global de TokenInterceptor con authService
+const tokenInterceptor = new TokenInterceptor(authService);
+
+// Crear instancia de ApiClient con TokenInterceptor
+const apiClient = new ApiClient(API_URL, tokenInterceptor);
+
+// Crear servicios con el ApiClient configurado
 const imageUploader = new ImageUploader(apiClient);
 const businessService = new BusinessService(apiClient, imageUploader);
 const menuService = new MenuService(apiClient, imageUploader);
@@ -1018,10 +1121,10 @@ export default {
 	getMenuItems: () => menuService.getMenuItems(), // Ya no requiere menuId
 	getMenuItemCategories: () => menuService.getMenuItemCategories(),
 
-	createSection: (data) => menuService.createSection(data), // Ya no requiere menuId
-	getSections: () => menuService.getSections(), // Ya no requiere menuId
-	moveSectionUp: (sectionId) => menuService.moveSectionUp(sectionId), // Ya no requiere menuId
-	moveSectionDown: (sectionId) => menuService.moveSectionDown(sectionId), // Ya no requiere menuId
+	createSection: (menuId, data) => menuService.createSection(menuId, data),
+	getSections: () => menuService.getSections(),
+	moveSectionUp: (menuId, sectionId) => menuService.moveSectionUp(menuId, sectionId),
+	moveSectionDown: (menuId, sectionId) => menuService.moveSectionDown(menuId, sectionId),
 
 	createFlyer: (data) => menuService.createFlyer(data), // Ya no requiere menuId
 	getFlyer: (flyerId) => menuService.getFlyer(flyerId),
@@ -1036,39 +1139,3 @@ export default {
 	_getBusinessIdsForUser: (userId) =>
 		StorageHelper.getBusinessesForUser(userId),
 };
-
-	async moveSectionUp(sectionId) {
-		// Ya no necesitamos menuId ya que el backend lo obtiene del token
-		if (!sectionId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID de la sección es requerido');
-		}
-
-		try {
-			const response = await this.apiClient.put(
-				`/sections/${sectionId}/move-up`,
-			);
-			errorLogger.info('Section moved up', { sectionId });
-			return response.data;
-		} catch (error) {
-			errorLogger.error(error, { sectionId, operation: 'moveSectionUp' });
-			throw error;
-		}
-	}
-
-	async moveSectionDown(sectionId) {
-		// Ya no necesitamos menuId ya que el backend lo obtiene del token
-		if (!sectionId) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID de la sección es requerido');
-		}
-
-		try {
-			const response = await this.apiClient.put(
-				`/sections/${sectionId}/move-down`,
-			);
-			errorLogger.info('Section moved down', { sectionId });
-			return response.data;
-		} catch (error) {
-			errorLogger.error(error, { sectionId, operation: 'moveSectionDown' });
-			throw error;
-		}
-	}

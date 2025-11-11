@@ -1,13 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
 import authService from "../services/authService";
 import menuService from "../services/menuService";
+import { AppError } from "../utils/AppError";
+import { ERROR_TYPES } from "../utils/errorTypes";
 
 export const useAuth = () => {
 	const [userData, setUserData] = useState(null);
 	const [loading, setLoading] = useState(true);
 
 	const loadUserData = useCallback(async () => {
+		// Verificar autenticación
 		if (!authService.isAuthenticated()) {
+			window.location.href = "/login";
+			return;
+		}
+
+		// Verificar que el token no esté expirado
+		if (authService.isTokenExpired()) {
+			console.log('[useAuth] Token expired, redirecting to login');
+			authService.logout();
 			window.location.href = "/login";
 			return;
 		}
@@ -15,6 +26,8 @@ export const useAuth = () => {
 		const currentUserId = authService.getUserId();
 
 		if (!currentUserId) {
+			console.log('[useAuth] No userId found in token, redirecting to login');
+			authService.logout();
 			window.location.href = "/login";
 			return;
 		}
@@ -31,7 +44,16 @@ export const useAuth = () => {
 				role: "Owner",
 			});
 		} catch (error) {
-			// Usar nombre por defecto si hay error al cargar
+			// Si es error de autenticación, redirigir a login
+			if (error instanceof AppError && error.type === ERROR_TYPES.UNAUTHORIZED) {
+				console.log('[useAuth] Unauthorized error, redirecting to login');
+				authService.logout();
+				window.location.href = "/login";
+				return;
+			}
+
+			// Para otros errores, usar nombre por defecto
+			console.warn('[useAuth] Error loading user data, using defaults', error);
 			setUserData({
 				id: currentUserId,
 				name: "Mi Negocio",
