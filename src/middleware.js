@@ -63,7 +63,7 @@ async function tryRefreshToken(refreshToken, context) {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ refreshToken })
+			body: JSON.stringify({ RefreshToken: refreshToken })
 		});
 
 		if (!response.ok) {

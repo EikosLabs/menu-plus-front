@@ -21,7 +21,7 @@ export const authService = {
 			throw new AppError(ERROR_TYPES.REQUIRED_FIELD, passwordError);
 		}
 
-		const requestBody = { email: email.trim(), password };
+		const requestBody = { Email: email.trim(), Password: password };
 
 		try {
 			const response = await fetch(`${API_URL}/auth/login`, {
@@ -202,7 +202,7 @@ export const authService = {
 				headers: addCsrfHeader({
 					'Content-Type': 'application/json'
 				}),
-				body: JSON.stringify({ refreshToken }),
+				body: JSON.stringify({ RefreshToken: refreshToken }),
 				credentials: 'include'
 			});
 
