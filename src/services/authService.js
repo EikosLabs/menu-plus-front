@@ -269,30 +269,22 @@ export const authService = {
 		return cookieManager.get(cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name);
 	},
 
-	_storeTokens(token, refreshToken) {
-		// Almacenar auth_token
-		cookieManager.set(
-			cookieManager.COOKIE_OPTIONS.AUTH_TOKEN.name,
-			token,
-			cookieManager.COOKIE_OPTIONS.AUTH_TOKEN
-		);
-
-		// Almacenar token (compatibilidad)
-		cookieManager.set(
-			cookieManager.COOKIE_OPTIONS.TOKEN.name,
-			token,
-			cookieManager.COOKIE_OPTIONS.TOKEN
-		);
-
-		// Almacenar refresh_token si existe
-		if (refreshToken) {
+		_storeTokens(token, refreshToken) {
 			cookieManager.set(
-				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name,
-				refreshToken,
-				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN
+				cookieManager.COOKIE_OPTIONS.AUTH_TOKEN.name,
+				token,
+				cookieManager.COOKIE_OPTIONS.AUTH_TOKEN
 			);
-		}
-	},
+
+			// Almacenar refresh_token si existe
+			if (refreshToken) {
+				cookieManager.set(
+					cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name,
+					refreshToken,
+					cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN
+				);
+			}
+		},
 
 	getBusinessIdFromToken() {
 		const token = this.getToken();

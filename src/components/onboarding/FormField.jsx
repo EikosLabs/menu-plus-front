@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormField as SharedFormField, TextAreaField as SharedTextAreaField, SelectField as SharedSelectField } from '../shared/FormField.jsx';
 
 /**
  * Componente de campo de formulario reutilizable
@@ -16,54 +17,25 @@ export function FormField({
   maxLength,
   showCharCount = false
 }) {
-  const handleChange = (e) => {
-    onChange(name, e.target.value);
-  };
+  const handleChange = (e) => onChange(name, e.target.value);
 
   return (
     <div className="mb-4">
-      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
-        {label}
-        {required && <span className="text-neo-flame ml-1">*</span>}
-      </label>
-
-      <input
-        id={name}
+      <SharedFormField
+        label={label}
         name={name}
         type={type}
         value={value}
         onChange={handleChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        maxLength={maxLength}
+        error={error}
         required={required}
-        className={`neo-input w-full ${error ? 'neo-border-thick border-red-500' : ''}`}
-        aria-invalid={error ? 'true' : 'false'}
-        aria-describedby={error ? `${name}-error` : undefined}
+        disabled={disabled}
+        placeholder={placeholder}
+        maxLength={maxLength}
       />
-
       {showCharCount && maxLength && (
         <div className="neo-text text-xs mt-1 text-right text-neo-black opacity-60">
           {value.length} / {maxLength}
-        </div>
-      )}
-
-      {error && (
-        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
-          <svg
-            className="w-4 h-4 flex-shrink-0 mt-0.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{error}</span>
         </div>
       )}
     </div>
@@ -86,54 +58,25 @@ export function TextAreaField({
   rows = 4,
   showCharCount = true
 }) {
-  const handleChange = (e) => {
-    onChange(name, e.target.value);
-  };
+  const handleChange = (e) => onChange(name, e.target.value);
 
   return (
     <div className="mb-4">
-      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
-        {label}
-        {required && <span className="text-neo-flame ml-1">*</span>}
-      </label>
-
-      <textarea
-        id={name}
+      <SharedTextAreaField
+        label={label}
         name={name}
         value={value}
         onChange={handleChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        maxLength={maxLength}
-        rows={rows}
+        error={error}
         required={required}
-        className={`neo-textarea w-full resize-none ${error ? 'neo-border-thick border-red-500' : ''}`}
-        aria-invalid={error ? 'true' : 'false'}
-        aria-describedby={error ? `${name}-error` : undefined}
+        disabled={disabled}
+        placeholder={placeholder}
+        rows={rows}
+        maxLength={maxLength}
       />
-
       {showCharCount && maxLength && (
         <div className="neo-text text-xs mt-1 text-right text-neo-black opacity-60">
           {value.length} / {maxLength}
-        </div>
-      )}
-
-      {error && (
-        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
-          <svg
-            className="w-4 h-4 flex-shrink-0 mt-0.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{error}</span>
         </div>
       )}
     </div>
@@ -159,51 +102,20 @@ export function SelectField({
     onChange(name, selectedValue === '' ? null : parseInt(selectedValue, 10));
   };
 
+  const mappedOptions = options.map((opt) => ({ value: opt.id, label: opt.name }));
+
   return (
-    <div className="mb-4">
-      <label htmlFor={name} className="neo-text neo-text-bold block mb-1.5 text-sm">
-        {label}
-        {required && <span className="text-neo-flame ml-1">*</span>}
-      </label>
-
-      <select
-        id={name}
-        name={name}
-        value={value || ''}
-        onChange={handleChange}
-        disabled={disabled}
-        required={required}
-        className={`neo-select w-full ${error ? 'neo-border-thick border-red-500' : ''}`}
-        aria-invalid={error ? 'true' : 'false'}
-        aria-describedby={error ? `${name}-error` : undefined}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option.id} value={option.id}>
-            {option.name}
-          </option>
-        ))}
-      </select>
-
-      {error && (
-        <div id={`${name}-error`} className="neo-alert neo-alert-error mt-1.5 text-xs flex items-start gap-2 p-2" role="alert">
-          <svg
-            className="w-4 h-4 flex-shrink-0 mt-0.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{error}</span>
-        </div>
-      )}
-    </div>
+    <SharedSelectField
+      label={label}
+      name={name}
+      value={value || ''}
+      onChange={handleChange}
+      options={mappedOptions}
+      error={error}
+      required={required}
+      disabled={disabled}
+      placeholder={placeholder}
+    />
   );
 }
 

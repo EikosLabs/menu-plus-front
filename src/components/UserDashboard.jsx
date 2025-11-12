@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useBusinesses } from "../hooks/useBusinesses";
 import Navigation from "./ui/Navigation";
@@ -6,10 +6,11 @@ import MobileMenu from "./ui/MobileMenu";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import ErrorAlert from "./ui/ErrorAlert";
 import DashboardHeader from "./ui/DashboardHeader";
-import BusinessSection from "./sections/BusinessSection";
-import StatsSection from "./sections/StatsSection";
-import ProfileSection from "./sections/ProfileSection";
-import TemplateSection from "./sections/TemplateSection";
+
+const BusinessSection = lazy(() => import("./sections/BusinessSection"));
+const StatsSection = lazy(() => import("./sections/StatsSection"));
+const ProfileSection = lazy(() => import("./sections/ProfileSection"));
+const TemplateSection = lazy(() => import("./sections/TemplateSection"));
 
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
@@ -97,25 +98,30 @@ export default function UserDashboard() {
 				<DashboardHeader activeSection={activeSection} />
 				<ErrorAlert error={error} onClose={() => setError(null)} />
 
-				{activeSection === "negocios" && (
-					<BusinessSection
-						businesses={businesses}
-						setBusinesses={setBusinesses}
-						userData={userData}
-						showAddBusiness={showAddBusiness}
-						setShowAddBusiness={setShowAddBusiness}
-						showAddMenu={showAddMenu}
-						setShowAddMenu={setShowAddMenu}
-						selectedBusinessId={selectedBusinessId}
-						setSelectedBusinessId={setSelectedBusinessId}
-						onBusinessAdded={handleBusinessAdded}
-						onMenuAdded={handleMenuAdded}
-					/>
-				)}
 
-				{activeSection === "templates" && <TemplateSection businesses={businesses} onTemplateUpdated={fetchBusinesses} />}
-				{activeSection === "estadisticas" && <StatsSection />}
-				{activeSection === "perfil" && <ProfileSection />}
+				<Suspense fallback={<LoadingSpinner />}>
+					{activeSection === "negocios" && (
+						<BusinessSection
+							businesses={businesses}
+							setBusinesses={setBusinesses}
+							userData={userData}
+							showAddBusiness={showAddBusiness}
+							setShowAddBusiness={setShowAddBusiness}
+							showAddMenu={showAddMenu}
+							setShowAddMenu={setShowAddMenu}
+							selectedBusinessId={selectedBusinessId}
+							setSelectedBusinessId={setSelectedBusinessId}
+							onBusinessAdded={handleBusinessAdded}
+							onMenuAdded={handleMenuAdded}
+						/>
+					)}
+
+					{activeSection === "templates" && (
+						<TemplateSection businesses={businesses} onTemplateUpdated={fetchBusinesses} />
+					)}
+					{activeSection === "estadisticas" && <StatsSection />}
+					{activeSection === "perfil" && <ProfileSection />}
+				</Suspense>
 			</main>
 
 			<footer className="mt-auto bg-neo-black text-white border-t-neo-thick border-neo-flame py-6 relative z-10">
