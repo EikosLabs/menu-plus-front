@@ -788,27 +788,34 @@ class MenuService {
 			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, 'El ID del item es requerido');
 		}
 
-		const payload = {
-			Name: menuItemData.name,
-			Description: menuItemData.description,
-			Price: menuItemData.price !== undefined ? Number.parseFloat(menuItemData.price) : undefined,
-			CurrencyType: menuItemData.currencyType !== undefined ? Number.parseInt(menuItemData.currencyType) : undefined,
-			IsAvailable:
-				menuItemData.isAvailable === undefined
-					? true
-					: menuItemData.isAvailable,
-			MenuItemCategoryId: menuItemData.menuItemCategoryId || null,
-			SectionId: menuItemData.sectionId,
-			Order: menuItemData.order,
-			MenuId: menuItemData.menuId ? Number.parseInt(menuItemData.menuId, 10) : undefined,
-			...(menuItemData.imageKey && { ImageKey: menuItemData.imageKey }),
-		};
-
-		Object.keys(payload).forEach(
-			(key) => payload[key] === undefined && delete payload[key],
-		);
-
 		try {
+			// Upload new image if provided
+			let imageKey = menuItemData.imageKey;
+			if (menuItemData.image) {
+				imageKey = await this.imageUploader.upload(menuItemData.image);
+				errorLogger.info('Image uploaded for menu item update', { itemId, imageKey });
+			}
+
+			const payload = {
+				Name: menuItemData.name,
+				Description: menuItemData.description,
+				Price: menuItemData.price !== undefined ? Number.parseFloat(menuItemData.price) : undefined,
+				CurrencyType: menuItemData.currencyType !== undefined ? Number.parseInt(menuItemData.currencyType) : undefined,
+				IsAvailable:
+					menuItemData.isAvailable === undefined
+						? true
+						: menuItemData.isAvailable,
+				MenuItemCategoryId: menuItemData.menuItemCategoryId || null,
+				SectionId: menuItemData.sectionId,
+				Order: menuItemData.order,
+				MenuId: menuItemData.menuId ? Number.parseInt(menuItemData.menuId, 10) : undefined,
+				...(imageKey && { ImageKey: imageKey }),
+			};
+
+			Object.keys(payload).forEach(
+				(key) => payload[key] === undefined && delete payload[key],
+			);
+
 			const response = await retryOperation(
 				() => this.apiClient.put(`/menu-item/${itemId}`, payload),
 				{ maxRetries: 2 }

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import authService from "../services/authService";
 import { useErrorHandler } from "../hooks/useErrorHandler";
 import ErrorAlert, { SuccessAlert, FieldError } from "./shared/ErrorAlert";
-import { FieldError } from "./shared/ErrorAlert";
 import { validateEmail, validateRequired } from "../utils/validation";
 import { useTranslation } from "../i18n/utils";
 import { ERROR_TYPES } from "../utils/errorTypes";

@@ -174,6 +174,7 @@ export default function AddMenuItem({
 					menuItemCategoryId: dataToSend.menuItemCategoryId,
 					sectionId: dataToSend.sectionId,
 					order: existingItem.order || 0,
+					image: image, // Include image for update
 				};
 
 				await menuService.updateMenuItem(existingItem.id, payload);
