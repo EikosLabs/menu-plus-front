@@ -8,25 +8,63 @@ export function renderMenu(menu, business, itemsBySection) {
 
   // Hero Section
   if (business) {
+    const hasLogo = business.logoUrl || business.logoUri;
     html += `
-      <div class="menu-hero">
+      <div class="menu-hero ${hasLogo ? 'has-logo' : 'no-logo'}">
         <div class="hero-bg">
           <div class="hero-pattern"></div>
           <div class="hero-gradient"></div>
+          <div class="hero-glow hero-glow-1"></div>
+          <div class="hero-glow hero-glow-2"></div>
         </div>
-        <div class="hero-content">
-          ${(business.logoUrl || business.logoUri) ? `
-            <div class="hero-logo-wrapper">
-              <div class="hero-logo-ring"></div>
-              <img src="${sanitizeUrl(business.logoUrl || business.logoUri)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" width="180" height="180" decoding="async" fetchpriority="high" onerror="console.warn('Logo image failed:', this.src); this.parentElement.style.display='none';" />
+        <div class="hero-container">
+          <div class="hero-content">
+            ${hasLogo ? `
+              <div class="hero-logo-container">
+                <div class="hero-logo-wrapper">
+                  <div class="hero-logo-ring hero-logo-ring-1"></div>
+                  <div class="hero-logo-ring hero-logo-ring-2"></div>
+                  <div class="hero-logo-frame">
+                    <img src="${sanitizeUrl(business.logoUrl || business.logoUri)}"
+                         alt="${sanitizeHtml(business.name)}"
+                         class="hero-logo"
+                         width="200"
+                         height="200"
+                         decoding="async"
+                         fetchpriority="high"
+                         onerror="this.closest('.hero-logo-container').style.display='none';document.querySelector('.hero-fallback-icon')?.classList.remove('hidden');" />
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            <div class="hero-fallback-icon ${hasLogo ? 'hidden' : ''}">
+              <div class="fallback-icon-wrapper">
+                <span class="fallback-icon">🍽️</span>
+              </div>
             </div>
-          ` : `
-            <div class="hero-icon">🍽️</div>
-          `}
-          <h1 class="hero-title">
-            <span class="hero-title-main">${sanitizeHtml(business.name)}</span>
-            ${business.description ? `<span class="hero-subtitle">${sanitizeHtml(business.description)}</span>` : ''}
-          </h1>
+            <div class="hero-text">
+              <div class="hero-badge">
+                <svg class="hero-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <span>Menú Digital</span>
+              </div>
+              <h1 class="hero-title">
+                <span class="hero-title-main">${sanitizeHtml(business.name)}</span>
+              </h1>
+              ${business.description ? `
+                <p class="hero-description">
+                  <span class="hero-description-icon">✨</span>
+                  ${sanitizeHtml(business.description)}
+                </p>
+              ` : ''}
+              <div class="hero-divider">
+                <div class="hero-divider-line"></div>
+                <div class="hero-divider-dot"></div>
+                <div class="hero-divider-line"></div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="hero-wave">
           <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
