@@ -172,16 +172,16 @@ const { qrCodeId } = Astro.params;
         if (business) {
           // Map template enum to template name
           const templateMap = {
-            0: 'modern',
-            1: 'elegant',
-            2: 'casual',
-            3: 'minimalist',
-            4: 'colorful',
-            5: 'dark',
-            6: 'classic'
+            '0': 'modern',
+            '1': 'elegant',
+            '2': 'casual',
+            '3': 'minimalist',
+            '4': 'colorful',
+            '5': 'dark',
+            '6': 'classic'
           };
 
-          const templateName = templateMap[business.template] || 'modern';
+          const templateName = templateMap[String(business.template)] || 'modern';
           document.documentElement.setAttribute('data-template', templateName);
 
           // Apply font family
