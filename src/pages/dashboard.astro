@@ -5,7 +5,11 @@ import UserDashboard from "../components/UserDashboard.jsx";
 // Indica a Astro que esta página debe renderizarse en el servidor
 export const prerender = false;
 ---
-<Layout title="Panel de Control - Menu Plus Platform">
+---
+import { t } from "../i18n/utils";
+const lang = "es";
+---
+<Layout title={`${t('dashboard.title', lang)} - Menu Plus Platform`}>
   <div class="min-h-screen flex flex-col bg-neo-lavender relative overflow-hidden">
     <!-- Animated Background Pattern -->
     <div class="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none"></div>

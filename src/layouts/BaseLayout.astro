@@ -1,6 +1,6 @@
 ---
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
-import { t } from "../i18n/utils";
+import { t, localizeUrl } from "../i18n/utils";
 import "../styles/global.css";
 
 export interface Props {
@@ -139,14 +139,14 @@ const layoutDescription = description || t("dashboard.welcome", currentLang);
           </div>
 
           <div class="flex items-center space-x-6">
-            <a href={currentLang === 'es' ? '/ayuda' : '/en/help'} class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
-              {currentLang === 'es' ? 'Ayuda' : 'Help'}
+            <a href={localizeUrl('/help', currentLang)} class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
+              {t('navigation.help', currentLang)}
             </a>
-            <a href={currentLang === 'es' ? '/privacidad' : '/en/privacy'} class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
-              {currentLang === 'es' ? 'Privacidad' : 'Privacy'}
+            <a href={localizeUrl('/privacy', currentLang)} class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
+              {t('privacy.title', currentLang) || 'Privacy'}
             </a>
-            <a href={currentLang === 'es' ? '/terminos' : '/en/terms'} class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
-              {currentLang === 'es' ? 'Términos' : 'Terms'}
+            <a href={localizeUrl('/terms', currentLang)} class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
+              {t('terms.title', currentLang) || 'Terms'}
             </a>
           </div>
         </div>

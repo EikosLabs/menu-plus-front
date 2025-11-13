@@ -4,11 +4,13 @@ import { useErrorHandler } from "../hooks/useErrorHandler";
 import ErrorAlert from "./shared/ErrorAlert";
 import { FieldError } from "./shared/ErrorAlert";
 import { validateEmail, validateRequired } from "../utils/validation";
+import { useTranslation } from "../i18n/utils";
 
 export default function LoginForm() {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
 	const { error, fieldErrors, clearError, clearFieldError, handleError } = useErrorHandler();
 
@@ -72,71 +74,71 @@ export default function LoginForm() {
 				/>
 			)}
 
-			{/* Email Field */}
-			<div>
-				<label
-					htmlFor="email"
-					className="neo-text-bold block mb-2"
-				>
-					Correo Electrónico
-				</label>
-				<input
-					type="email"
-					name="email"
-					id="email"
-					className={`neo-input ${getFieldError('email') ? 'border-red-500' : ''}`}
-					placeholder="tu@correo.com"
-					value={email}
-					onChange={(e) => {
-						setEmail(e.target.value);
-						if (touched.email) clearFieldError('email');
-					}}
-					onBlur={() => handleBlur('email')}
-				/>
-				<FieldError error={getFieldError('email')} />
-			</div>
+            {/* Email Field */}
+            <div>
+                <label
+                    htmlFor="email"
+                    className="neo-text-bold block mb-2"
+                >
+                    {t("auth.email")}
+                </label>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    className={`neo-input ${getFieldError('email') ? 'border-red-500' : ''}`}
+                    placeholder={t("auth.emailPlaceholder")}
+                    value={email}
+                    onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (touched.email) clearFieldError('email');
+                    }}
+                    onBlur={() => handleBlur('email')}
+                />
+                <FieldError error={getFieldError('email')} />
+            </div>
 
-			{/* Password Field */}
-			<div>
-				<label
-					htmlFor="password"
-					className="neo-text-bold block mb-2"
-				>
-					Contraseña
-				</label>
-				<input
-					type="password"
-					name="password"
-					id="password"
-					className={`neo-input ${getFieldError('password') ? 'border-red-500' : ''}`}
-					placeholder="••••••••"
-					value={password}
-					onChange={(e) => {
-						setPassword(e.target.value);
-						if (touched.password) clearFieldError('password');
-					}}
-					onBlur={() => handleBlur('password')}
-				/>
-				<FieldError error={getFieldError('password')} />
-			</div>
+            {/* Password Field */}
+            <div>
+                <label
+                    htmlFor="password"
+                    className="neo-text-bold block mb-2"
+                >
+                    {t("auth.password")}
+                </label>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    className={`neo-input ${getFieldError('password') ? 'border-red-500' : ''}`}
+                    placeholder={t("auth.passwordPlaceholder")}
+                    value={password}
+                    onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (touched.password) clearFieldError('password');
+                    }}
+                    onBlur={() => handleBlur('password')}
+                />
+                <FieldError error={getFieldError('password')} />
+            </div>
 
-			{/* Forgot Password Link */}
-			<div className="text-right">
-				<a href="#" className="neo-text text-neo-flame hover:underline neo-text-bold text-sm">
-					¿Olvidaste tu contraseña?
-				</a>
-			</div>
+            {/* Forgot Password Link */}
+            <div className="text-right">
+                <a href="#" className="neo-text text-neo-flame hover:underline neo-text-bold text-sm">
+                    {t("auth.forgotPassword")}
+                </a>
+            </div>
 
-			{/* Submit Button */}
-			<div>
-				<button
-					type="submit"
-					disabled={loading}
-					className="neo-btn neo-btn-primary w-full"
-				>
-					{loading ? "Procesando..." : "Ingresar"}
-				</button>
-			</div>
-		</form>
-	);
+            {/* Submit Button */}
+            <div>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="neo-btn neo-btn-primary w-full"
+                >
+                    {loading ? t("common.loading") : t("auth.loginButton")}
+                </button>
+            </div>
+        </form>
+    );
 }

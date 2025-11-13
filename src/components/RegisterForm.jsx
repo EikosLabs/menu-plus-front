@@ -3,6 +3,7 @@ import authService from "../services/authService";
 import { useErrorHandler } from "../hooks/useErrorHandler";
 import ErrorAlert, { SuccessAlert, FieldError } from "./shared/ErrorAlert";
 import { validateEmail, validateRequired, validatePassword } from "../utils/validation";
+import { useTranslation } from "../i18n/utils";
 
 export default function RegisterForm() {
 	const [formData, setFormData] = useState({
@@ -13,11 +14,12 @@ export default function RegisterForm() {
 	});
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
-	const [touched, setTouched] = useState({
-		fullName: false,
-		email: false,
-		password: false,
-	});
+    const [touched, setTouched] = useState({
+        fullName: false,
+        email: false,
+        password: false,
+    });
+    const { t } = useTranslation();
 
 	const { error, clearError, handleError } = useErrorHandler();
 
@@ -128,98 +130,98 @@ export default function RegisterForm() {
 				/>
 			)}
 
-			{/* Full Name Field */}
-			<div>
-				<label
-					htmlFor="fullName"
-					className="neo-text-bold block mb-2"
-				>
-					Nombre Completo
-				</label>
-				<input
-					type="text"
-					name="fullName"
-					id="fullName"
-					className={`neo-input ${getFieldError('fullName') ? 'border-red-500' : ''}`}
-					placeholder="Tu Nombre Completo"
-					value={formData.fullName}
-					onChange={handleChange}
-					onBlur={() => handleBlur('fullName')}
-				/>
-				<FieldError error={getFieldError('fullName')} />
-			</div>
+            {/* Full Name Field */}
+            <div>
+                <label
+                    htmlFor="fullName"
+                    className="neo-text-bold block mb-2"
+                >
+                    {t("auth.fullName")}
+                </label>
+                <input
+                    type="text"
+                    name="fullName"
+                    id="fullName"
+                    className={`neo-input ${getFieldError('fullName') ? 'border-red-500' : ''}`}
+                    placeholder={t("business.namePlaceholder")}
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    onBlur={() => handleBlur('fullName')}
+                />
+                <FieldError error={getFieldError('fullName')} />
+            </div>
 
-			{/* Email Field */}
-			<div>
-				<label
-					htmlFor="email"
-					className="neo-text-bold block mb-2"
-				>
-					Correo Electrónico
-				</label>
-				<input
-					type="email"
-					name="email"
-					id="email"
-					className={`neo-input ${getFieldError('email') ? 'border-red-500' : ''}`}
-					placeholder="tu@correo.com"
-					value={formData.email}
-					onChange={handleChange}
-					onBlur={() => handleBlur('email')}
-				/>
-				<FieldError error={getFieldError('email')} />
-			</div>
+            {/* Email Field */}
+            <div>
+                <label
+                    htmlFor="email"
+                    className="neo-text-bold block mb-2"
+                >
+                    {t("auth.email")}
+                </label>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    className={`neo-input ${getFieldError('email') ? 'border-red-500' : ''}`}
+                    placeholder={t("auth.emailPlaceholder")}
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={() => handleBlur('email')}
+                />
+                <FieldError error={getFieldError('email')} />
+            </div>
 
-			{/* Username Field (Optional) */}
-			<div>
-				<label
-					htmlFor="userName"
-					className="neo-text-bold block mb-2"
-				>
-					Nombre de Usuario <span className="neo-text text-neo-gray text-sm">(opcional)</span>
-				</label>
-				<input
-					type="text"
-					name="userName"
-					id="userName"
-					className="neo-input"
-					placeholder="Si no lo ingresas, usaremos tu email"
-					value={formData.userName}
-					onChange={handleChange}
-				/>
-			</div>
+            {/* Username Field (Optional) */}
+            <div>
+                <label
+                    htmlFor="userName"
+                    className="neo-text-bold block mb-2"
+                >
+                    {t("auth.userName")} <span className="neo-text text-neo-gray text-sm">(opcional)</span>
+                </label>
+                <input
+                    type="text"
+                    name="userName"
+                    id="userName"
+                    className="neo-input"
+                    placeholder={t("auth.userName")}
+                    value={formData.userName}
+                    onChange={handleChange}
+                />
+            </div>
 
-			{/* Password Field */}
-			<div>
-				<label
-					htmlFor="password"
-					className="neo-text-bold block mb-2"
-				>
-					Contraseña
-				</label>
-				<input
-					type="password"
-					name="password"
-					id="password"
-					className={`neo-input ${getFieldError('password') ? 'border-red-500' : ''}`}
-					placeholder="Crea una contraseña segura (mínimo 8 caracteres)"
-					value={formData.password}
-					onChange={handleChange}
-					onBlur={() => handleBlur('password')}
-				/>
-				<FieldError error={getFieldError('password')} />
-			</div>
+            {/* Password Field */}
+            <div>
+                <label
+                    htmlFor="password"
+                    className="neo-text-bold block mb-2"
+                >
+                    {t("auth.password")}
+                </label>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    className={`neo-input ${getFieldError('password') ? 'border-red-500' : ''}`}
+                    placeholder={t("auth.passwordHint")}
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={() => handleBlur('password')}
+                />
+                <FieldError error={getFieldError('password')} />
+            </div>
 
-			{/* Submit Button */}
-			<div>
-				<button
-					type="submit"
-					disabled={loading}
-					className="neo-btn neo-btn-primary w-full"
-				>
-					{loading ? "Procesando..." : "Registrarme"}
-				</button>
-			</div>
-		</form>
-	);
+            {/* Submit Button */}
+            <div>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="neo-btn neo-btn-primary w-full"
+                >
+                    {loading ? t("common.loading") : t("auth.registerButton")}
+                </button>
+            </div>
+        </form>
+    );
 }

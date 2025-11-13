@@ -1,0 +1,15 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { t } from "../../i18n/utils";
+import UserDashboard from "../../components/UserDashboard.jsx";
+const lang = "en";
+export const prerender = false;
+---
+<BaseLayout title={`${t('dashboard.title', lang)} - Menu Plus Platform`} lang={lang}>
+  <div class="min-h-screen flex flex-col bg-neo-lavender relative overflow-hidden">
+    <div class="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none"></div>
+    <div class="relative z-10">
+      <UserDashboard client:only="react" />
+    </div>
+  </div>
+</BaseLayout>

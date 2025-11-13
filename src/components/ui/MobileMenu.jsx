@@ -1,12 +1,14 @@
 import React from "react";
+import { useTranslation } from "../../i18n/utils";
 
 const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMenu, onLogout }) => {
-	const menuItems = [
-		{
-			id: "negocios",
-			label: "Mis Negocios",
-			icon: (
-				<path
+    const { t } = useTranslation();
+    const menuItems = [
+        {
+            id: "negocios",
+            label: t("dashboard.myBusinesses"),
+            icon: (
+                <path
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					strokeWidth={2}
@@ -14,11 +16,11 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 				/>
 			)
 		},
-		{
-			id: "templates",
-			label: "Templates",
-			icon: (
-				<path
+        {
+            id: "templates",
+            label: t("navigation.templates"),
+            icon: (
+                <path
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					strokeWidth={2}
@@ -26,11 +28,11 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 				/>
 			)
 		},
-		{
-			id: "estadisticas",
-			label: "Estadísticas",
-			icon: (
-				<path
+        {
+            id: "estadisticas",
+            label: t("navigation.dashboard"),
+            icon: (
+                <path
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					strokeWidth={2}
@@ -38,11 +40,11 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 				/>
 			)
 		},
-		{
-			id: "perfil",
-			label: "Mi Perfil",
-			icon: (
-				<path
+        {
+            id: "perfil",
+            label: t("navigation.profile"),
+            icon: (
+                <path
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					strokeWidth={2}
@@ -94,9 +96,9 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 						<svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
 						</svg>
-						Cerrar Sesión
-					</button>
-				</div>
+                        {t("auth.logout")}
+                    </button>
+                </div>
 			</div>
 		</div>
 	);

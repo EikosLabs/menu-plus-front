@@ -1,13 +1,22 @@
+import { t, getCurrentLang } from '../i18n/utils';
+
 export function renderBusinessInfo(business) {
   if (!business || (!business.address && !business.phoneNumber && !business.email &&
       !business.facebookUrl && !business.instagramUrl && !business.twitterUrl && !business.whatsAppNumber)) {
     return '';
   }
 
+  const lang = getCurrentLang();
+  const mapUrl = business.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}` : null;
+  const templateNames = {
+    0: 'modern', 1: 'elegant', 2: 'casual', 3: 'minimalist', 4: 'colorful', 5: 'dark', 6: 'classic'
+  };
+  const fontDisplay = business.fontFamily || 'poppins';
+
   let html = `
     <section class="business-info">
       <div class="business-info-container">
-        <h2 class="business-info-title">Contact & Find Us</h2>
+        <h2 class="business-info-title">${t('businessInfo.title', lang)}</h2>
         <div class="business-info-grid">
   `;
 
@@ -17,7 +26,7 @@ export function renderBusinessInfo(business) {
       <div class="info-card">
         <h3 class="info-card-title">
           <span class="info-icon">📍</span>
-          Contact Information
+          ${t('businessInfo.contactInformation', lang)}
         </h3>
         <div class="info-list">
     `;
@@ -27,8 +36,9 @@ export function renderBusinessInfo(business) {
         <div class="info-item">
           <span class="info-item-icon">📍</span>
           <div>
-            <div class="info-item-label">Address</div>
+            <div class="info-item-label">${t('businessInfo.address', lang)}</div>
             <div class="info-item-value">${business.address}</div>
+            ${mapUrl ? `<a href="${mapUrl}" target="_blank" rel="noopener" class="info-link info-small">${t('businessInfo.openInMaps', lang)}</a>` : ''}
           </div>
         </div>
       `;
@@ -39,8 +49,12 @@ export function renderBusinessInfo(business) {
         <div class="info-item">
           <span class="info-item-icon">📞</span>
           <div>
-            <div class="info-item-label">Phone</div>
+            <div class="info-item-label">${t('businessInfo.phone', lang)}</div>
             <a href="tel:${business.phoneNumber}" class="info-item-value info-link">${business.phoneNumber}</a>
+            <div class="info-actions">
+              <a href="tel:${business.phoneNumber}" class="action-btn action-btn--call">${t('businessInfo.call', lang)}</a>
+              ${business.whatsAppNumber ? `<a href="https://wa.me/${business.whatsAppNumber.replace(/[^0-9]/g, '')}" target="_blank" rel="noopener" class="action-btn action-btn--whatsapp">${t('businessInfo.whatsapp', lang)}</a>` : ''}
+            </div>
           </div>
         </div>
       `;
@@ -51,7 +65,7 @@ export function renderBusinessInfo(business) {
         <div class="info-item">
           <span class="info-item-icon">✉️</span>
           <div>
-            <div class="info-item-label">Email</div>
+            <div class="info-item-label">${t('businessInfo.email', lang)}</div>
             <a href="mailto:${business.email}" class="info-item-value info-link">${business.email}</a>
           </div>
         </div>
@@ -70,7 +84,7 @@ export function renderBusinessInfo(business) {
       <div class="info-card">
         <h3 class="info-card-title">
           <span class="info-icon">🌐</span>
-          Follow Us
+          ${t('businessInfo.followUs', lang)}
         </h3>
         <div class="social-links">
     `;
@@ -125,6 +139,51 @@ export function renderBusinessInfo(business) {
       </div>
     `;
   }
+
+  // About / Branding
+  html += `
+    <div class="info-card">
+      <h3 class="info-card-title">
+        <span class="info-icon">🏪</span>
+        ${t('businessInfo.aboutTitle', lang)}
+      </h3>
+      <div class="info-list">
+        ${business.slogan ? `
+          <div class="info-item">
+            <span class="info-item-icon">🎯</span>
+            <div>
+              <div class="info-item-label">${t('businessInfo.slogan', lang)}</div>
+              <div class="info-item-value">${business.slogan}</div>
+            </div>
+          </div>
+        ` : ''}
+        ${business.description ? `
+          <div class="info-item">
+            <span class="info-item-icon">📝</span>
+            <div>
+              <div class="info-item-label">${t('businessInfo.description', lang)}</div>
+              <div class="info-item-value">${business.description}</div>
+            </div>
+          </div>
+        ` : ''}
+        <div class="branding-row">
+          <div class="branding-chip">
+            <span class="chip-label">${t('businessInfo.template', lang)}</span>
+            <span class="chip-value">${templateNames[business.template] || 'modern'}</span>
+          </div>
+          <div class="branding-chip">
+            <span class="chip-label">${t('businessInfo.font', lang)}</span>
+            <span class="chip-value">${fontDisplay}</span>
+          </div>
+        </div>
+        <div class="colors-row">
+          ${business.primaryColor ? `<span class="color-dot" style="background:${business.primaryColor}" title="${t('businessInfo.primaryColor', lang)}"></span>` : ''}
+          ${business.secondaryColor ? `<span class="color-dot" style="background:${business.secondaryColor}" title="${t('businessInfo.secondaryColor', lang)}"></span>` : ''}
+          ${business.accentColor ? `<span class="color-dot" style="background:${business.accentColor}" title="${t('businessInfo.accentColor', lang)}"></span>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
 
   html += `
         </div>
