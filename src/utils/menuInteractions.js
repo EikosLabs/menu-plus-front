@@ -5,6 +5,7 @@ export function initializeInteractiveElements() {
   setupScrollAnimations();
   setupActiveCategory();
   setupDishModal();
+  setupMobileCarousel();
 }
 
 function setupCategoryNavigation() {
@@ -151,4 +152,142 @@ function setupDishModal() {
       document.startViewTransition ? document.startViewTransition(hideModal) : hideModal();
     }, 300);
   }
+}
+
+function setupMobileCarousel() {
+  // Only run on mobile devices
+  if (window.innerWidth > 768) return;
+
+  const track = document.querySelector('.category-nav-track');
+  if (!track || track.children.length === 0) return;
+
+  const chips = Array.from(track.children);
+  const chipWidth = chips[0].offsetWidth;
+  const gap = 16; // 1rem gap
+  const scrollDistance = chipWidth + gap;
+
+  let currentIndex = 0;
+  let autoScrollInterval;
+  let isUserInteracting = false;
+  let userInteractionTimeout;
+
+  // Clone chips for infinite effect
+  const clonedChips = chips.map(chip => chip.cloneNode(true));
+  clonedChips.forEach(chip => track.appendChild(chip));
+
+  function scrollToIndex(index, smooth = true) {
+    const scrollPosition = index * scrollDistance;
+    track.scrollTo({
+      left: scrollPosition,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+  }
+
+  function autoScroll() {
+    if (isUserInteracting) return;
+
+    currentIndex++;
+
+    // If we've scrolled past the original items, reset to start
+    if (currentIndex >= chips.length) {
+      // Scroll to the cloned first item smoothly
+      scrollToIndex(currentIndex, true);
+
+      // After animation completes, snap back to real first item instantly
+      setTimeout(() => {
+        currentIndex = 0;
+        scrollToIndex(0, false);
+      }, 500);
+    } else {
+      scrollToIndex(currentIndex, true);
+    }
+  }
+
+  function startAutoScroll() {
+    stopAutoScroll();
+    autoScrollInterval = setInterval(autoScroll, 3000);
+  }
+
+  function stopAutoScroll() {
+    if (autoScrollInterval) {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = null;
+    }
+  }
+
+  function handleUserInteraction() {
+    isUserInteracting = true;
+    stopAutoScroll();
+
+    clearTimeout(userInteractionTimeout);
+    userInteractionTimeout = setTimeout(() => {
+      isUserInteracting = false;
+
+      // Calculate current index based on scroll position
+      const scrollLeft = track.scrollLeft;
+      currentIndex = Math.round(scrollLeft / scrollDistance);
+
+      // If we're in the cloned section, adjust
+      if (currentIndex >= chips.length) {
+        currentIndex = currentIndex % chips.length;
+        scrollToIndex(currentIndex, false);
+      }
+
+      startAutoScroll();
+    }, 2000);
+  }
+
+  // Event listeners
+  track.addEventListener('touchstart', handleUserInteraction, { passive: true });
+  track.addEventListener('scroll', handleUserInteraction, { passive: true });
+
+  // Handle chip clicks
+  track.querySelectorAll('.category-chip').forEach((chip, index) => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleUserInteraction();
+
+      // Get the actual index (handle clones)
+      const actualIndex = index % chips.length;
+      currentIndex = actualIndex;
+
+      // Scroll to section
+      const targetId = chip.getAttribute('href').substring(1);
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        const offset = 100;
+        const elementPosition = targetEl.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Start auto-scroll
+  startAutoScroll();
+
+  // Pause on window blur, resume on focus
+  window.addEventListener('blur', stopAutoScroll);
+  window.addEventListener('focus', () => {
+    if (!isUserInteracting) startAutoScroll();
+  });
+
+  // Clean up on resize to desktop
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (window.innerWidth > 768) {
+        stopAutoScroll();
+        // Remove clones
+        clonedChips.forEach(clone => {
+          if (clone.parentNode) clone.remove();
+        });
+      }
+    }, 250);
+  });
 }
