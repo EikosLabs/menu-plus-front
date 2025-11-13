@@ -162,9 +162,7 @@ function setupMobileCarousel() {
   if (!track || track.children.length === 0) return;
 
   const chips = Array.from(track.children);
-  const chipWidth = chips[0].offsetWidth;
-  const gap = 16; // 1rem gap
-  const scrollDistance = chipWidth + gap;
+  if (chips.length === 0) return;
 
   let currentIndex = 0;
   let autoScrollInterval;
@@ -172,10 +170,24 @@ function setupMobileCarousel() {
   let userInteractionTimeout;
 
   // Clone chips for infinite effect
-  const clonedChips = chips.map(chip => chip.cloneNode(true));
+  const clonedChips = chips.map(chip => {
+    const clone = chip.cloneNode(true);
+    clone.classList.add('cloned-chip');
+    return clone;
+  });
   clonedChips.forEach(chip => track.appendChild(chip));
 
+  function getScrollDistance() {
+    // Recalculate on each call to handle dynamic changes
+    const firstChip = chips[0];
+    if (!firstChip) return 0;
+    const style = window.getComputedStyle(track);
+    const gap = parseFloat(style.gap) || 12; // fallback to 12px
+    return firstChip.offsetWidth + gap;
+  }
+
   function scrollToIndex(index, smooth = true) {
+    const scrollDistance = getScrollDistance();
     const scrollPosition = index * scrollDistance;
     track.scrollTo({
       left: scrollPosition,
@@ -197,7 +209,7 @@ function setupMobileCarousel() {
       setTimeout(() => {
         currentIndex = 0;
         scrollToIndex(0, false);
-      }, 500);
+      }, 600);
     } else {
       scrollToIndex(currentIndex, true);
     }
@@ -224,6 +236,7 @@ function setupMobileCarousel() {
       isUserInteracting = false;
 
       // Calculate current index based on scroll position
+      const scrollDistance = getScrollDistance();
       const scrollLeft = track.scrollLeft;
       currentIndex = Math.round(scrollLeft / scrollDistance);
 
@@ -267,8 +280,10 @@ function setupMobileCarousel() {
     });
   });
 
-  // Start auto-scroll
-  startAutoScroll();
+  // Start auto-scroll after a brief delay to ensure everything is loaded
+  setTimeout(() => {
+    startAutoScroll();
+  }, 500);
 
   // Pause on window blur, resume on focus
   window.addEventListener('blur', stopAutoScroll);

@@ -16,6 +16,7 @@
   background: linear-gradient(135deg, #f8f5ff 0%, #fff5f5 100%);
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Background Decorations */
@@ -658,65 +659,73 @@
 .footer-link:hover { color: #f093fb; }
 .footer-tagline { font-size: 0.9rem; opacity: 0.6; }
 
-/* Dish Detail Modal */
+/* Dish Detail Modal - Neobrutalist Style */
 .dish-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 .dish-modal-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0);
   transition: background 0.3s ease;
-  backdrop-filter: blur(0px);
 }
-.dish-modal-backdrop.active { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); }
+.dish-modal-backdrop.active { background: rgba(0, 0, 0, 0.6); }
 .dish-modal-content {
   position: relative;
-  background: white;
-  border: 4px solid var(--primary-dark, #000);
-  border-radius: 24px;
+  background: #ffffff;
+  border: 5px solid #000;
+  border-radius: 0;
   max-width: 900px;
   width: 100%;
   max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  transform: scale(0.8) translateY(50px);
+  overflow: hidden;
+  box-shadow: 12px 12px 0 #000;
+  transform: scale(0.9) translateY(30px);
   opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10000;
 }
 .dish-modal-content.active { transform: scale(1) translateY(0); opacity: 1; }
 .dish-modal-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 48px;
-  height: 48px;
-  background: white;
-  border: 3px solid var(--primary-dark, #000);
-  border-radius: 50%;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 52px;
+  height: 52px;
+  background: #ff6b6b;
+  border: 4px solid #000;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 3px 3px 0 #000;
+  box-shadow: 4px 4px 0 #000;
   z-index: 10;
 }
 .dish-modal-close:hover {
-  transform: translate(-2px, -2px) scale(1.05);
-  box-shadow: 5px 5px 0 #000;
-  background: var(--primary-dark, #ff4444);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+  background: #ff5252;
 }
-.dish-modal-close:hover svg { stroke: white; }
-.dish-modal-close svg { width: 24px; height: 24px; stroke: var(--primary-dark, #000); }
-.dish-modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.dish-modal-close:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 #000;
+}
+.dish-modal-close svg { width: 28px; height: 28px; stroke: #000; stroke-width: 3; }
+.dish-modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  max-height: 90vh;
+  overflow-y: auto;
+}
 .dish-modal-image-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 400px;
-  border-right: 4px solid var(--primary-dark, #000);
+  min-height: 450px;
+  border-right: 5px solid #000;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--secondary-dark, #667eea) 0%, var(--primary-dark, #764ba2) 100%);
+  background: #ffd93d;
 }
 .dish-modal-image { width: 100%; height: 100%; object-fit: cover; }
 .dish-modal-image-placeholder {
@@ -725,55 +734,79 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--secondary-dark, #667eea) 0%, var(--primary-dark, #764ba2) 100%);
+  background: #ffd93d;
 }
-.dish-modal-image-placeholder .placeholder-emoji { font-size: 6rem; opacity: 0.7; }
-.dish-modal-info { padding: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.dish-modal-image-placeholder .placeholder-emoji { font-size: 7rem; opacity: 0.5; filter: grayscale(20%); }
+.dish-modal-info {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  background: #fff;
+}
 .dish-modal-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 3px solid var(--primary-dark, #000);
+  border-bottom: 4px solid #000;
 }
 .dish-modal-title {
   font-family: var(--font-display, 'Poppins', sans-serif);
   font-size: 2.5rem;
   font-weight: 900;
-  color: var(--hero-text-color, #1a1a1a);
-  line-height: 1.2;
+  color: #000;
+  line-height: 1.1;
   flex: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
 }
 .dish-modal-price-badge {
-  background: linear-gradient(135deg, var(--secondary-dark, #667eea) 0%, var(--primary-dark, #764ba2) 100%);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 50px;
-  border: 3px solid var(--primary-dark, #000);
-  box-shadow: 4px 4px 0 #000;
+  background: #6BCF7F;
+  color: #000;
+  padding: 1rem 1.75rem;
+  border-radius: 0;
+  border: 4px solid #000;
+  box-shadow: 5px 5px 0 #000;
   font-family: var(--font-display, 'Poppins', sans-serif);
-  font-size: 1.75rem;
+  font-size: 1.85rem;
   font-weight: 900;
   white-space: nowrap;
   flex-shrink: 0;
 }
-.dish-modal-description { font-size: 1.15rem; line-height: 1.8; color: #555; }
+.dish-modal-description {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #333;
+  font-weight: 500;
+}
 .dish-modal-allergens {
-  background: #fff5f5;
-  border: 3px solid #f5576c;
-  border-radius: 16px;
+  background: #fff;
+  border: 4px solid #ff6b6b;
+  border-radius: 0;
   padding: 1.5rem;
+  box-shadow: 5px 5px 0 #ff6b6b;
 }
 .allergens-title {
   font-family: var(--font-display, 'Poppins', sans-serif);
   font-size: 1.25rem;
-  font-weight: 800;
-  color: #f5576c;
+  font-weight: 900;
+  color: #000;
   margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .allergens-list { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.dish-modal-allergens .allergen-badge { padding: 0.5rem 1rem; font-size: 0.9rem; }
+.dish-modal-allergens .allergen-badge {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  background: #ff6b6b;
+  color: #fff;
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  font-weight: 700;
+}
 
 /* Responsive */
 @media (max-width: 1024px) {
@@ -903,12 +936,17 @@
   .error-card { padding: 2rem; }
   .error-actions { flex-direction: column; }
   .btn { width: 100%; justify-content: center; }
+  .dish-modal-content { box-shadow: 8px 8px 0 #000; }
   .dish-modal-body { grid-template-columns: 1fr; }
-  .dish-modal-image-wrapper { border-right: none; border-bottom: 4px solid var(--primary-dark, #000); min-height: 300px; max-height: 300px; }
-  .dish-modal-info { padding: 2rem 1.5rem; }
-  .dish-modal-title { font-size: 1.75rem; }
-  .dish-modal-price-badge { font-size: 1.25rem; padding: 0.75rem 1.25rem; }
+  .dish-modal-image-wrapper { border-right: none; border-bottom: 5px solid #000; min-height: 280px; max-height: 280px; }
+  .dish-modal-info { padding: 1.75rem 1.5rem; gap: 1.25rem; }
+  .dish-modal-close { width: 44px; height: 44px; top: 1rem; right: 1rem; }
+  .dish-modal-close svg { width: 24px; height: 24px; }
+  .dish-modal-title { font-size: 1.65rem; }
+  .dish-modal-price-badge { font-size: 1.35rem; padding: 0.75rem 1.25rem; box-shadow: 4px 4px 0 #000; }
   .dish-modal-description { font-size: 1rem; }
+  .dish-modal-allergens { padding: 1.25rem; box-shadow: 4px 4px 0 #ff6b6b; }
+  .allergens-title { font-size: 1.1rem; }
 }
 
 @media (max-width: 480px) {
