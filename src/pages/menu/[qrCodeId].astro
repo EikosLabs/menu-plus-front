@@ -273,10 +273,10 @@ const { qrCodeId } = Astro.params;
               <div class="hero-gradient"></div>
             </div>
             <div class="hero-content">
-              ${business.logoUri ? `
+              ${(business.logoUrl || business.logoUri) ? `
                 <div class="hero-logo-wrapper">
                   <div class="hero-logo-ring"></div>
-                  <img src="${sanitizeUrl(business.logoUri)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" />
+                  <img src="${sanitizeUrl(business.logoUrl || business.logoUri)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" onerror="console.warn('Logo image failed:', this.src); this.parentElement.style.display='none';" />
                 </div>
               ` : `
                 <div class="hero-icon">🍽️</div>
