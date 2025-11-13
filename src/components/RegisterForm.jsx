@@ -21,20 +21,32 @@ export default function RegisterForm() {
     });
     const { t } = useTranslation();
 
-	const { error, clearError, handleError } = useErrorHandler();
+  const { error, clearError, handleError } = useErrorHandler();
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setFormData((prev) => ({
-			...prev,
-			[name]: value,
-		}));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
 		// Limpiar error del campo al cambiar
-		if (touched[name]) {
-			clearError();
-		}
-	};
+    if (touched[name]) {
+      clearError();
+    }
+
+    if (name === 'password') {
+      const v = value || '';
+      let s = 0;
+      if (v.length >= 8) s++;
+      if (/[A-Z]/.test(v)) s++;
+      if (/[a-z]/.test(v)) s++;
+      if (/[0-9]/.test(v)) s++;
+      if (/[^A-Za-z0-9]/.test(v)) s++;
+      setPasswordStrength(Math.min(s, 5));
+    }
+  };
 
 	const handleBlur = (field) => {
 		setTouched(prev => ({ ...prev, [field]: true }));
@@ -112,23 +124,24 @@ export default function RegisterForm() {
 		}
 	};
 
-	if (success) {
-		return (
-			<SuccessAlert
-				message="¡Registro exitoso! Serás redirigido a configurar tu negocio en unos momentos..."
-			/>
-		);
-	}
+  if (success) {
+    return (
+      <SuccessAlert
+        message="¡Registro exitoso! Serás redirigido a configurar tu negocio en unos momentos..."
+      />
+    );
+  }
 
 	return (
 		<form className="neo-space-md" onSubmit={handleSubmit}>
 			{/* Error Alert */}
-			{error && (
-				<ErrorAlert
-					error={error}
-					onClose={clearError}
-				/>
-			)}
+      {error && (
+        <ErrorAlert
+          error={error}
+          onClose={clearError}
+          onRetry={!loading ? handleSubmit : undefined}
+        />
+      )}
 
             {/* Full Name Field */}
             <div>
@@ -139,14 +152,14 @@ export default function RegisterForm() {
                     {t("auth.fullName")}
                 </label>
                 <input
-                    type="text"
-                    name="fullName"
-                    id="fullName"
-                    className={`neo-input ${getFieldError('fullName') ? 'border-red-500' : ''}`}
-                    placeholder={t("business.namePlaceholder")}
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur('fullName')}
+                  type="text"
+                  name="fullName"
+                  id="fullName"
+                  className={`neo-input ${(getFieldError('fullName')) ? 'border-red-500' : ''}`}
+                  placeholder={t("business.namePlaceholder")}
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur('fullName')}
                 />
                 <FieldError error={getFieldError('fullName')} />
             </div>
@@ -160,14 +173,14 @@ export default function RegisterForm() {
                     {t("auth.email")}
                 </label>
                 <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    className={`neo-input ${getFieldError('email') ? 'border-red-500' : ''}`}
-                    placeholder={t("auth.emailPlaceholder")}
-                    value={formData.email}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur('email')}
+                  type="email"
+                  name="email"
+                  id="email"
+                  className={`neo-input ${(getFieldError('email')) ? 'border-red-500' : ''}`}
+                  placeholder={t("auth.emailPlaceholder")}
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur('email')}
                 />
                 <FieldError error={getFieldError('email')} />
             </div>
@@ -200,26 +213,37 @@ export default function RegisterForm() {
                     {t("auth.password")}
                 </label>
                 <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    className={`neo-input ${getFieldError('password') ? 'border-red-500' : ''}`}
-                    placeholder={t("auth.passwordHint")}
-                    value={formData.password}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur('password')}
+                  type="password"
+                  name="password"
+                  id="password"
+                  className={`neo-input ${(getFieldError('password')) ? 'border-red-500' : ''}`}
+                  placeholder={t("auth.passwordHint")}
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur('password')}
                 />
+                <div className="mt-2">
+                  <div className="h-2 bg-gray-200 rounded">
+                    <div
+                      className={`h-2 rounded ${passwordStrength <= 2 ? 'bg-red-500' : passwordStrength === 3 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                      style={{ width: `${(passwordStrength/5)*100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs mt-1 neo-text">
+                    {passwordStrength <= 2 ? 'Contraseña débil' : passwordStrength === 3 ? 'Contraseña media' : 'Contraseña fuerte'}
+                  </p>
+                </div>
                 <FieldError error={getFieldError('password')} />
             </div>
 
             {/* Submit Button */}
             <div>
                 <button
-                    type="submit"
-                    disabled={loading}
-                    className="neo-btn neo-btn-primary w-full"
+                  type="submit"
+                  disabled={loading}
+                  className="neo-btn neo-btn-primary w-full"
                 >
-                    {loading ? t("common.loading") : t("auth.registerButton")}
+                  {loading ? t("common.loading") : t("auth.registerButton")}
                 </button>
             </div>
         </form>
