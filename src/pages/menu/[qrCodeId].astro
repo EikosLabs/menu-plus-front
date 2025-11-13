@@ -196,7 +196,7 @@ const { qrCodeId } = Astro.params;
             'merriweather': "'Merriweather', serif"
           };
 
-          const fontFamily = business.fontFamily || 'poppins';
+          const fontFamily = (business.fontFamily || 'poppins').toLowerCase();
           const fontFamilyValue = fontMap[fontFamily] || fontMap['poppins'];
 
           const customColors = {
@@ -212,6 +212,8 @@ const { qrCodeId } = Astro.params;
               ${customColors.secondary ? `--secondary-dark: ${customColors.secondary};` : ''}
               ${customColors.accent ? `--accent-gold: ${customColors.accent};` : ''}
               --font-display: ${fontFamilyValue};
+              ${customColors.primary ? `--hero-text-color: ${getContrastColor(customColors.primary)};` : '--hero-text-color: #ffffff;'}
+              ${customColors.primary ? `--hero-subtitle-color: ${getContrastColor(customColors.primary, 0.85)};` : '--hero-subtitle-color: rgba(255,255,255,0.95);'}
             }
             
             body, .menu-page, * {
@@ -226,6 +228,23 @@ const { qrCodeId } = Astro.params;
             }
           `;
           document.head.appendChild(styleEl);
+          function getContrastColor(hex, alphaFactor = 1) {
+            try {
+              const clean = hex.replace('#','');
+              const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16) / 255;
+              const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16) / 255;
+              const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16) / 255;
+              const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+              const color = lum > 0.5 ? '#111111' : '#FFFFFF';
+              if (color === '#FFFFFF' && alphaFactor < 1) {
+                return `rgba(255,255,255,${alphaFactor})`;
+              }
+              if (color === '#111111' && alphaFactor < 1) {
+                return `rgba(17,17,17,${alphaFactor})`;
+              }
+              return color;
+            } catch { return '#FFFFFF'; }
+          }
         }
 
         const itemsBySection = {};
@@ -276,7 +295,7 @@ const { qrCodeId } = Astro.params;
               ${(business.logoUrl || business.logoUri) ? `
                 <div class="hero-logo-wrapper">
                   <div class="hero-logo-ring"></div>
-                  <img src="${sanitizeUrl(business.logoUrl || business.logoUri)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" onerror="console.warn('Logo image failed:', this.src); this.parentElement.style.display='none';" />
+                  <img src="${sanitizeUrl(business.logoUrl || business.logoUri)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" width="180" height="180" decoding="async" fetchpriority="high" onerror="console.warn('Logo image failed:', this.src); this.parentElement.style.display='none';" />
                 </div>
               ` : `
                 <div class="hero-icon">🍽️</div>
@@ -1091,8 +1110,8 @@ const { qrCodeId } = Astro.params;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     animation: pulse 3s ease-in-out infinite;
@@ -1100,12 +1119,13 @@ const { qrCodeId } = Astro.params;
 
   .hero-logo {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     border: 6px solid white;
     object-fit: cover;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+    image-rendering: -webkit-optimize-contrast;
   }
 
   .hero-icon {
@@ -1124,14 +1144,14 @@ const { qrCodeId } = Astro.params;
     font-family: var(--font-display, 'Poppins', sans-serif);
     font-size: clamp(2.5rem, 6vw, 4rem);
     font-weight: 900;
-    color: white;
+    color: var(--hero-text-color, white);
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
     letter-spacing: -0.02em;
   }
 
   .hero-subtitle {
     font-size: clamp(1rem, 2vw, 1.5rem);
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--hero-subtitle-color, rgba(255, 255, 255, 0.95));
     font-weight: 400;
     max-width: 600px;
     margin: 0 auto;

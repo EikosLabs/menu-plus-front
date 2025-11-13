@@ -3,10 +3,11 @@ import { useTranslation } from "../i18n/utils";
 import menuService from "../services/menuService";
 
 export default function QRCodeComponent({
-	businessName,
-	qrCodeId,
-	menuId,
-	onClose,
+    businessName,
+    businessLogoUrl,
+    qrCodeId,
+    menuId,
+    onClose,
 }) {
 	const { t } = useTranslation();
 	const [qrUrl, setQrUrl] = useState("");
@@ -117,63 +118,112 @@ export default function QRCodeComponent({
 		} catch (err) {}
 	};
 
-	const handleDownloadQr = () => {
-		if (!qrUrl) return;
+    const handleDownloadQr = () => {
+        if (!qrUrl) return;
 
-		const canvas = document.createElement("canvas");
-		const ctx = canvas.getContext("2d");
-		const img = new Image();
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        const logoImg = businessLogoUrl ? new Image() : null;
 
-		img.onload = () => {
-			const padding = 60;
-			const qrSize = 400;
-			const totalWidth = qrSize + padding * 2;
-			const totalHeight = qrSize + padding * 2 + 130; // QR + padding + espacio para textos
+        const renderCanvas = () => {
+            const padding = 60;
+            const qrSize = 400;
+            const headerHeight = 120;
+            const totalWidth = qrSize + padding * 2;
+            const totalHeight = qrSize + padding * 2 + headerHeight + 90;
 
-			canvas.width = totalWidth;
-			canvas.height = totalHeight;
+            canvas.width = totalWidth;
+            canvas.height = totalHeight;
 
-			ctx.fillStyle = "#ffffff";
-			ctx.fillRect(0, 0, totalWidth, totalHeight);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
 
-			ctx.fillStyle = "#004E71";
-			ctx.font = "bold 32px Arial, sans-serif";
-			ctx.textAlign = "center";
-			ctx.fillText("MenuPlus", totalWidth / 2, 45);
+            // Fondo blanco para contraste suficiente
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, totalWidth, totalHeight);
 
-			ctx.fillStyle = "#1a1a1a";
-			ctx.font = "bold 24px Arial, sans-serif";
-			ctx.fillText(businessName || "Mi Negocio", totalWidth / 2, 80);
+            // Logo centrado sobre el QR (si existe)
+            let logoDrawn = false;
+            if (logoImg && logoImg.complete) {
+                const logoSize = 90;
+                const logoX = (totalWidth - logoSize) / 2;
+                const logoY = 20;
+                // Marco circular con borde para nitidez
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(totalWidth / 2, logoY + logoSize / 2, logoSize / 2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+                ctx.restore();
+                // Borde y sombra para contraste
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(totalWidth / 2, logoY + logoSize / 2, logoSize / 2 + 3, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.shadowColor = 'rgba(0,0,0,0.15)';
+                ctx.shadowBlur = 8;
+                logoDrawn = true;
+                ctx.shadowBlur = 0;
+            }
 
-			ctx.drawImage(img, padding, padding + 50, qrSize, qrSize);
+            // Título y nombre del negocio con alto contraste
+            ctx.fillStyle = "#0A3342";
+            ctx.font = "bold 28px Arial, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("MenuPlus", totalWidth / 2, logoDrawn ? 135 : 45);
 
-			ctx.fillStyle = "#666666";
-			ctx.font = "16px Arial, sans-serif";
-			ctx.fillText(
-				"Escanea este código para ver nuestro menú",
-				totalWidth / 2,
-				qrSize + padding + 80,
-			);
+            ctx.fillStyle = "#111111";
+            ctx.font = "bold 24px Arial, sans-serif";
+            ctx.fillText(businessName || "Mi Negocio", totalWidth / 2, logoDrawn ? 170 : 80);
 
-			ctx.fillStyle = "#888888";
-			ctx.font = "12px Arial, sans-serif";
-			ctx.fillText(menuUrl, totalWidth / 2, qrSize + padding + 105);
+            // QR con zona de silencio alrededor
+            const qrY = (logoDrawn ? 190 : 100);
+            // Marco claro para asegurar legibilidad
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(padding - 10, qrY - 10, qrSize + 20, qrSize + 20);
+            ctx.drawImage(img, padding, qrY, qrSize, qrSize);
 
-			const link = document.createElement("a");
-			link.download = `QR-${businessName || "MenuPlus"}.png`;
-			link.href = canvas.toDataURL("image/png");
-			link.click();
-		};
+            // Instrucciones y URL
+            ctx.fillStyle = "#333333";
+            ctx.font = "16px Arial, sans-serif";
+            ctx.fillText(
+                "Escanea este código para ver nuestro menú",
+                totalWidth / 2,
+                qrY + qrSize + 40,
+            );
 
-		img.crossOrigin = "anonymous";
-		img.src = qrUrl;
-	};
+            ctx.fillStyle = "#555555";
+            ctx.font = "12px Arial, sans-serif";
+            ctx.fillText(menuUrl, totalWidth / 2, qrY + qrSize + 65);
+
+            const link = document.createElement("a");
+            link.download = `QR-${businessName || "MenuPlus"}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        };
+
+        img.onload = () => {
+            if (logoImg) {
+                logoImg.onload = renderCanvas;
+                logoImg.crossOrigin = 'anonymous';
+                logoImg.src = businessLogoUrl;
+            } else {
+                renderCanvas();
+            }
+        };
+
+        img.crossOrigin = "anonymous";
+        img.src = qrUrl;
+    };
 
 	const handlePrintQr = () => {
 		if (!qrUrl) return;
 
-		const printWindow = window.open("", "_blank");
-		printWindow.document.write(`
+        const printWindow = window.open("", "_blank");
+        printWindow.document.write(`
       <html>
         <head>
           <title>Imprimir QR - ${businessName || "MenuPlus"}</title>
@@ -200,12 +250,8 @@ export default function QRCodeComponent({
               box-shadow: 0 4px 16px rgba(0,0,0,0.1);
               max-width: 500px;
             }
-            .logo {
-              font-size: 36px;
-              font-weight: bold;
-              color: #004E71;
-              margin-bottom: 10px;
-            }
+            .logo-img { width: 90px; height: 90px; border-radius: 50%; border: 6px solid #fff; box-shadow: 0 8px 16px rgba(0,0,0,0.15); object-fit: cover; display: block; margin: 0 auto 10px auto; }
+            .logo { font-size: 28px; font-weight: bold; color: #004E71; margin-bottom: 10px; }
             .business-name {
               font-size: 28px;
               font-weight: bold;
@@ -247,7 +293,7 @@ export default function QRCodeComponent({
         </head>
         <body>
           <div class="qr-container">
-            <div class="logo">MenuPlus</div>
+            ${businessLogoUrl ? `<img src="${businessLogoUrl}" class="logo-img" alt="Logo" />` : `<div class="logo">MenuPlus</div>`}
             <div class="business-name">${businessName || "Mi Negocio"}</div>
             <img src="${qrUrl}" alt="Código QR del menú" class="qr-image" />
             <div class="instructions">Escanea este código QR para ver nuestro menú digital</div>
@@ -257,8 +303,8 @@ export default function QRCodeComponent({
         </body>
       </html>
     `);
-		printWindow.document.close();
-	};
+        printWindow.document.close();
+    };
 
 	const handleNativeShare = async () => {
 		if (navigator.share) {

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { exportToPDF } from './utils/pdfExport';
+import { exportToImage } from './utils/pdfExport';
 import { FOLLETO_TEMPLATES, FOLLETO_FORMATS } from './utils/flyerTemplates';
 import PromotionalFlyerPreview from './PromotionalFlyerPreview';
 import menuService from '../../services/menuService';
@@ -127,7 +127,7 @@ export default function PromotionalFlyerGenerator({
   };
 
   /**
-   * Export to PDF
+   * Export to PNG
    */
   const handleExport = async () => {
     if (selectedItems.length === 0) {
@@ -139,10 +139,10 @@ export default function PromotionalFlyerGenerator({
 
     setIsExporting(true);
     try {
-      await exportToPDF(previewRef.current, {
-        fileName: `${folletoName || business?.name || 'menu'}-folleto.pdf`,
+      await exportToImage(previewRef.current, {
+        fileName: `${folletoName || business?.name || 'menu'}-folleto.png`,
+        format: 'png',
         paperSize: 'A4',
-        orientation: 'portrait',
         quality: 2,
       });
     } catch (error) {
@@ -409,8 +409,8 @@ export default function PromotionalFlyerGenerator({
               disabled={isExporting || selectedItems.length === 0}
               className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              {isExporting ? '⏳' : '📄'}
-              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
+              {isExporting ? '⏳' : '🖼️'}
+              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PNG'}</span>
             </button>
           </div>
         </div>

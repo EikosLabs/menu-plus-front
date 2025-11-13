@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { exportToPDF } from './utils/pdfExport';
+import { exportToImage } from './utils/pdfExport';
 import { FLYER_TEMPLATES } from './utils/flyerTemplates';
 import FlyerPreview from './FlyerPreview';
 
@@ -47,17 +47,17 @@ export default function SimpleFlyerGenerator({
   };
 
   /**
-   * Export to PDF
+   * Export to PNG
    */
   const handleExport = async () => {
     if (!previewRef.current) return;
 
     setIsExporting(true);
     try {
-      await exportToPDF(previewRef.current, {
-        fileName: `${business?.name || 'menu'}-folleto.pdf`,
+      await exportToImage(previewRef.current, {
+        fileName: `${business?.name || 'menu'}-folleto.png`,
         paperSize,
-        orientation: 'portrait',
+        format: 'png',
         quality: 2,
       });
     } catch (error) {
@@ -225,7 +225,7 @@ export default function SimpleFlyerGenerator({
               disabled={isExporting}
               className="neo-btn neo-btn-primary"
             >
-              {isExporting ? '⏳ Generando...' : '📄 Descargar PDF'}
+              {isExporting ? '⏳ Generando...' : '🖼️ Descargar PNG'}
             </button>
           </div>
         </div>

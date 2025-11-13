@@ -797,14 +797,15 @@ export default function BusinessList({
 				});
 				
 				return (
-					<QRCodeComponent 
-						businessName={business?.name}
-						qrCodeId={qrCodeId}
-						menuId={menu?.id}
-						onClose={() => setShowQr(null)} 
-					/>
-				);
-			})()}
+                    <QRCodeComponent 
+                        businessName={business?.name}
+                        businessLogoUrl={business?.logoUri || business?.imageUrl || business?.heroImageUri || null}
+                        qrCodeId={qrCodeId}
+                        menuId={menu?.id}
+                        onClose={() => setShowQr(null)} 
+                    />
+                );
+            })()}
 
 			{showSectionManager && (
 				<SectionManager

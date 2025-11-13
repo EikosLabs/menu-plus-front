@@ -11,7 +11,8 @@ const MenuCardPreview = forwardRef(({
   menu,
   items = [],
   template,
-  paperSize = 'A4'
+  paperSize = 'A4',
+  fontFamily = "'Poppins', sans-serif"
 }, ref) => {
   const paper = PAPER_SIZES[paperSize];
   const colors = getColorScheme(business);
@@ -23,7 +24,7 @@ const MenuCardPreview = forwardRef(({
     width: `${paper.pxWidth}px`,
     height: `${paper.pxHeight}px`,
     backgroundColor: colors.background,
-    fontFamily: 'Poppins, sans-serif',
+    fontFamily: fontFamily,
     position: 'relative',
     overflow: 'hidden',
   };
@@ -181,7 +182,7 @@ const MenuCardPreview = forwardRef(({
                   </span>
                 </div>
 
-                {item.description && (
+                {template.showImages && item.description && (
                   <p
                     style={{
                       fontSize: template.itemsPerRow === 1 ? '13px' : '12px',

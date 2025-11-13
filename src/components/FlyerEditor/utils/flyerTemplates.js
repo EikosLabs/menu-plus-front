@@ -166,7 +166,7 @@ export function getColorScheme(business) {
 export function getBusinessBranding(business) {
   return {
     name: business?.name || 'Mi Negocio',
-    logo: business?.logoKey ? `${import.meta.env.PUBLIC_API_URL}/images/${business.logoKey}` : null,
+    logo: business?.logoUri || (business?.logoKey ? `${import.meta.env.PUBLIC_API_URL}/images/${business.logoKey}` : null),
     slogan: business?.slogan || '',
     phone: business?.contactInfo?.phone || business?.phoneNumber || '',
     email: business?.contactInfo?.email || business?.email || '',

@@ -19,6 +19,19 @@ export default function MenuCardGenerator({
   savedFlyer = null
 }) {
   const [selectedTemplate, setSelectedTemplate] = useState(savedFlyer?.templateId || 'elegante');
+  const FONT_MAP = {
+    poppins: "'Poppins', sans-serif",
+    playfair: "'Playfair Display', serif",
+    roboto: "'Roboto', sans-serif",
+    montserrat: "'Montserrat', sans-serif",
+    lora: "'Lora', serif",
+    opensans: "'Open Sans', sans-serif",
+    raleway: "'Raleway', sans-serif",
+    merriweather: "'Merriweather', serif",
+  };
+  const defaultFontKey = (business?.fontFamily || 'poppins').toLowerCase();
+  const [selectedFontKey, setSelectedFontKey] = useState(FONT_MAP[defaultFontKey] ? defaultFontKey : 'poppins');
+  const [includePhotos, setIncludePhotos] = useState(savedFlyer?.includePhotos ?? CARTA_TEMPLATES[selectedTemplate].showImages);
   const [orderedItems, setOrderedItems] = useState(() => {
     if (savedFlyer?.itemsOrder && savedFlyer.itemsOrder.length > 0) {
       // Reorder items based on saved order
@@ -76,6 +89,8 @@ export default function MenuCardGenerator({
         selectedItemIds: JSON.stringify([]), // Carta shows all items
         itemsOrder: JSON.stringify(orderedItems.map(item => item.id)),
         paperSize: paperSize,
+        fontFamily: selectedFontKey,
+        includePhotos: includePhotos,
       };
 
       if (savedId) {
@@ -185,7 +200,7 @@ export default function MenuCardGenerator({
                 {Object.values(CARTA_TEMPLATES).map((tmpl) => (
                   <button
                     key={tmpl.id}
-                    onClick={() => setSelectedTemplate(tmpl.id)}
+                    onClick={() => { setSelectedTemplate(tmpl.id); setIncludePhotos(tmpl.showImages); }}
                     className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
                       selectedTemplate === tmpl.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
@@ -206,6 +221,34 @@ export default function MenuCardGenerator({
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Fuente tipográfica */}
+            <div>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Fuente Tipográfica</h3>
+              <select
+                value={selectedFontKey}
+                onChange={(e) => setSelectedFontKey(e.target.value)}
+                className="w-full neo-border rounded-lg px-2 sm:px-3 py-2 neo-text text-xs sm:text-sm"
+              >
+                {Object.keys(FONT_MAP).map((key) => (
+                  <option key={key} value={key}>{key}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Incluir fotos */}
+            <div>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Fotos de platos</h3>
+              <label className="flex items-center gap-2 neo-text text-xs sm:text-sm">
+                <input
+                  type="checkbox"
+                  checked={includePhotos}
+                  onChange={(e) => setIncludePhotos(e.target.checked)}
+                />
+                Incluir fotos
+              </label>
+              <p className="neo-text text-xs opacity-70 mt-1">Si desactivas, se mostrará solo nombre y precio.</p>
             </div>
 
             {/* Paper size */}
@@ -269,8 +312,9 @@ export default function MenuCardGenerator({
                 business={business}
                 menu={menu}
                 items={orderedItems}
-                template={template}
+                template={{ ...template, showImages: includePhotos }}
                 paperSize={paperSize}
+                fontFamily={FONT_MAP[selectedFontKey]}
               />
             </div>
           </div>
