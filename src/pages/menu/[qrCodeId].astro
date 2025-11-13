@@ -273,10 +273,10 @@ const { qrCodeId } = Astro.params;
               <div class="hero-gradient"></div>
             </div>
             <div class="hero-content">
-              ${business.logoUrl ? `
+              ${business.logoUri ? `
                 <div class="hero-logo-wrapper">
                   <div class="hero-logo-ring"></div>
-                  <img src="${sanitizeUrl(business.logoUrl)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" />
+                  <img src="${sanitizeUrl(business.logoUri)}" alt="${sanitizeHtml(business.name)}" class="hero-logo" />
                 </div>
               ` : `
                 <div class="hero-icon">🍽️</div>
@@ -390,12 +390,12 @@ const { qrCodeId } = Astro.params;
           description: item.description || '',
           price: item.price,
           currencyType: item.currencyType !== undefined ? item.currencyType : business.defaultCurrency,
-          imageUrl: item.imageUrl || '',
+          imageUrl: item.imageUrl || item.imageUri || '',
           allergens: item.allergens || [],
           categoryId: item.menuItemCategoryId || null
         };
 
-        const hasImage = item.imageUrl && item.imageUrl.trim() !== '';
+        const hasImage = (item.imageUrl || item.imageUri) && (item.imageUrl || item.imageUri).trim() !== '';
 
         html += `
           <article class="menu-item clickable-item"
@@ -404,7 +404,7 @@ const { qrCodeId } = Astro.params;
                    style="animation-delay: ${idx * 0.05}s">
             ${hasImage ? `
               <div class="item-image-wrapper">
-                <img src="${sanitizeUrl(item.imageUrl)}" alt="${sanitizeHtml(item.name)}" class="item-image" loading="lazy" onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';" />
+                <img src="${sanitizeUrl(item.imageUrl || item.imageUri)}" alt="${sanitizeHtml(item.name)}" class="item-image" loading="lazy" onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';" />
                 <div class="item-image-overlay">
                   <span class="item-view-icon">👁️</span>
                 </div>
@@ -592,8 +592,8 @@ const { qrCodeId } = Astro.params;
           modalDescription.style.display = 'none';
         }
 
-        if (item.imageUrl && item.imageUrl.trim() !== '') {
-          modalImage.src = item.imageUrl;
+        if ((item.imageUrl || item.imageUri) && (item.imageUrl || item.imageUri).trim() !== '') {
+          modalImage.src = item.imageUrl || item.imageUri;
           modalImage.alt = item.name;
           modalImage.style.display = 'block';
           modalImage.onerror = function() {
