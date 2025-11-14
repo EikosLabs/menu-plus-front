@@ -678,8 +678,8 @@
   position: relative;
   background: var(--surface-white, #ffffff);
   border: var(--template-border, 4px solid var(--primary-dark, #000));
-  border-radius: var(--template-border-radius, 20px);
-  max-width: 900px;
+  border-radius: 24px;
+  max-width: 1040px;
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
@@ -720,7 +720,7 @@
 .dish-modal-close:hover svg { stroke: var(--surface-white, #fff); }
 .dish-modal-body {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 0;
   max-height: 90vh;
   overflow-y: auto;
@@ -734,7 +734,15 @@
   overflow: hidden;
   background: var(--template-primary, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
 }
+.dish-modal-image-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.0) 40%, rgba(0,0,0,0.2) 100%);
+  pointer-events: none;
+}
 .dish-modal-image { width: 100%; height: 100%; object-fit: cover; }
+.dish-modal-content.active .dish-modal-image { transform: scale(1.03); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .dish-modal-image-placeholder {
   position: absolute;
   inset: 0;
@@ -745,7 +753,7 @@
 }
 .dish-modal-image-placeholder .placeholder-emoji { font-size: 7rem; opacity: 0.6; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
 .dish-modal-info {
-  padding: 2.5rem;
+  padding: 2.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
@@ -761,37 +769,41 @@
 }
 .dish-modal-title {
   font-family: var(--font-display, 'Playfair Display', serif);
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 2.6rem;
+  font-weight: 900;
   color: var(--text-primary, #000);
   line-height: 1.2;
   flex: 1;
   letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--primary-dark, #667eea) 0%, var(--secondary-dark, #764ba2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .dish-modal-price-badge {
   background: var(--template-primary, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: var(--surface-white, #fff);
-  padding: 1rem 1.75rem;
-  border-radius: var(--template-border-radius, 50px);
-  border: var(--template-border, 3px solid var(--primary-dark, #000));
-  box-shadow: var(--template-card-shadow, 4px 4px 0 #000);
+  padding: 0.85rem 1.5rem;
+  border-radius: 50px;
+  border: 3px solid var(--primary-dark, #000);
+  box-shadow: 5px 5px 0 #000;
   font-family: var(--font-display, 'Playfair Display', serif);
-  font-size: 1.85rem;
-  font-weight: 800;
+  font-size: 1.8rem;
+  font-weight: 900;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .dish-modal-description {
   font-family: var(--font-body, 'Inter', sans-serif);
   font-size: 1.1rem;
-  line-height: 1.7;
-  color: var(--text-secondary, #555);
-  font-weight: 400;
+  line-height: 1.8;
+  color: var(--text-secondary, #444);
+  font-weight: 500;
 }
 .dish-modal-allergens {
   background: var(--background-secondary, #fff5f5);
-  border: var(--template-border, 3px solid var(--template-secondary, #f5576c));
-  border-radius: var(--radius-md, 12px);
+  border: 3px solid var(--template-secondary, #f5576c);
+  border-radius: 14px;
   padding: 1.5rem;
   box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
 }
@@ -807,15 +819,20 @@
 }
 .allergens-list { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .dish-modal-allergens .allergen-badge {
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
   background: var(--surface-white, #fff);
   color: var(--text-primary, #000);
-  border: var(--template-border, 2px solid var(--primary-dark, #000));
-  box-shadow: var(--template-card-shadow, 2px 2px 0 #000);
+  border: 2px solid var(--primary-dark, #000);
+  box-shadow: 2px 2px 0 #000;
   font-weight: 600;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: 10px;
 }
+
+.dish-modal-body::-webkit-scrollbar { width: 10px; }
+.dish-modal-body::-webkit-scrollbar-track { background: #f1f1f1; }
+.dish-modal-body::-webkit-scrollbar-thumb { background: #bbb; border: 2px solid #f1f1f1; border-radius: 12px; }
+.dish-modal-body { scrollbar-color: #bbb #f1f1f1; scrollbar-width: thin; }
 
 /* Responsive */
 @media (max-width: 1024px) {

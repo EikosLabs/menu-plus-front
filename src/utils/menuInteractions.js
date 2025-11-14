@@ -144,6 +144,40 @@ function setupDishModal() {
     const showModal = () => {
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
+
+      const contentEl = modal.querySelector('.dish-modal-content');
+      const menuContent = document.getElementById('menu-content');
+      if (contentEl) {
+        contentEl.setAttribute('role', 'dialog');
+        contentEl.setAttribute('aria-modal', 'true');
+        contentEl.setAttribute('tabindex', '-1');
+        contentEl.focus({ preventScroll: true });
+
+        if (!contentEl.dataset.focusTrap) {
+          const getFocusable = () => Array.from(contentEl.querySelectorAll('a, button, textarea, input, select, [tabindex]:not([tabindex="-1"])'));
+          const handleKeyDown = (e) => {
+            if (e.key !== 'Tab') return;
+            const focusables = getFocusable();
+            if (focusables.length === 0) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          };
+          contentEl.addEventListener('keydown', handleKeyDown);
+          contentEl.dataset.focusTrap = '1';
+        }
+      }
+      menuContent?.setAttribute('aria-hidden', 'true');
     };
 
     document.startViewTransition ? document.startViewTransition(showModal) : showModal();
@@ -161,6 +195,8 @@ function setupDishModal() {
       const hideModal = () => {
         modal.style.display = 'none';
         document.body.style.overflow = '';
+        const menuContent = document.getElementById('menu-content');
+        menuContent?.removeAttribute('aria-hidden');
       };
       document.startViewTransition ? document.startViewTransition(hideModal) : hideModal();
     }, 300);
