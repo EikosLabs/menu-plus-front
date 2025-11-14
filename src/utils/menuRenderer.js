@@ -79,34 +79,26 @@ export function renderMenu(menu, business, itemsBySection) {
 
   // Category Nav
   if (menu.sections && menu.sections.length > 0) {
-  let navHtml = '<div class="category-nav-track">';
-  menu.sections.forEach((section, index) => {
-    const emoji = getEmojiForSection(section.name, index);
-    navHtml += `
-      <a href="#section-${section.id}" class="category-chip">
-        <span class="category-emoji">${emoji}</span>
-        <span class="category-name">${sanitizeHtml(section.name)}</span>
-      </a>
-    `;
-  });
-  if (itemsBySection['no-section']) {
-    navHtml += `
-      <a href="#section-no-section" class="category-chip">
-        <span class="category-emoji">✨</span>
-        <span class="category-name">Other Items</span>
-      </a>
-    `;
+    html += '<nav class="category-nav"><div class="category-nav-track">';
+    menu.sections.forEach((section, index) => {
+      const emoji = getEmojiForSection(section.name, index);
+      html += `
+        <a href="#section-${section.id}" class="category-chip">
+          <span class="category-emoji">${emoji}</span>
+          <span class="category-name">${sanitizeHtml(section.name)}</span>
+        </a>
+      `;
+    });
+    if (itemsBySection['no-section']) {
+      html += `
+        <a href="#section-no-section" class="category-chip">
+          <span class="category-emoji">✨</span>
+          <span class="category-name">Other Items</span>
+        </a>
+      `;
+    }
+    html += '</div></nav>';
   }
-  navHtml += '</div>';
-  // Remover cualquier nav existente para evitar duplicados
-  const existingNav = document.querySelector('.category-nav');
-  if (existingNav) existingNav.remove();
-  
-  const categoryNav = document.createElement('nav');
-  categoryNav.className = 'category-nav';
-  categoryNav.innerHTML = navHtml;
-  document.body.appendChild(categoryNav);
-}
 
   // Menu Sections
   html += '<div class="menu-sections">';

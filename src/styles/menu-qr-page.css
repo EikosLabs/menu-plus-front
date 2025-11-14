@@ -16,6 +16,9 @@
   background: linear-gradient(135deg, #f8f5ff 0%, #fff5f5 100%);
   position: relative;
   overflow-x: hidden;
+}
+
+.menu-page.nav-sticky {
   padding-top: var(--category-nav-height, 80px);
 }
 
@@ -456,7 +459,7 @@
 
 /* Category Navigation */
 .category-nav {
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
@@ -468,6 +471,17 @@
   padding: 1rem 0;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.category-nav.sticky-active {
+  position: sticky;
+  top: 0;
+}
+
+.category-nav.sticky-top {
+  position: fixed;
+  top: 0;
 }
 .category-nav-track {
   display: flex;
