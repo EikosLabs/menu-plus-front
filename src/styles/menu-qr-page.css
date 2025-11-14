@@ -890,7 +890,11 @@
   .category-nav {
     padding: 0.75rem 0 1rem 0;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
   }
 
   .category-nav::before,
