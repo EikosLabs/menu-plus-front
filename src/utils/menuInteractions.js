@@ -9,13 +9,16 @@ export function initializeInteractiveElements() {
 }
 
 function setupCategoryNavigation() {
+  const categoryNav = document.querySelector('.category-nav');
+
   document.querySelectorAll('.category-chip').forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
       const targetId = this.getAttribute('href').substring(1);
       const targetEl = document.getElementById(targetId);
       if (targetEl) {
-        const offset = 100;
+        const categoryNavHeight = categoryNav?.offsetHeight || 80;
+        const offset = categoryNavHeight + 20;
         const elementPosition = targetEl.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -46,12 +49,16 @@ function setupScrollAnimations() {
 function setupActiveCategory() {
   const sections = document.querySelectorAll('.menu-section');
   const navLinks = document.querySelectorAll('.category-chip');
+  const categoryNav = document.querySelector('.category-nav');
 
   window.addEventListener('scroll', () => {
+    const categoryNavHeight = categoryNav?.offsetHeight || 80;
+    const scrollOffset = categoryNavHeight + 50;
+
     let current = '';
     sections.forEach(section => {
       const sectionTop = section.offsetTop;
-      if (window.pageYOffset >= sectionTop - 200) {
+      if (window.pageYOffset >= sectionTop - scrollOffset) {
         current = section.getAttribute('id');
       }
     });
@@ -168,6 +175,7 @@ function setupMobileCarousel() {
   let autoScrollInterval;
   let isUserInteracting = false;
   let userInteractionTimeout;
+  let isResetting = false;
 
   // Clone chips for infinite effect
   const clonedChips = chips.map(chip => {
@@ -178,11 +186,10 @@ function setupMobileCarousel() {
   clonedChips.forEach(chip => track.appendChild(chip));
 
   function getScrollDistance() {
-    // Recalculate on each call to handle dynamic changes
     const firstChip = chips[0];
     if (!firstChip) return 0;
     const style = window.getComputedStyle(track);
-    const gap = parseFloat(style.gap) || 12; // fallback to 12px
+    const gap = parseFloat(style.gap) || 16;
     return firstChip.offsetWidth + gap;
   }
 
@@ -196,20 +203,23 @@ function setupMobileCarousel() {
   }
 
   function autoScroll() {
-    if (isUserInteracting) return;
+    if (isUserInteracting || isResetting) return;
 
     currentIndex++;
 
     // If we've scrolled past the original items, reset to start
     if (currentIndex >= chips.length) {
-      // Scroll to the cloned first item smoothly
+      isResetting = true;
       scrollToIndex(currentIndex, true);
 
-      // After animation completes, snap back to real first item instantly
+      // After smooth animation, snap back instantly
       setTimeout(() => {
         currentIndex = 0;
         scrollToIndex(0, false);
-      }, 600);
+        setTimeout(() => {
+          isResetting = false;
+        }, 50);
+      }, 500);
     } else {
       scrollToIndex(currentIndex, true);
     }
@@ -217,7 +227,7 @@ function setupMobileCarousel() {
 
   function startAutoScroll() {
     stopAutoScroll();
-    autoScrollInterval = setInterval(autoScroll, 3000);
+    autoScrollInterval = setInterval(autoScroll, 2500);
   }
 
   function stopAutoScroll() {
@@ -240,14 +250,14 @@ function setupMobileCarousel() {
       const scrollLeft = track.scrollLeft;
       currentIndex = Math.round(scrollLeft / scrollDistance);
 
-      // If we're in the cloned section, adjust
+      // If we're in the cloned section, snap to corresponding real chip
       if (currentIndex >= chips.length) {
         currentIndex = currentIndex % chips.length;
         scrollToIndex(currentIndex, false);
       }
 
       startAutoScroll();
-    }, 2000);
+    }, 1500);
   }
 
   // Event listeners
@@ -268,7 +278,8 @@ function setupMobileCarousel() {
       const targetId = chip.getAttribute('href').substring(1);
       const targetEl = document.getElementById(targetId);
       if (targetEl) {
-        const offset = 100;
+        const categoryNavHeight = document.querySelector('.category-nav')?.offsetHeight || 80;
+        const offset = categoryNavHeight + 20;
         const elementPosition = targetEl.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -280,10 +291,10 @@ function setupMobileCarousel() {
     });
   });
 
-  // Start auto-scroll after a brief delay to ensure everything is loaded
+  // Start auto-scroll after a brief delay
   setTimeout(() => {
     startAutoScroll();
-  }, 500);
+  }, 1000);
 
   // Pause on window blur, resume on focus
   window.addEventListener('blur', stopAutoScroll);
@@ -298,7 +309,6 @@ function setupMobileCarousel() {
     resizeTimeout = setTimeout(() => {
       if (window.innerWidth > 768) {
         stopAutoScroll();
-        // Remove clones
         clonedChips.forEach(clone => {
           if (clone.parentNode) clone.remove();
         });
