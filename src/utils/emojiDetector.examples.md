@@ -8,7 +8,7 @@ El módulo `emojiDetector.js` detecta automáticamente emojis apropiados basados
 - ✅ **Multilenguaje** (Español e Inglés)
 - ✅ **Normalización de texto** (elimina tildes, case-insensitive)
 - ✅ **Coincidencias exactas y parciales**
-- ✅ **Sin emoji forzado** - Si no hay coincidencia, usa emoji por defecto variado
+- ✅ **Sin emoji forzado** - Si no hay coincidencia, NO muestra emoji (cadena vacía)
 - ✅ **Categorías extensas** - Bebidas, comidas, postres, internacionales y más
 
 ## 📝 Ejemplos de Detección
@@ -438,8 +438,8 @@ const categories = getEmojiCategories();
 
 1. **Nombres descriptivos**: Usa nombres claros como "Bebidas Frías" en lugar de "Categoría 1"
 2. **Palabras clave**: Incluye palabras clave relevantes: "Pastas Caseras" mejor que solo "Pastas"
-3. **Fallback automático**: Si no hay coincidencia, el sistema usa emojis variados por defecto
-4. **Sin emojis duplicados**: Cada sección tendrá su propio emoji único
+3. **Sin fallback**: Si no hay coincidencia, NO se muestra emoji - mantén nombres descriptivos para mejores resultados
+4. **Detección inteligente**: El sistema busca coincidencias exactas primero, luego parciales
 
 ## 🔍 Testing
 
@@ -456,6 +456,11 @@ console.log(detectEmoji("Tikka Masala")); // 🍛
 console.log(detectEmoji("Best Sellers")); // ⭐
 console.log(detectEmoji("Loaded Fries")); // 🍟
 console.log(detectEmoji("Bibimbap Coreano")); // 🍜
+
+// Sin coincidencia - retorna cadena vacía
+console.log(detectEmoji("Sección Random")); // '' (cadena vacía)
+console.log(detectEmoji("Categoría 1")); // '' (cadena vacía)
+console.log(detectEmoji("Otros")); // '' (cadena vacía)
 ```
 
 ## ✨ Nuevas Características (Última Actualización)

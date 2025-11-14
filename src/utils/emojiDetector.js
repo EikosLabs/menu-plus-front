@@ -204,22 +204,17 @@ export function detectEmoji(sectionName) {
 }
 
 /**
- * Obtiene emoji para una sección con fallback a emojis por defecto
+ * Obtiene emoji para una sección (solo si hay coincidencia)
  * @param {string} sectionName - Nombre de la sección
- * @param {number} index - Índice de la sección (para emoji por defecto)
- * @returns {string} - Emoji detectado o emoji por defecto basado en índice
+ * @param {number} index - Índice de la sección (no utilizado, mantenido por compatibilidad)
+ * @returns {string} - Emoji detectado o cadena vacía si no hay coincidencia
  */
 export function getEmojiForSection(sectionName, index = 0) {
   // Intentar detectar emoji inteligentemente
   const detectedEmoji = detectEmoji(sectionName);
 
-  if (detectedEmoji) {
-    return detectedEmoji;
-  }
-
-  // Si no se detectó nada, usar emojis por defecto variados
-  const defaultEmojis = ['🍽️', '🍕', '🍔', '🍜', '🍱', '🥘', '🍲', '🥗', '🍛', '🥙'];
-  return defaultEmojis[index % defaultEmojis.length];
+  // Solo retornar emoji si hay coincidencia, sino cadena vacía
+  return detectedEmoji;
 }
 
 /**
