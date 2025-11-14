@@ -55,7 +55,7 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 	];
 
 	return (
-		<div className="absolute top-16 right-0 left-0 z-10 origin-top transform animate-slideDown bg-white px-4 py-4 shadow-xl transition-all duration-300 md:hidden">
+		<div className="absolute top-16 right-0 left-0 z-40 origin-top transform animate-slideDown bg-white px-4 py-4 shadow-xl transition-all duration-300 md:hidden border-neo-black border-l-neo-thick border-r-neo-thick border-b-neo-thick">
 			<div className="flex flex-col space-y-3">
 				<div className="flex items-center border-gray-100 border-b py-3">
 					<div className="mr-3 rounded-full bg-[#004E71] bg-opacity-10 p-2">
