@@ -466,6 +466,11 @@
   -webkit-backdrop-filter: blur(10px);
 }
 .category-nav.stuck {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
 }
 .category-nav-track {

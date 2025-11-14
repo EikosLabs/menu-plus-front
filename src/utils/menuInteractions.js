@@ -76,11 +76,20 @@ function setupActiveCategory() {
 function setupStickyState() {
   const categoryNav = document.querySelector('.category-nav');
   if (!categoryNav) return;
+  const menuSections = document.querySelector('.menu-sections');
+  let initialY = categoryNav.getBoundingClientRect().top + window.pageYOffset;
   const update = () => {
-    const stuck = categoryNav.getBoundingClientRect().top <= 0;
+    const stuck = window.pageYOffset >= initialY;
     categoryNav.classList.toggle('stuck', stuck);
+    if (menuSections) {
+      menuSections.style.marginTop = stuck ? `${categoryNav.offsetHeight}px` : '';
+    }
   };
   window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', () => {
+    initialY = categoryNav.getBoundingClientRect().top + window.pageYOffset;
+    update();
+  });
   update();
 }
 
