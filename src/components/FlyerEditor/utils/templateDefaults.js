@@ -16,6 +16,12 @@ export const PAPER_SIZES = {
     pxWidth: 816,
     pxHeight: 1056,
   },
+  STORY: {
+    width: 90, // mm approx for 1080px at ~300DPI equivalent preview
+    height: 160, // mm approx for 1920px
+    pxWidth: 1080,
+    pxHeight: 1920,
+  },
 };
 
 export const TEMPLATES = {

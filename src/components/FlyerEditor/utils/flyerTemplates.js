@@ -48,12 +48,12 @@ export const CARTA_TEMPLATES = {
     name: 'Minimalista',
     description: 'Limpio y espacioso',
     icon: '⚪',
-    itemsPerRow: 1,
+    itemsPerRow: 2,
     showImages: false,
     imageSize: null,
-    headerHeight: '140px',
-    footerHeight: '60px',
-    itemSpacing: 'generous',
+    headerHeight: '120px',
+    footerHeight: '50px',
+    itemSpacing: 'compact',
   },
 };
 
@@ -121,6 +121,21 @@ export const FOLLETO_TEMPLATES = {
     footerHeight: '40px',
     style: 'simple',
   },
+
+  story: {
+    id: 'story',
+    name: 'Historia IG',
+    description: 'Formato vertical 9:16 para redes',
+    icon: '📱',
+    format: 'story-vertical',
+    itemsPerRow: 1,
+    showImages: true,
+    imageSize: 'large',
+    maxItems: 5,
+    headerHeight: '100px',
+    footerHeight: '50px',
+    style: 'featured',
+  },
 };
 
 /**
@@ -142,6 +157,11 @@ export const FOLLETO_FORMATS = {
     name: 'Cuarto de Página',
     width: 'A6', // 105 x 148 mm
     description: 'Volante para repartir',
+  },
+  'story-vertical': {
+    name: 'Historia IG',
+    width: 'STORY',
+    description: 'Formato vertical 9:16 (1080x1920)',
   },
 };
 

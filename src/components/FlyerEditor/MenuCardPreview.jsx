@@ -114,7 +114,7 @@ const MenuCardPreview = forwardRef(({
       {/* Items Grid */}
       <div
         style={{
-          padding: '20px',
+          padding: template.itemSpacing === 'compact' ? '16px' : '20px',
           height: `calc(100% - ${template.headerHeight} - ${template.footerHeight})`,
           overflow: 'hidden',
         }}
@@ -123,7 +123,7 @@ const MenuCardPreview = forwardRef(({
           style={{
             display: 'grid',
             gridTemplateColumns: template.itemsPerRow === 1 ? '1fr' : '1fr 1fr',
-            gap: template.itemSpacing === 'compact' ? '12px' : template.itemSpacing === 'generous' ? '24px' : '16px',
+            gap: template.itemSpacing === 'compact' ? '10px' : template.itemSpacing === 'generous' ? '24px' : '16px',
             height: '100%',
           }}
         >
@@ -131,12 +131,12 @@ const MenuCardPreview = forwardRef(({
             <div
               key={item.id}
               style={{
-                border: `2px solid ${colors.text}`,
+                border: template.itemSpacing === 'compact' ? `1px solid ${colors.text}` : `2px solid ${colors.text}`,
                 borderRadius: '8px',
-                padding: template.itemSpacing === 'compact' ? '10px' : '12px',
+                padding: template.itemSpacing === 'compact' ? '8px' : '12px',
                 backgroundColor: '#ffffff',
                 display: 'flex',
-                gap: '12px',
+                gap: template.itemSpacing === 'compact' ? '10px' : '12px',
                 alignItems: template.showImages ? 'flex-start' : 'center',
               }}
             >
@@ -145,22 +145,22 @@ const MenuCardPreview = forwardRef(({
                   src={item.imageUri}
                   alt={item.name}
                   style={{
-                    width: template.imageSize === 'large' ? '120px' : template.imageSize === 'medium' ? '80px' : '60px',
-                    height: template.imageSize === 'large' ? '120px' : template.imageSize === 'medium' ? '80px' : '60px',
+                    width: template.imageSize === 'large' ? '100px' : template.imageSize === 'medium' ? '80px' : '60px',
+                    height: template.imageSize === 'large' ? '100px' : template.imageSize === 'medium' ? '80px' : '60px',
                     objectFit: 'cover',
                     borderRadius: '6px',
-                    border: `2px solid ${colors.text}`,
+                    border: template.itemSpacing === 'compact' ? `1px solid ${colors.text}` : `2px solid ${colors.text}`,
                     flexShrink: 0,
                   }}
                   crossOrigin="anonymous"
                 />
               )}
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: template.itemSpacing === 'compact' ? '4px' : '6px' }}>
                   <h3
                     style={{
-                      fontSize: template.itemsPerRow === 1 ? '18px' : '16px',
+                      fontSize: template.itemsPerRow === 1 ? (template.itemSpacing === 'compact' ? '16px' : '18px') : (template.itemSpacing === 'compact' ? '14px' : '16px'),
                       fontWeight: 'bold',
                       color: colors.text,
                       margin: 0,
@@ -171,7 +171,7 @@ const MenuCardPreview = forwardRef(({
                   </h3>
                   <span
                     style={{
-                      fontSize: template.itemsPerRow === 1 ? '20px' : '18px',
+                      fontSize: template.itemsPerRow === 1 ? (template.itemSpacing === 'compact' ? '18px' : '20px') : (template.itemSpacing === 'compact' ? '16px' : '18px'),
                       fontWeight: 'bold',
                       color: colors.primary,
                       marginLeft: '8px',
@@ -185,7 +185,7 @@ const MenuCardPreview = forwardRef(({
                 {template.showImages && item.description && (
                   <p
                     style={{
-                      fontSize: template.itemsPerRow === 1 ? '13px' : '12px',
+                      fontSize: template.itemsPerRow === 1 ? (template.itemSpacing === 'compact' ? '12px' : '13px') : (template.itemSpacing === 'compact' ? '11px' : '12px'),
                       color: colors.textLight,
                       margin: 0,
                       lineHeight: 1.4,

@@ -25,6 +25,8 @@ const PromotionalFlyerPreview = forwardRef(({
         return { width: '595px', height: '281px' }; // ~1/3 of A4
       case 'quarter-page':
         return { width: '420px', height: '297px' }; // A6 landscape
+      case 'story-vertical':
+        return { width: '360px', height: '640px' }; // scaled preview for 9:16
       default:
         return { width: '595px', height: '421px' };
     }

@@ -10,6 +10,12 @@ export function initializeInteractiveElements() {
 
 function setupCategoryNavigation() {
   const categoryNav = document.querySelector('.category-nav');
+  if (categoryNav) {
+    document.documentElement.style.setProperty('--category-nav-height', `${categoryNav.offsetHeight}px`);
+    window.addEventListener('resize', () => {
+      document.documentElement.style.setProperty('--category-nav-height', `${categoryNav.offsetHeight}px`);
+    });
+  }
 
   document.querySelectorAll('.category-chip').forEach(link => {
     link.addEventListener('click', function(e) {
