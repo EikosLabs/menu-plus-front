@@ -1,12 +1,18 @@
-/* Minimalist Template - Limpio y minimalista */
+/* Minimalist Template - Limpio y minimalista para cafés, delis y negocios wellness */
+/* Paleta: Warm Neutrals - Buff, Desert Sand, Dun, Cambridge Blue, Dark Purple */
 :root[data-template="minimalist"] {
-  --template-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  --template-secondary: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-  --template-accent: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
-  --template-bg: #ffffff;
-  --template-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --template-border: 1px solid #ecf0f1;
-  --template-border-radius: 8px;
+  --template-primary: linear-gradient(135deg, #86a397 0%, #361d2e 100%);
+  --template-secondary: linear-gradient(135deg, #e1b07e 0%, #e5be9e 100%);
+  --template-accent: linear-gradient(135deg, #cbc0ad 0%, #86a397 100%);
+  --template-bg: #fdfcfa;
+  --template-card-shadow: 0 3px 12px rgba(54, 29, 46, 0.08);
+  --template-border: 1px solid #cbc0ad;
+  --template-border-radius: 10px;
+  --minimalist-buff: #e1b07e;
+  --minimalist-desert-sand: #e5be9e;
+  --minimalist-dun: #cbc0ad;
+  --minimalist-cambridge-blue: #86a397;
+  --minimalist-dark-purple: #361d2e;
 }
 
 [data-template="minimalist"] .menu-page {
@@ -21,45 +27,57 @@
   background: var(--template-primary);
 }
 
+[data-template="minimalist"] .hero-title-main {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 [data-template="minimalist"] .category-nav {
   background: white;
-  border-bottom: var(--template-border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid var(--minimalist-dun);
+  box-shadow: 0 1px 4px rgba(54, 29, 46, 0.06);
 }
 
 [data-template="minimalist"] .category-chip {
   background: white;
-  border: var(--template-border);
-  border-radius: 6px;
-  color: #2c3e50;
+  border: 1px solid var(--minimalist-cambridge-blue);
+  border-radius: 8px;
+  color: var(--minimalist-dark-purple);
   box-shadow: none;
-  font-weight: 500;
+  font-weight: 600;
+  transition: all 0.25s ease;
 }
 
 [data-template="minimalist"] .category-chip:hover,
 [data-template="minimalist"] .category-chip.active {
-  background: #2c3e50;
+  background: var(--minimalist-cambridge-blue);
   color: white;
-  border-color: #2c3e50;
-  transform: none;
-  box-shadow: none;
+  border-color: var(--minimalist-cambridge-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(134, 163, 151, 0.25);
 }
 
 [data-template="minimalist"] .section-icon {
   background: white;
-  border: 2px solid #2c3e50;
-  border-radius: 8px;
+  border: 2px solid var(--minimalist-cambridge-blue);
+  border-radius: 10px;
   box-shadow: none;
-  color: #2c3e50;
+  color: var(--minimalist-cambridge-blue);
+  font-weight: 600;
 }
 
 [data-template="minimalist"] .section-header {
-  border-bottom: 2px solid #ecf0f1;
+  border-bottom: 2px solid var(--minimalist-dun);
 }
 
 [data-template="minimalist"] .section-title {
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--minimalist-dark-purple);
+  letter-spacing: 0.01em;
+}
+
+[data-template="minimalist"] .section-description {
+  color: var(--minimalist-cambridge-blue);
 }
 
 [data-template="minimalist"] .menu-item {
@@ -67,47 +85,122 @@
   border: var(--template-border);
   border-radius: var(--template-border-radius);
   box-shadow: var(--template-card-shadow);
+  transition: all 0.25s ease;
 }
 
 [data-template="minimalist"] .menu-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-[data-template="minimalist"] .item-price-wrapper {
-  background: #2c3e50;
-  border: none;
-  border-radius: 6px;
-  box-shadow: none;
-}
-
-[data-template="minimalist"] .item-image-overlay {
-  background: rgba(44, 62, 80, 0.85);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(54, 29, 46, 0.12);
+  border-color: var(--minimalist-cambridge-blue);
 }
 
 [data-template="minimalist"] .item-name {
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 700;
+  color: var(--minimalist-dark-purple);
+}
+
+[data-template="minimalist"] .item-description {
+  color: var(--minimalist-cambridge-blue);
+  opacity: 0.9;
+}
+
+[data-template="minimalist"] .item-price-wrapper {
+  background: var(--minimalist-cambridge-blue);
+  border: none;
+  border-radius: 8px;
+  box-shadow: none;
+  color: white;
+  font-weight: 700;
+}
+
+[data-template="minimalist"] .item-image-overlay {
+  background: linear-gradient(135deg, rgba(54, 29, 46, 0.88) 0%, rgba(134, 163, 151, 0.88) 100%);
+}
+
+[data-template="minimalist"] .item-image-placeholder {
+  background: var(--template-secondary);
+  border-bottom: 1px solid var(--minimalist-dun);
 }
 
 [data-template="minimalist"] .btn--primary {
-  background: #2c3e50;
-  border: 2px solid #2c3e50;
+  background: var(--minimalist-cambridge-blue);
+  border: 2px solid var(--minimalist-cambridge-blue);
   box-shadow: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+[data-template="minimalist"] .btn--primary:hover {
+  background: var(--minimalist-dark-purple);
+  border-color: var(--minimalist-dark-purple);
+  box-shadow: 0 4px 12px rgba(54, 29, 46, 0.2);
 }
 
 [data-template="minimalist"] .btn--secondary {
   background: white;
-  border: 2px solid #2c3e50;
-  color: #2c3e50;
+  border: 2px solid var(--minimalist-cambridge-blue);
+  color: var(--minimalist-cambridge-blue);
   box-shadow: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+[data-template="minimalist"] .btn--secondary:hover {
+  background: var(--minimalist-dun);
+  border-color: var(--minimalist-dark-purple);
+  color: var(--minimalist-dark-purple);
 }
 
 [data-template="minimalist"] .loading-card,
 [data-template="minimalist"] .error-card {
   border: var(--template-border);
   box-shadow: var(--template-card-shadow);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: white;
+}
+
+[data-template="minimalist"] .loading-title,
+[data-template="minimalist"] .error-title {
+  color: var(--minimalist-dark-purple);
+}
+
+[data-template="minimalist"] .empty-state {
+  background: white;
+  border: 1px solid var(--minimalist-dun);
+}
+
+[data-template="minimalist"] .empty-title {
+  color: var(--minimalist-dark-purple);
+}
+
+[data-template="minimalist"] .empty-text {
+  color: var(--minimalist-cambridge-blue);
+}
+
+[data-template="minimalist"] .menu-footer {
+  background: var(--minimalist-dark-purple);
+  border-top: 2px solid var(--minimalist-cambridge-blue);
+  color: var(--minimalist-dun);
+}
+
+[data-template="minimalist"] .footer-link {
+  color: var(--minimalist-cambridge-blue);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+[data-template="minimalist"] .footer-link:hover {
+  color: var(--minimalist-buff);
+}
+
+[data-template="minimalist"] .footer-logo {
+  font-weight: 700;
+}
+
+[data-template="minimalist"] .footer-logo span {
+  color: var(--minimalist-cambridge-blue);
 }

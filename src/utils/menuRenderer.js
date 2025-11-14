@@ -137,7 +137,7 @@ export function renderMenu(menu, business, itemsBySection) {
       <div class="footer-content">
         <div class="footer-logo">Menu<span>Plus</span></div>
         <p class="footer-text">
-          Powered by <a href="https://menu-plus.app" target="_blank" rel="noopener noreferrer" class="footer-link">MenuPlus</a>
+          Powered by <a href="https://menusesqr.com" target="_blank" rel="noopener noreferrer" class="footer-link">MenuPlus</a>
         </p>
         <p class="footer-tagline">Digital menus made beautiful ✨</p>
       </div>
