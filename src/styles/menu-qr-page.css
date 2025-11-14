@@ -465,6 +465,9 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+.category-nav.stuck {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
 .category-nav-track {
   display: flex;
   gap: 1rem;
@@ -499,6 +502,15 @@
   color: white;
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0 #000;
+}
+
+@supports not (position: sticky) {
+  .category-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
 }
 .category-emoji { font-size: 1.25rem; }
 

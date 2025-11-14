@@ -77,6 +77,9 @@ export function renderMenu(menu, business, itemsBySection) {
     `;
   }
 
+  // Business Information
+  html += renderBusinessInfo(business);
+
   // Category Nav
   if (menu.sections && menu.sections.length > 0) {
     html += '<nav class="category-nav"><div class="category-nav-track">';
@@ -128,8 +131,6 @@ export function renderMenu(menu, business, itemsBySection) {
 
   html += '</div>';
 
-  // Business Information
-  html += renderBusinessInfo(business);
 
   // Footer
   html += `

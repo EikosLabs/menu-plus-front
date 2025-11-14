@@ -6,6 +6,7 @@ export function initializeInteractiveElements() {
   setupActiveCategory();
   setupDishModal();
   setupMobileCarousel();
+  setupStickyState();
 }
 
 function setupCategoryNavigation() {
@@ -70,6 +71,17 @@ function setupActiveCategory() {
       }
     });
   });
+}
+
+function setupStickyState() {
+  const categoryNav = document.querySelector('.category-nav');
+  if (!categoryNav) return;
+  const update = () => {
+    const stuck = categoryNav.getBoundingClientRect().top <= 0;
+    categoryNav.classList.toggle('stuck', stuck);
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  update();
 }
 
 function setupDishModal() {
