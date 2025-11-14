@@ -98,12 +98,13 @@ export function renderMenu(menu, business, itemsBySection) {
     `;
   }
   navHtml += '</div>';
-  const categoryNav = document.createElement('nav');
-  categoryNav.className = 'category-nav';
-  categoryNav.innerHTML = navHtml;
   // Remover cualquier nav existente para evitar duplicados
   const existingNav = document.querySelector('.category-nav');
   if (existingNav) existingNav.remove();
+  
+  const categoryNav = document.createElement('nav');
+  categoryNav.className = 'category-nav';
+  categoryNav.innerHTML = navHtml;
   document.body.appendChild(categoryNav);
 }
 
