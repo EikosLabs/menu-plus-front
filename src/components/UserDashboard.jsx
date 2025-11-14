@@ -94,7 +94,7 @@ export default function UserDashboard() {
 				/>
 			)}
 
-			<main className="container mx-auto flex-grow px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8 relative z-10">
+			<main className="container mx-auto flex-grow px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8 relative z-0">
 				<DashboardHeader activeSection={activeSection} />
 				<ErrorAlert error={error} onClose={() => setError(null)} />
 
@@ -124,7 +124,7 @@ export default function UserDashboard() {
 				</Suspense>
 			</main>
 
-			<footer className="mt-auto bg-neo-black text-white border-t-neo-thick border-neo-flame py-6 relative z-10">
+			<footer className="mt-auto bg-neo-black text-white border-t-neo-thick border-neo-flame py-6 relative z-0">
 				<div className="container mx-auto px-4 text-center">
 					<p className="neo-text text-white/80">© {new Date().getFullYear()} Menu Plus. Todos los derechos reservados.</p>
 				</div>

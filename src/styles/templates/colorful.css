@@ -1,12 +1,18 @@
-/* Colorful Template - Vibrante para negocios juveniles */
+/* Colorful Template - Explosivo y divertido para food trucks, heladerías y negocios juveniles */
+/* Paleta: Warm Sunset - Sage, Rosy Brown, Atomic Tangerine, Folly, Russian Violet */
 :root[data-template="colorful"] {
-  --template-primary: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  --template-secondary: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-  --template-accent: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-  --template-bg: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  --template-card-shadow: 8px 8px 0 rgba(0, 0, 0, 0.1);
-  --template-border: 4px solid #000;
+  --template-primary: linear-gradient(135deg, #ff3864 0%, #f39c6b 100%);
+  --template-secondary: linear-gradient(135deg, #cc978e 0%, #c0bda5 100%);
+  --template-accent: linear-gradient(135deg, #261447 0%, #ff3864 100%);
+  --template-bg: linear-gradient(135deg, #fff9f5 0%, #fef5ef 100%);
+  --template-card-shadow: 8px 8px 0 #261447;
+  --template-border: 4px solid #261447;
   --template-border-radius: 30px;
+  --colorful-sage: #c0bda5;
+  --colorful-rosy-brown: #cc978e;
+  --colorful-atomic-tangerine: #f39c6b;
+  --colorful-folly: #ff3864;
+  --colorful-russian-violet: #261447;
 }
 
 [data-template="colorful"] .menu-page {
@@ -15,51 +21,63 @@
 
 [data-template="colorful"] .hero-gradient {
   background: var(--template-primary);
+  border-bottom: 5px solid var(--colorful-russian-violet);
 }
 
 [data-template="colorful"] .hero-pattern {
   background-image:
-    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.25) 35px, rgba(255,255,255,.25) 70px);
+}
+
+[data-template="colorful"] .hero-title-main {
+  text-shadow: 5px 5px 0 var(--colorful-russian-violet);
+  font-weight: 900;
 }
 
 [data-template="colorful"] .category-nav {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  border-bottom: 4px solid #000;
+  background: var(--template-primary);
+  border-bottom: 5px solid var(--colorful-russian-violet);
+  box-shadow: 0 6px 0 var(--colorful-russian-violet);
 }
 
 [data-template="colorful"] .category-chip {
   background: white;
   border: var(--template-border);
   border-radius: 50px;
-  color: #1a1a1a;
+  color: var(--colorful-russian-violet);
   font-weight: 900;
-  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 5px 5px 0 var(--colorful-russian-violet);
+  transition: all 0.2s ease;
 }
 
 [data-template="colorful"] .category-chip:hover,
 [data-template="colorful"] .category-chip.active {
-  background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  background: var(--template-accent);
   color: white;
-  transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+  transform: translate(-4px, -4px);
+  box-shadow: 9px 9px 0 var(--colorful-russian-violet);
 }
 
 [data-template="colorful"] .section-icon {
   background: var(--template-secondary);
   border: var(--template-border);
   border-radius: 25px;
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 6px 6px 0 var(--colorful-russian-violet);
+  color: var(--colorful-russian-violet);
+  font-weight: 900;
 }
 
 [data-template="colorful"] .section-header {
-  border-bottom: 5px solid #000;
+  border-bottom: 5px solid var(--colorful-russian-violet);
 }
 
 [data-template="colorful"] .section-title {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  background: var(--template-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 [data-template="colorful"] .menu-item {
@@ -67,48 +85,107 @@
   border: var(--template-border);
   border-radius: var(--template-border-radius);
   box-shadow: var(--template-card-shadow);
+  transition: all 0.2s ease;
 }
 
 [data-template="colorful"] .menu-item:nth-child(odd) {
-  border-color: #fa709a;
+  border-color: var(--colorful-folly);
 }
 
 [data-template="colorful"] .menu-item:nth-child(even) {
-  border-color: #30cfd0;
+  border-color: var(--colorful-atomic-tangerine);
+}
+
+[data-template="colorful"] .menu-item:nth-child(3n) {
+  border-color: var(--colorful-rosy-brown);
 }
 
 [data-template="colorful"] .menu-item:hover {
-  transform: translate(-4px, -4px) scale(1.02);
-  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.15);
+  transform: translate(-5px, -5px) scale(1.02);
+  box-shadow: 13px 13px 0 var(--colorful-russian-violet);
+}
+
+[data-template="colorful"] .item-name {
+  color: var(--colorful-russian-violet);
+  font-weight: 900;
+}
+
+[data-template="colorful"] .item-description {
+  color: var(--colorful-rosy-brown);
 }
 
 [data-template="colorful"] .item-price-wrapper {
   background: var(--template-primary);
-  border: 3px solid #000;
+  border: 3px solid var(--colorful-russian-violet);
   border-radius: 50px;
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 4px 4px 0 var(--colorful-russian-violet);
+  color: white;
+  font-weight: 900;
 }
 
 [data-template="colorful"] .item-image-overlay {
-  background: linear-gradient(135deg, rgba(250, 112, 154, 0.9) 0%, rgba(254, 225, 64, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(255, 56, 100, 0.92) 0%, rgba(243, 156, 107, 0.92) 100%);
+}
+
+[data-template="colorful"] .item-image-placeholder {
+  background: var(--template-secondary);
+  border-bottom: var(--template-border);
 }
 
 [data-template="colorful"] .btn--primary {
   background: var(--template-primary);
   border: var(--template-border);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 6px 6px 0 var(--colorful-russian-violet);
+  color: white;
+  font-weight: 900;
+  transition: all 0.2s ease;
+}
+
+[data-template="colorful"] .btn--primary:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 var(--colorful-russian-violet);
 }
 
 [data-template="colorful"] .btn--secondary {
   background: var(--template-secondary);
   border: var(--template-border);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
-  color: white;
+  box-shadow: 6px 6px 0 var(--colorful-russian-violet);
+  color: var(--colorful-russian-violet);
+  font-weight: 800;
 }
 
 [data-template="colorful"] .allergen-badge {
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-  border: 2px solid #000;
-  color: #1a1a1a;
-  font-weight: 800;
+  background: var(--colorful-sage);
+  border: 3px solid var(--colorful-russian-violet);
+  color: var(--colorful-russian-violet);
+  font-weight: 900;
+  box-shadow: 3px 3px 0 var(--colorful-russian-violet);
+}
+
+[data-template="colorful"] .menu-footer {
+  background: var(--colorful-russian-violet);
+  border-top: 5px solid var(--colorful-folly);
+  color: white;
+}
+
+[data-template="colorful"] .footer-link {
+  color: var(--colorful-atomic-tangerine);
+  font-weight: 900;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  text-shadow: 3px 3px 0 rgba(38, 20, 71, 0.7);
+}
+
+[data-template="colorful"] .footer-link:hover {
+  color: var(--colorful-folly);
+  text-shadow: 4px 4px 0 rgba(38, 20, 71, 0.9);
+  transform: translate(-2px, -2px);
+}
+
+[data-template="colorful"] .footer-logo {
+  font-weight: 900;
+}
+
+[data-template="colorful"] .footer-logo span {
+  color: var(--colorful-folly);
 }

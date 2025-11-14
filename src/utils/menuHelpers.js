@@ -1,49 +1,23 @@
 import { sanitizeHtml, sanitizeUrl } from './security.js';
 import { getCurrencySymbol } from './currencies.js';
+import { getEmojiForSection } from './emojiDetector.js';
 
-export function getEmojiForSection(sectionName, index) {
-  const name = sectionName.toLowerCase();
-  const emojiMap = {
-    'appetizers': '🥗', 'starters': '🥗', 'entradas': '🥗',
-    'main': '🍽️', 'mains': '🍽️', 'entrees': '🍽️', 'platos': '🍽️',
-    'desserts': '🍰', 'postres': '🍰', 'sweets': '🍰',
-    'drinks': '🍹', 'beverages': '🍹', 'bebidas': '🍹',
-    'salads': '🥗', 'ensaladas': '🥗',
-    'pasta': '🍝', 'pastas': '🍝',
-    'pizza': '🍕', 'pizzas': '🍕',
-    'burgers': '🍔', 'hamburguesas': '🍔',
-    'seafood': '🦞', 'mariscos': '🦞',
-    'meat': '🥩', 'carnes': '🥩',
-    'chicken': '🍗', 'pollo': '🍗',
-    'vegetarian': '🥬', 'vegetariano': '🥬',
-    'vegan': '🌱', 'vegano': '🌱',
-    'breakfast': '🍳', 'desayuno': '🍳',
-    'lunch': '🍱', 'almuerzo': '🍱',
-    'dinner': '🌙', 'cena': '🌙',
-    'specials': '⭐', 'especialidades': '⭐',
-    'sides': '🍟', 'acompañamientos': '🍟',
-    'soups': '🍲', 'sopas': '🍲',
-    'sushi': '🍣', 'japanese': '🍣',
-    'coffee': '☕', 'café': '☕',
-    'wine': '🍷', 'vino': '🍷',
-    'beer': '🍺', 'cerveza': '🍺',
-    'cocktails': '🍸', 'cócteles': '🍸'
-  };
-
-  for (const [key, emoji] of Object.entries(emojiMap)) {
-    if (name.includes(key)) return emoji;
-  }
-
-  const defaultEmojis = ['🍽️', '🍕', '🍔', '🍜', '🍱', '🥘', '🍲', '🥗', '🍛'];
-  return defaultEmojis[index % defaultEmojis.length];
-}
+// Re-export for backwards compatibility
+export { getEmojiForSection } from './emojiDetector.js';
 
 function getImageUrl(item) {
   return item.imageUrl || item.imageUri || '';
 }
 
 function getCurrencyType(item, business) {
-  return item.currencyType !== undefined ? item.currencyType : business.defaultCurrency;
+  // Prioridad: item.currencyType > business?.defaultCurrency > 0 (USD)
+  if (item.currencyType !== undefined && item.currencyType !== null) {
+    return item.currencyType;
+  }
+  if (business && business.defaultCurrency !== undefined && business.defaultCurrency !== null) {
+    return business.defaultCurrency;
+  }
+  return 0; // USD por defecto
 }
 
 export function renderSection(section, items, index, business) {
@@ -51,6 +25,8 @@ export function renderSection(section, items, index, business) {
   const itemsHtml = items.map((item, idx) => {
     const imageUrl = getImageUrl(item);
     const currencyType = getCurrencyType(item, business);
+    const currencySymbol = getCurrencySymbol(currencyType);
+
     const itemData = {
       id: item.id,
       name: item.name,
@@ -71,7 +47,7 @@ export function renderSection(section, items, index, business) {
         <div class="item-content">
           <div class="item-header">
             <h3 class="item-name">${sanitizeHtml(item.name)}</h3>
-            <div class="item-price-wrapper"><span class="item-price">${getCurrencySymbol(currencyType)}${item.price.toFixed(2)}</span></div>
+            <div class="item-price-wrapper"><span class="item-price">${currencySymbol}${item.price.toFixed(2)}</span></div>
           </div>
           ${item.description ? `<p class="item-description">${sanitizeHtml(item.description)}</p>` : ''}
           ${item.allergens?.length ? `<div class="item-allergens">${item.allergens.map(a => `<span class="allergen-badge">${sanitizeHtml(a)}</span>`).join('')}</div>` : ''}

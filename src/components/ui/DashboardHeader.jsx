@@ -19,7 +19,7 @@ const DashboardHeader = ({ activeSection }) => {
     };
 
 	return (
-		<div className="mb-4 sm:mb-6 neo-card-3d p-4 sm:p-6 mt-2">
+		<div className="mb-4 sm:mb-6 neo-card-3d p-4 sm:p-6 mt-4 sm:mt-6">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
 				<div>
                     <div className="mb-2 flex items-center">

@@ -8,6 +8,7 @@ import { ERROR_TYPES } from "../utils/errorTypes";
 import { errorLogger } from "../utils/errorLogger";
 import { validateRequired, validateEmail, validateUrl, validatePhone, validateFileType, validateFileSize } from "../utils/validation";
 import { getAllCurrencies } from "../utils/currencies";
+import CircularColorPicker from "./ui/CircularColorPicker";
 
 export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBusiness = null, isEditing = false }) {
 	const { t } = useTranslation();
@@ -702,85 +703,58 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 							d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
 						/>
 					</svg>
-					Paleta de Colores
+					🎨 Paleta de Colores
 				</h3>
 
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-					<div>
-						<label
-							htmlFor="primaryColor"
-							className="mb-1 block flex items-center font-medium text-[#0A3342] text-sm"
-						>
-							Color Primario
-						</label>
-						<div className="flex items-center space-x-2">
-							<input
-								type="color"
-								id="primaryColor"
-								name="primaryColor"
-								value={formData.primaryColor}
-								onChange={handleChange}
-								className="h-10 w-20 cursor-pointer rounded border border-slate-300"
-							/>
-							<input
-								type="text"
-								value={formData.primaryColor}
-								onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
-								className="flex-1 neo-input text-sm"
-								placeholder="#1a1a1a"
-							/>
+				<div className="mb-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+					<div className="flex items-start gap-2">
+						<svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						<div>
+							<p className="font-semibold text-blue-900 text-sm mb-1">💡 Selector de Colores con Teoría del Color</p>
+							<p className="text-blue-700 text-xs">
+								Usa las paletas armónicas (complementarios, análogos, triádicos) para crear combinaciones profesionales que se vean bien juntas.
+							</p>
 						</div>
 					</div>
+				</div>
 
-					<div>
-						<label
-							htmlFor="secondaryColor"
-							className="mb-1 block flex items-center font-medium text-[#0A3342] text-sm"
-						>
-							Color Secundario
-						</label>
-						<div className="flex items-center space-x-2">
-							<input
-								type="color"
-								id="secondaryColor"
-								name="secondaryColor"
-								value={formData.secondaryColor}
-								onChange={handleChange}
-								className="h-10 w-20 cursor-pointer rounded border border-slate-300"
-							/>
-							<input
-								type="text"
-								value={formData.secondaryColor}
-								onChange={(e) => setFormData(prev => ({ ...prev, secondaryColor: e.target.value }))}
-								className="flex-1 neo-input text-sm"
-								placeholder="#004E71"
-							/>
+				<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+					<CircularColorPicker
+						label="🎯 Color Primario"
+						name="primaryColor"
+						value={formData.primaryColor}
+						onChange={handleChange}
+					/>
+
+					<CircularColorPicker
+						label="🌟 Color Secundario"
+						name="secondaryColor"
+						value={formData.secondaryColor}
+						onChange={handleChange}
+					/>
+
+					<CircularColorPicker
+						label="✨ Color de Acento"
+						name="accentColor"
+						value={formData.accentColor}
+						onChange={handleChange}
+					/>
+				</div>
+
+				{/* Vista previa de la paleta */}
+				<div className="mt-6 p-4 bg-slate-50 rounded-lg border-2 border-slate-200">
+					<p className="text-sm font-semibold text-slate-700 mb-3">👁️ Vista Previa de Paleta</p>
+					<div className="flex gap-2">
+						<div className="flex-1 h-24 rounded-lg neo-shadow-md border-2 border-slate-300 flex items-center justify-center" style={{ backgroundColor: formData.primaryColor }}>
+							<span className="text-white font-bold text-xs bg-black bg-opacity-50 px-2 py-1 rounded">Primario</span>
 						</div>
-					</div>
-
-					<div>
-						<label
-							htmlFor="accentColor"
-							className="mb-1 block flex items-center font-medium text-[#0A3342] text-sm"
-						>
-							Color de Acento
-						</label>
-						<div className="flex items-center space-x-2">
-							<input
-								type="color"
-								id="accentColor"
-								name="accentColor"
-								value={formData.accentColor}
-								onChange={handleChange}
-								className="h-10 w-20 cursor-pointer rounded border border-slate-300"
-							/>
-							<input
-								type="text"
-								value={formData.accentColor}
-								onChange={(e) => setFormData(prev => ({ ...prev, accentColor: e.target.value }))}
-								className="flex-1 neo-input text-sm"
-								placeholder="#0A3342"
-							/>
+						<div className="flex-1 h-24 rounded-lg neo-shadow-md border-2 border-slate-300 flex items-center justify-center" style={{ backgroundColor: formData.secondaryColor }}>
+							<span className="text-white font-bold text-xs bg-black bg-opacity-50 px-2 py-1 rounded">Secundario</span>
+						</div>
+						<div className="flex-1 h-24 rounded-lg neo-shadow-md border-2 border-slate-300 flex items-center justify-center" style={{ backgroundColor: formData.accentColor }}>
+							<span className="text-white font-bold text-xs bg-black bg-opacity-50 px-2 py-1 rounded">Acento</span>
 						</div>
 					</div>
 				</div>
