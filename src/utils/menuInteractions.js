@@ -18,7 +18,7 @@ function setupCategoryNavigation() {
       const targetEl = document.getElementById(targetId);
       if (targetEl) {
         const categoryNavHeight = categoryNav?.offsetHeight || 80;
-        const offset = categoryNavHeight + 20;
+        const offset = categoryNavHeight + 30; // Increased offset for fixed navbar
         const elementPosition = targetEl.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -53,7 +53,7 @@ function setupActiveCategory() {
 
   window.addEventListener('scroll', () => {
     const categoryNavHeight = categoryNav?.offsetHeight || 80;
-    const scrollOffset = categoryNavHeight + 50;
+    const scrollOffset = categoryNavHeight + 60; // Increased offset for fixed navbar
 
     let current = '';
     sections.forEach(section => {
@@ -97,6 +97,10 @@ function setupDishModal() {
     }
   });
 
+  function getScrollbarWidth() {
+    return window.innerWidth - document.documentElement.clientWidth;
+  }
+
   function openDishModal(item) {
     const elements = {
       image: document.getElementById('modal-dish-image'),
@@ -136,8 +140,10 @@ function setupDishModal() {
     }
 
     const showModal = () => {
+      const scrollbarWidth = getScrollbarWidth();
+      document.body.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
+      document.body.classList.add('modal-open');
       modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
     };
 
     document.startViewTransition ? document.startViewTransition(showModal) : showModal();
@@ -154,7 +160,8 @@ function setupDishModal() {
     setTimeout(() => {
       const hideModal = () => {
         modal.style.display = 'none';
-        document.body.style.overflow = '';
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('--scrollbar-width');
       };
       document.startViewTransition ? document.startViewTransition(hideModal) : hideModal();
     }, 300);
@@ -279,7 +286,7 @@ function setupMobileCarousel() {
       const targetEl = document.getElementById(targetId);
       if (targetEl) {
         const categoryNavHeight = document.querySelector('.category-nav')?.offsetHeight || 80;
-        const offset = categoryNavHeight + 20;
+        const offset = categoryNavHeight + 30; // Increased offset for fixed navbar
         const elementPosition = targetEl.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - offset;
 
