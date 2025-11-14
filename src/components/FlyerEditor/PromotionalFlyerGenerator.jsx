@@ -139,7 +139,7 @@ export default function PromotionalFlyerGenerator({
 
     setIsExporting(true);
     try {
-      const paperSize = template.format === 'story-vertical' ? 'STORY' : 'A4';
+kk      const paperSize = template.format === 'story-vertical' ? 'STORY' : 'A4';
       await exportToImage(previewRef.current, {
         fileName: `${folletoName || business?.name || 'menu'}-${template.format === 'story-vertical' ? 'story' : 'folleto'}.png`,
         format: 'png',

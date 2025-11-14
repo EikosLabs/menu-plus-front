@@ -10,72 +10,6 @@ export function initializeInteractiveElements() {
 
 function setupCategoryNavigation() {
   const categoryNav = document.querySelector('.category-nav');
-  if (categoryNav) {
-    document.documentElement.style.setProperty('--category-nav-height', `${categoryNav.offsetHeight}px`);
-    window.addEventListener('resize', () => {
-      document.documentElement.style.setProperty('--category-nav-height', `${categoryNav.offsetHeight}px`);
-    });
-
-    // Crear un elemento sentinel para detectar cuando el nav llega al top
-    const sentinel = document.createElement('div');
-    sentinel.className = 'category-nav-sentinel';
-    sentinel.style.position = 'absolute';
-    sentinel.style.top = '0';
-    sentinel.style.left = '0';
-    sentinel.style.width = '100%';
-    sentinel.style.height = '1px';
-    sentinel.style.pointerEvents = 'none';
-    sentinel.style.visibility = 'hidden';
-    
-    // Insertar el sentinel antes del category-nav
-    categoryNav.parentNode.insertBefore(sentinel, categoryNav);
-
-    // Configurar Intersection Observer
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          const menuPage = document.querySelector('.menu-page');
-          if (!entry.isIntersecting) {
-            // El sentinel ya no es visible, el nav está en el top
-            categoryNav.classList.add('sticky-active');
-            categoryNav.classList.remove('sticky-top');
-            if (menuPage) menuPage.classList.add('nav-sticky');
-          } else {
-            // El sentinel es visible, el nav no está en el top
-            categoryNav.classList.remove('sticky-active', 'sticky-top');
-            if (menuPage) menuPage.classList.remove('nav-sticky');
-          }
-        });
-      },
-      {
-        threshold: 0,
-        rootMargin: '0px 0px -1px 0px'
-      }
-    );
-
-    observer.observe(sentinel);
-
-    // También observar el nav mismo para detectar cuando está en el top
-    const navObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          const menuPage = document.querySelector('.menu-page');
-          if (entry.isIntersecting && entry.intersectionRatio < 1) {
-            // El nav está parcialmente visible en el top
-            categoryNav.classList.add('sticky-top');
-            categoryNav.classList.remove('sticky-active');
-            if (menuPage) menuPage.classList.add('nav-sticky');
-          }
-        });
-      },
-      {
-        threshold: [0, 1],
-        rootMargin: '0px 0px -100% 0px'
-      }
-    );
-
-    navObserver.observe(categoryNav);
-  }
 
   document.querySelectorAll('.category-chip').forEach(link => {
     link.addEventListener('click', function(e) {
@@ -204,40 +138,6 @@ function setupDishModal() {
     const showModal = () => {
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
-
-      const contentEl = modal.querySelector('.dish-modal-content');
-      const menuContent = document.getElementById('menu-content');
-      if (contentEl) {
-        contentEl.setAttribute('role', 'dialog');
-        contentEl.setAttribute('aria-modal', 'true');
-        contentEl.setAttribute('tabindex', '-1');
-        contentEl.focus({ preventScroll: true });
-
-        if (!contentEl.dataset.focusTrap) {
-          const getFocusable = () => Array.from(contentEl.querySelectorAll('a, button, textarea, input, select, [tabindex]:not([tabindex="-1"])'));
-          const handleKeyDown = (e) => {
-            if (e.key !== 'Tab') return;
-            const focusables = getFocusable();
-            if (focusables.length === 0) return;
-            const first = focusables[0];
-            const last = focusables[focusables.length - 1];
-            if (e.shiftKey) {
-              if (document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-              }
-            } else {
-              if (document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-              }
-            }
-          };
-          contentEl.addEventListener('keydown', handleKeyDown);
-          contentEl.dataset.focusTrap = '1';
-        }
-      }
-      menuContent?.setAttribute('aria-hidden', 'true');
     };
 
     document.startViewTransition ? document.startViewTransition(showModal) : showModal();
@@ -255,8 +155,6 @@ function setupDishModal() {
       const hideModal = () => {
         modal.style.display = 'none';
         document.body.style.overflow = '';
-        const menuContent = document.getElementById('menu-content');
-        menuContent?.removeAttribute('aria-hidden');
       };
       document.startViewTransition ? document.startViewTransition(hideModal) : hideModal();
     }, 300);
