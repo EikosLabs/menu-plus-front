@@ -1,11 +1,11 @@
 /* Elegant Template - Sofisticado para restaurantes de alta gama, bistros elegantes y fine dining */
 /* Paleta: Purple Gradient - Russian Violet, Ultra Violet, African Violet, Lilac, Pink Lavender */
 :root[data-template="elegant"] {
-  --template-primary: linear-gradient(135deg, #231942 0%, #5e548e 100%);
-  --template-secondary: linear-gradient(135deg, #9f86c0 0%, #be95c4 100%);
-  --template-accent: linear-gradient(135deg, #e0b1cb 0%, #be95c4 100%);
+  --template-primary: linear-gradient(135deg, var(--brand-primary, #231942) 0%, var(--brand-secondary, #5e548e) 100%);
+  --template-secondary: linear-gradient(135deg, var(--brand-secondary, #9f86c0) 0%, var(--brand-accent, #be95c4) 100%);
+  --template-accent: linear-gradient(135deg, var(--brand-accent, #e0b1cb) 0%, var(--brand-secondary, #be95c4) 100%);
   --template-bg: linear-gradient(135deg, #faf8fc 0%, #f5f2f8 100%);
-  --template-card-shadow: 0 10px 35px rgba(35, 25, 66, 0.15);
+  --template-card-shadow: 0 10px 35px var(--brand-shadow-color, rgba(35, 25, 66, 0.15));
   --template-border: none;
   --template-border-radius: 16px;
   --elegant-russian-violet: #231942;
@@ -30,15 +30,15 @@
 [data-template="elegant"] .category-nav {
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(159, 134, 192, 0.3);
-  box-shadow: 0 2px 25px rgba(35, 25, 66, 0.08);
+  border-bottom: 1px solid var(--brand-secondary, rgba(159, 134, 192, 0.3));
+  box-shadow: 0 2px 25px var(--brand-shadow-color, rgba(35, 25, 66, 0.08));
 }
 
 [data-template="elegant"] .category-chip {
   background: white;
-  border: 2px solid var(--elegant-african-violet);
+  border: 2px solid var(--brand-secondary, var(--elegant-african-violet));
   border-radius: 30px;
-  color: var(--elegant-ultra-violet);
+  color: var(--brand-primary, var(--elegant-ultra-violet));
   box-shadow: none;
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 600;
@@ -47,27 +47,27 @@
 [data-template="elegant"] .category-chip:hover,
 [data-template="elegant"] .category-chip.active {
   background: var(--template-secondary);
-  color: white;
-  border-color: var(--elegant-lilac);
+  color: var(--brand-secondary-contrast, #ffffff);
+  border-color: var(--brand-secondary, var(--elegant-lilac));
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(159, 134, 192, 0.35);
+  box-shadow: 0 6px 20px var(--brand-shadow-color, rgba(159, 134, 192, 0.35));
 }
 
 [data-template="elegant"] .section-icon {
   background: var(--template-secondary);
   border: none;
   border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(159, 134, 192, 0.35);
-  color: white;
+  box-shadow: 0 6px 20px var(--brand-shadow-color, rgba(159, 134, 192, 0.35));
+  color: var(--brand-secondary-contrast, #ffffff);
 }
 
 [data-template="elegant"] .section-header {
-  border-bottom: 2px solid var(--elegant-african-violet);
+  border-bottom: 2px solid var(--brand-secondary, var(--elegant-african-violet));
 }
 
 [data-template="elegant"] .menu-item {
   background: white;
-  border: 1px solid rgba(159, 134, 192, 0.15);
+  border: 1px solid var(--brand-secondary, rgba(159, 134, 192, 0.15));
   border-radius: 16px;
   box-shadow: var(--template-card-shadow);
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -75,16 +75,16 @@
 
 [data-template="elegant"] .menu-item:hover {
   transform: translateY(-10px);
-  box-shadow: 0 15px 45px rgba(35, 25, 66, 0.2);
-  border-color: var(--elegant-lilac);
+  box-shadow: 0 15px 45px var(--brand-shadow-color, rgba(35, 25, 66, 0.2));
+  border-color: var(--brand-secondary, var(--elegant-lilac));
 }
 
 [data-template="elegant"] .item-price-wrapper {
   background: var(--template-secondary);
   border: none;
   border-radius: 30px;
-  box-shadow: 0 4px 15px rgba(159, 134, 192, 0.25);
-  color: white;
+  box-shadow: 0 4px 15px var(--brand-shadow-color, rgba(159, 134, 192, 0.25));
+  color: var(--brand-secondary-contrast, #ffffff);
   font-weight: 700;
 }
 
@@ -94,57 +94,57 @@
 
 [data-template="elegant"] .item-name {
   font-weight: 700;
-  color: var(--elegant-russian-violet);
+  color: var(--brand-primary, var(--elegant-russian-violet));
 }
 
 [data-template="elegant"] .item-description {
-  color: var(--elegant-ultra-violet);
+  color: var(--brand-secondary, var(--elegant-ultra-violet));
   opacity: 0.85;
 }
 
 [data-template="elegant"] .section-title {
-  color: var(--elegant-russian-violet);
+  color: var(--brand-primary, var(--elegant-russian-violet));
 }
 
 [data-template="elegant"] .btn--primary {
   background: var(--template-secondary);
-  border: 2px solid var(--elegant-african-violet);
-  box-shadow: 0 6px 20px rgba(159, 134, 192, 0.35);
-  color: white;
+  border: 2px solid var(--brand-secondary, var(--elegant-african-violet));
+  box-shadow: 0 6px 20px var(--brand-shadow-color, rgba(159, 134, 192, 0.35));
+  color: var(--brand-secondary-contrast, #ffffff);
   font-weight: 700;
   transition: all 0.3s ease;
 }
 
 [data-template="elegant"] .btn--primary:hover {
-  box-shadow: 0 8px 25px rgba(159, 134, 192, 0.45);
+  box-shadow: 0 8px 25px var(--brand-shadow-color, rgba(159, 134, 192, 0.45));
   transform: translateY(-2px);
 }
 
 [data-template="elegant"] .btn--secondary {
   background: white;
-  border: 2px solid var(--elegant-ultra-violet);
-  color: var(--elegant-ultra-violet);
+  border: 2px solid var(--brand-primary, var(--elegant-ultra-violet));
+  color: var(--brand-primary, var(--elegant-ultra-violet));
   font-weight: 600;
 }
 
 [data-template="elegant"] .menu-footer {
-  background: var(--elegant-russian-violet);
-  border-top: 2px solid var(--elegant-african-violet);
-  color: var(--elegant-pink-lavender);
+  background: var(--brand-primary, var(--elegant-russian-violet));
+  border-top: 2px solid var(--brand-secondary, var(--elegant-african-violet));
+  color: var(--brand-primary-contrast, var(--elegant-pink-lavender));
 }
 
 [data-template="elegant"] .footer-link {
-  color: var(--elegant-lilac);
+  color: var(--brand-secondary, var(--elegant-lilac));
   font-weight: 700;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 [data-template="elegant"] .footer-link:hover {
-  color: var(--elegant-pink-lavender);
-  text-shadow: 0 2px 8px rgba(224, 177, 203, 0.4);
+  color: var(--brand-accent, var(--elegant-pink-lavender));
+  text-shadow: 0 2px 8px var(--brand-shadow-color, rgba(224, 177, 203, 0.4));
 }
 
 [data-template="elegant"] .footer-logo span {
-  color: var(--elegant-african-violet);
+  color: var(--brand-secondary, var(--elegant-african-violet));
 }

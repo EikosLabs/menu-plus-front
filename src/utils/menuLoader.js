@@ -22,6 +22,16 @@ function getContrastColor(hex, alphaFactor = 1) {
   } catch { return '#FFFFFF'; }
 }
 
+function hexToRgba(hex, alpha = 1) {
+  try {
+    const clean = hex.replace('#','');
+    const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16);
+    const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16);
+    const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  } catch { return `rgba(0,0,0,${alpha})`; }
+}
+
 function applyTheme(business) {
   const templateMap = {
     '0': 'modern', '1': 'elegant', '2': 'casual', '3': 'minimalist',
@@ -57,6 +67,13 @@ function applyTheme(business) {
       ${customColors.primary ? `--primary-dark: ${customColors.primary};` : ''}
       ${customColors.secondary ? `--secondary-dark: ${customColors.secondary};` : ''}
       ${customColors.accent ? `--accent-gold: ${customColors.accent};` : ''}
+      ${customColors.primary ? `--brand-primary: ${customColors.primary};` : ''}
+      ${customColors.secondary ? `--brand-secondary: ${customColors.secondary};` : ''}
+      ${customColors.accent ? `--brand-accent: ${customColors.accent};` : ''}
+      ${customColors.primary ? `--brand-primary-contrast: ${getContrastColor(customColors.primary)};` : '--brand-primary-contrast: #ffffff;'}
+      ${customColors.secondary ? `--brand-secondary-contrast: ${getContrastColor(customColors.secondary)};` : '--brand-secondary-contrast: #ffffff;'}
+      ${customColors.accent ? `--brand-accent-contrast: ${getContrastColor(customColors.accent)};` : '--brand-accent-contrast: #ffffff;'}
+      ${customColors.primary ? `--brand-shadow-color: ${hexToRgba(customColors.primary, 0.25)};` : '--brand-shadow-color: rgba(0,0,0,0.2);'}
       --font-display: ${fontFamilyValue};
       ${customColors.primary ? `--hero-text-color: ${getContrastColor(customColors.primary)};` : '--hero-text-color: #ffffff;'}
       ${customColors.primary ? `--hero-subtitle-color: ${getContrastColor(customColors.primary, 0.85)};` : '--hero-subtitle-color: rgba(255,255,255,0.95);'}

@@ -179,8 +179,8 @@
 }
 .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #000; }
 .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
-.btn--primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-.btn--secondary { background: white; color: #1a1a1a; }
+.btn--primary { background: linear-gradient(135deg, var(--brand-primary, #667eea) 0%, var(--brand-accent, #764ba2) 100%); color: var(--brand-primary-contrast, #ffffff); }
+.btn--secondary { background: white; color: var(--brand-primary, #1a1a1a); }
 
 /* Hero Section - Enhanced Design */
 .menu-hero {

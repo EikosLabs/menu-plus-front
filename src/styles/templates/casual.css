@@ -1,12 +1,12 @@
 /* Casual Template - Amigable para cafeterías, bakeries y fast casual */
 /* Paleta: Natural Green - Nyanza, Ash Gray, Chinese Violet, Beaver, Battleship Gray */
 :root[data-template="casual"] {
-  --template-primary: linear-gradient(135deg, #a8c686 0%, #86a397 100%);
-  --template-secondary: linear-gradient(135deg, #dceed1 0%, #aac0aa 100%);
-  --template-accent: linear-gradient(135deg, #736372 0%, #a18276 100%);
+  --template-primary: linear-gradient(135deg, var(--brand-primary, #a8c686) 0%, var(--brand-secondary, #86a397) 100%);
+  --template-secondary: linear-gradient(135deg, var(--brand-secondary, #dceed1) 0%, var(--brand-accent, #aac0aa) 100%);
+  --template-accent: linear-gradient(135deg, var(--brand-accent, #736372) 0%, var(--brand-secondary, #a18276) 100%);
   --template-bg: linear-gradient(135deg, #f9fdf7 0%, #f5f9f3 100%);
-  --template-card-shadow: 5px 5px 0 #736372;
-  --template-border: 3px solid #736372;
+  --template-card-shadow: 5px 5px 0 var(--brand-shadow-color, #736372);
+  --template-border: 3px solid var(--brand-accent, #736372);
   --template-border-radius: 25px;
   --casual-nyanza: #dceed1;
   --casual-ash-gray: #aac0aa;
@@ -21,7 +21,7 @@
 
 [data-template="casual"] .hero-gradient {
   background: var(--template-primary);
-  border-bottom: 4px solid var(--casual-chinese-violet);
+  border-bottom: 4px solid var(--brand-accent, var(--casual-chinese-violet));
 }
 
 [data-template="casual"] .hero-title-main {
@@ -32,7 +32,7 @@
 [data-template="casual"] .category-nav {
   background: var(--casual-nyanza);
   border-bottom: var(--template-border);
-  box-shadow: 0 5px 0 var(--casual-chinese-violet);
+  box-shadow: 0 5px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
 }
 
 [data-template="casual"] .category-chip {
@@ -40,35 +40,35 @@
   border: var(--template-border);
   border-radius: 50px;
   font-weight: 800;
-  box-shadow: 4px 4px 0 var(--casual-chinese-violet);
-  color: var(--casual-chinese-violet);
+  box-shadow: 4px 4px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
+  color: var(--brand-accent, var(--casual-chinese-violet));
   transition: all 0.2s ease;
 }
 
 [data-template="casual"] .category-chip:hover,
 [data-template="casual"] .category-chip.active {
   background: var(--template-primary);
-  color: white;
+  color: var(--brand-primary-contrast, #ffffff);
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 var(--casual-chinese-violet);
+  box-shadow: 6px 6px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
 }
 
 [data-template="casual"] .section-icon {
   background: var(--template-secondary);
   border: var(--template-border);
   border-radius: 25px;
-  box-shadow: 5px 5px 0 var(--casual-chinese-violet);
+  box-shadow: 5px 5px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
   transform: rotate(-5deg);
-  color: var(--casual-chinese-violet);
+  color: var(--brand-accent, var(--casual-chinese-violet));
   font-weight: 800;
 }
 
 [data-template="casual"] .section-header {
-  border-bottom: 4px dashed var(--casual-chinese-violet);
+  border-bottom: 4px dashed var(--brand-accent, var(--casual-chinese-violet));
 }
 
 [data-template="casual"] .section-title {
-  color: var(--casual-chinese-violet);
+  color: var(--brand-accent, var(--casual-chinese-violet));
   font-weight: 800;
 }
 
@@ -91,25 +91,26 @@
 }
 
 [data-template="casual"] .item-name {
-  color: var(--casual-chinese-violet);
+  color: var(--brand-accent, var(--casual-chinese-violet));
   font-weight: 800;
 }
 
 [data-template="casual"] .item-description {
-  color: var(--casual-battleship-gray);
+  color: var(--brand-secondary, var(--casual-battleship-gray));
 }
 
 [data-template="casual"] .item-price-wrapper {
   background: var(--template-primary);
   border: var(--template-border);
   border-radius: 50px;
-  box-shadow: 3px 3px 0 var(--casual-chinese-violet);
-  color: white;
+  box-shadow: 3px 3px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
+  color: var(--brand-primary-contrast, #ffffff);
   font-weight: 800;
 }
 
 [data-template="casual"] .item-image-overlay {
-  background: linear-gradient(135deg, rgba(168, 198, 134, 0.9) 0%, rgba(134, 163, 151, 0.9) 100%);
+  background: var(--template-primary);
+  opacity: 0.9;
 }
 
 [data-template="casual"] .item-image-placeholder {
@@ -120,42 +121,42 @@
 [data-template="casual"] .btn--primary {
   background: var(--template-primary);
   border: var(--template-border);
-  box-shadow: 5px 5px 0 var(--casual-chinese-violet);
-  color: white;
+  box-shadow: 5px 5px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
+  color: var(--brand-primary-contrast, #ffffff);
   font-weight: 800;
   transition: all 0.2s ease;
 }
 
 [data-template="casual"] .btn--primary:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 var(--casual-chinese-violet);
+  box-shadow: 7px 7px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
 }
 
 [data-template="casual"] .btn--secondary {
   background: var(--casual-nyanza);
   border: var(--template-border);
-  box-shadow: 5px 5px 0 var(--casual-chinese-violet);
-  color: var(--casual-chinese-violet);
+  box-shadow: 5px 5px 0 var(--brand-shadow-color, var(--casual-chinese-violet));
+  color: var(--brand-accent, var(--casual-chinese-violet));
   font-weight: 800;
 }
 
 [data-template="casual"] .menu-footer {
-  background: var(--casual-chinese-violet);
-  border-top: 4px dashed var(--casual-battleship-gray);
-  color: var(--casual-nyanza);
+  background: var(--brand-accent, var(--casual-chinese-violet));
+  border-top: 4px dashed var(--brand-secondary, var(--casual-battleship-gray));
+  color: var(--brand-primary-contrast, var(--casual-nyanza));
 }
 
 [data-template="casual"] .footer-link {
-  color: var(--casual-ash-gray);
+  color: var(--brand-secondary, var(--casual-ash-gray));
   font-weight: 800;
   text-decoration: none;
   transition: all 0.2s ease;
-  text-shadow: 2px 2px 0 rgba(115, 99, 114, 0.5);
+  text-shadow: 2px 2px 0 var(--brand-shadow-color, rgba(115, 99, 114, 0.5));
 }
 
 [data-template="casual"] .footer-link:hover {
-  color: var(--casual-nyanza);
-  text-shadow: 3px 3px 0 rgba(115, 99, 114, 0.7);
+  color: var(--brand-primary-contrast, var(--casual-nyanza));
+  text-shadow: 3px 3px 0 var(--brand-shadow-color, rgba(115, 99, 114, 0.7));
   transform: translate(-1px, -1px);
 }
 
@@ -164,5 +165,5 @@
 }
 
 [data-template="casual"] .footer-logo span {
-  color: var(--casual-ash-gray);
+  color: var(--brand-secondary, var(--casual-ash-gray));
 }
