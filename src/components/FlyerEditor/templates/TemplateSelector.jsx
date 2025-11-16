@@ -16,7 +16,8 @@ export default function TemplateSelector({
       <div className="mb-6">
         <h3 className="neo-h4 mb-2">Elige un Template para tu Folleto</h3>
         <p className="neo-text text-gray-600">
-          Selecciona un diseño base. Podrás personalizarlo completamente después.
+          Los templates definen estructura y componentes (columnas, espacios, tarjetas, botones).
+          Los colores siempre vienen del branding del negocio y no del template.
         </p>
       </div>
 
@@ -52,8 +53,8 @@ function TemplateCard({ template, isSelected, onSelect }) {
   const getPreviewStyles = () => {
     const styles = template.styles;
     return {
-      backgroundColor: styles.backgroundColor,
-      borderColor: styles.borderColor,
+      backgroundColor: '#ffffff',
+      borderColor: '#000000',
       borderWidth: styles.borderWidth,
       borderRadius: styles.borderRadius,
       fontFamily: styles.fontFamily,
@@ -81,18 +82,14 @@ function TemplateCard({ template, isSelected, onSelect }) {
           className="absolute top-0 left-0 right-0 p-4 flex items-center justify-center"
           style={{
             height: `${template.layout.header.height}%`,
-            backgroundColor: template.styles.primaryColor === '{brandPrimary}'
-              ? '#ff6b35'
-              : template.styles.primaryColor,
+            backgroundColor: '#f5f5f5',
           }}
         >
           <div
             className="text-center font-bold"
             style={{
               fontSize: '12px',
-              color: template.id === 'classic' || template.id === 'minimalist'
-                ? '#000000'
-                : '#ffffff',
+              color: '#000000',
             }}
           >
             <div className="mb-1">{template.thumbnail} {template.name}</div>
@@ -122,7 +119,7 @@ function TemplateCard({ template, isSelected, onSelect }) {
                   backgroundColor: '#f0f0f0',
                   borderRadius: `${template.styles.borderRadius}px`,
                   border: template.styles.borderWidth > 0
-                    ? `${template.styles.borderWidth}px solid ${template.styles.borderColor}`
+                    ? `${template.styles.borderWidth}px solid #000000`
                     : 'none',
                 }}
               >
