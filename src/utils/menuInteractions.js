@@ -172,9 +172,17 @@ function setupMobileCarousel() {
   let animationFrameId = null;
   let isUserInteracting = false;
   let userInteractionTimeout = null;
-  let scrollSpeed = 0.5; // pixels per frame
   let lastUserScrollTime = 0;
   let isMouseOver = false;
+
+  // Detect if mobile device
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+  // Adjust scroll speed for mobile (faster for better visibility)
+  let scrollSpeed = isMobile ? 0.8 : 0.5; // pixels per frame
+
+  // Remove smooth scroll behavior for programmatic scrolling
+  track.style.scrollBehavior = 'auto';
 
   // Clone chips many times for truly infinite scroll
   const clonedChips = [];
@@ -220,6 +228,9 @@ function setupMobileCarousel() {
 
   function startAutoScroll() {
     if (animationFrameId) return; // Ya está corriendo
+    if (isMobile) {
+      console.log('Starting carousel animation on mobile');
+    }
     continuousScroll();
   }
 
@@ -237,15 +248,19 @@ function setupMobileCarousel() {
     clearTimeout(userInteractionTimeout);
     userInteractionTimeout = setTimeout(() => {
       isUserInteracting = false;
-    }, 800);
+    }, isMobile ? 1000 : 800);
   }
 
   function handleMouseEnter() {
-    isMouseOver = true;
+    if (!isMobile) {
+      isMouseOver = true;
+    }
   }
 
   function handleMouseLeave() {
-    isMouseOver = false;
+    if (!isMobile) {
+      isMouseOver = false;
+    }
   }
 
   function handleTouch() {
@@ -253,7 +268,7 @@ function setupMobileCarousel() {
     clearTimeout(userInteractionTimeout);
     userInteractionTimeout = setTimeout(() => {
       isUserInteracting = false;
-    }, 800);
+    }, 1000);
   }
 
   // Event listeners
@@ -277,6 +292,12 @@ function setupMobileCarousel() {
       e.preventDefault();
       handleTouch();
 
+      // Temporarily enable smooth scroll for this interaction
+      track.style.scrollBehavior = 'smooth';
+      setTimeout(() => {
+        track.style.scrollBehavior = 'auto';
+      }, 1000);
+
       // Scroll to section
       const targetId = chip.getAttribute('href').substring(1);
       const targetEl = document.getElementById(targetId);
@@ -294,10 +315,11 @@ function setupMobileCarousel() {
     });
   });
 
-  // Start auto-scroll immediately
+  // Start auto-scroll with delay for mobile stability
+  const initialDelay = isMobile ? 1000 : 500;
   setTimeout(() => {
     startAutoScroll();
-  }, 500);
+  }, initialDelay);
 
   // Pause on window blur, resume on focus
   window.addEventListener('blur', () => {
@@ -310,11 +332,39 @@ function setupMobileCarousel() {
     }
   });
 
-  // Reintentar el inicio si no hay animación después de un tiempo
+  // Multiple restart attempts for mobile reliability
   setTimeout(() => {
     if (!animationFrameId) {
-      console.log('Restarting carousel animation');
+      console.log('Restarting carousel animation (attempt 1)');
       startAutoScroll();
     }
   }, 2000);
+
+  if (isMobile) {
+    setTimeout(() => {
+      if (!animationFrameId) {
+        console.log('Restarting carousel animation (attempt 2 - mobile)');
+        startAutoScroll();
+      }
+    }, 3500);
+
+    // Restart on orientation change
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        stopAutoScroll();
+        setTimeout(() => {
+          startAutoScroll();
+        }, 300);
+      }, 100);
+    });
+  }
+
+  // Visibility change handler - restart when page becomes visible
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !isUserInteracting && !isMouseOver) {
+      setTimeout(() => {
+        startAutoScroll();
+      }, 500);
+    }
+  });
 }
