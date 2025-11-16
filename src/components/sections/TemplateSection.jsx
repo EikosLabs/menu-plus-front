@@ -16,91 +16,63 @@ const templates = [
 	{
 		id: 0,
 		name: "Modern",
-		description: "Gradientes y animaciones modernas. Ideal para negocios contemporáneos.",
+		description: "Neobrutalist: Bordes gruesos (4px), sombras pronunciadas y animaciones audaces.",
 		preview: "/templates/modern-preview.jpg",
-		colors: {
-			primary: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-			secondary: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-			bg: "linear-gradient(135deg, #f8f5ff 0%, #fff5f5 100%)"
-		},
+		style: "Bordes gruesos, sombras sólidas, transformaciones dinámicas",
 		icon: "🎨",
 		recommendedFont: 'poppins'
 	},
 	{
 		id: 1,
 		name: "Elegant",
-		description: "Sofisticado y lujoso para restaurantes de alta gama.",
+		description: "Sofisticado: Sin bordes, sombras suaves y transiciones elegantes.",
 		preview: "/templates/elegant-preview.jpg",
-		colors: {
-			primary: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
-			secondary: "linear-gradient(135deg, #c9a961 0%, #b8942a 100%)",
-			bg: "linear-gradient(135deg, #fdfcfa 0%, #f5f3ef 100%)"
-		},
+		style: "Sin bordes, sombras difusas, movimientos suaves",
 		icon: "👔",
 		recommendedFont: 'playfair'
 	},
 	{
 		id: 2,
 		name: "Casual",
-		description: "Amigable y vibrante para cafeterías y fast food.",
+		description: "Playful: Bordes redondeados (25px), rotaciones leves y diseño amigable.",
 		preview: "/templates/casual-preview.jpg",
-		colors: {
-			primary: "linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)",
-			secondary: "linear-gradient(135deg, #feca57 0%, #ff9ff3 100%)",
-			bg: "linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%)"
-		},
+		style: "Bordes medianos, rotaciones playful, bordes punteados",
 		icon: "🍔",
 		recommendedFont: 'montserrat'
 	},
 	{
 		id: 3,
 		name: "Minimalist",
-		description: "Limpio y minimalista. Menos es más.",
+		description: "Limpio: Bordes delgados (1px), sombras sutiles y espacios amplios.",
 		preview: "/templates/minimalist-preview.jpg",
-		colors: {
-			primary: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)",
-			secondary: "linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)",
-			bg: "#ffffff"
-		},
+		style: "Bordes finos, sombras mínimas, diseño espacioso",
 		icon: "⚪",
 		recommendedFont: 'roboto'
 	},
 	{
 		id: 4,
 		name: "Colorful",
-		description: "Vibrante y llamativo para negocios juveniles.",
+		description: "Explosivo: Bordes gruesos variados, sombras grandes y transformaciones llamativas.",
 		preview: "/templates/colorful-preview.jpg",
-		colors: {
-			primary: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-			secondary: "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
-			bg: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)"
-		},
+		style: "Bordes alternados, sombras grandes, efectos vibrantes",
 		icon: "🌈",
 		recommendedFont: 'poppins'
 	},
 	{
 		id: 5,
 		name: "Dark",
-		description: "Oscuro y premium con toques dorados.",
+		description: "Premium: Glassmorphism, blur effects y sombras profundas para ambiente nocturno.",
 		preview: "/templates/dark-preview.jpg",
-		colors: {
-			primary: "linear-gradient(135deg, #141E30 0%, #243B55 100%)",
-			secondary: "linear-gradient(135deg, #DAA520 0%, #FFD700 100%)",
-			bg: "linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)"
-		},
+		style: "Backdrop blur, transparencias, sombras profundas",
 		icon: "🌙",
 		recommendedFont: 'lora'
 	},
 	{
 		id: 6,
 		name: "Classic",
-		description: "Tradicional y atemporal con tonos tierra.",
+		description: "Tradicional: Bordes dobles (double), fuentes serif y diseño atemporal.",
 		preview: "/templates/classic-preview.jpg",
-		colors: {
-			primary: "linear-gradient(135deg, #8B4513 0%, #A0522D 100%)",
-			secondary: "linear-gradient(135deg, #CD853F 0%, #DEB887 100%)",
-			bg: "linear-gradient(135deg, #FDF5E6 0%, #FAF0E6 100%)"
-		},
+		style: "Bordes dobles, fuentes serif, diseño clásico",
 		icon: "📜",
 		recommendedFont: 'merriweather'
 	}
@@ -211,12 +183,15 @@ const TemplateSection = ({ businesses, onTemplateUpdated }) => {
 				<div>
 					<h2 className="flex items-center neo-heading neo-h3 text-2xl mb-2">
 						<svg className="mr-2 h-7 w-7 text-neo-flame" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 1 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
 						</svg>
-						Templates del Menú
+						Estilo del Menú (Template)
 					</h2>
+					<p className="neo-text text-neo-gray mb-2">
+						<strong>Los templates definen el ESTILO visual</strong> (tipos de botones, bordes, sombras, animaciones).
+					</p>
 					<p className="neo-text text-neo-gray">
-						Personaliza el diseño de tu menú digital. Elige el template que mejor represente tu negocio.
+						Los <strong>colores vienen de tu negocio</strong> (configurados en la sección de Información del Negocio).
 					</p>
 				</div>
 
@@ -273,29 +248,18 @@ const TemplateSection = ({ businesses, onTemplateUpdated }) => {
 							selectedTemplate === template.id ? "ring-4 ring-neo-flame ring-offset-4" : ""
 						} ${currentTemplate === template.id ? "border-4 border-green-500" : ""}`}
 					>
-						{/* Color Preview */}
-						<div className="h-32 rounded-t-lg overflow-hidden relative">
-							<div
-								className="absolute inset-0"
-								style={{ background: template.colors.bg }}
-							/>
-							<div className="absolute inset-0 flex items-center justify-center gap-2">
-								<div
-									className="w-16 h-16 rounded-lg shadow-lg"
-									style={{ background: template.colors.primary }}
-								/>
-								<div
-									className="w-12 h-12 rounded-lg shadow-lg"
-									style={{ background: template.colors.secondary }}
-								/>
+						{/* Style Preview */}
+						<div className="h-32 rounded-t-lg overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+							<div className="text-center">
+								<span className="text-5xl mb-2 block">{template.icon}</span>
+								<p className="text-xs text-gray-600 font-semibold px-2">{template.style}</p>
 							</div>
 						</div>
 
 						{/* Template Info */}
 						<div className="p-4">
 							<div className="flex items-center justify-between mb-2">
-								<h3 className="neo-heading neo-h4 flex items-center gap-2">
-									<span className="text-2xl">{template.icon}</span>
+								<h3 className="neo-heading neo-h4">
 									{template.name}
 								</h3>
 								{currentTemplate === template.id && (
@@ -376,9 +340,15 @@ const TemplateSection = ({ businesses, onTemplateUpdated }) => {
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
 					<div>
-						<p className="neo-text-bold mb-1">💡 Consejo Pro</p>
+						<p className="neo-text-bold mb-1">💡 ¿Cómo funciona?</p>
+						<p className="neo-text text-sm mb-2">
+							<strong>Template = Estilo:</strong> Define cómo se ven los botones, bordes, sombras y animaciones.
+						</p>
+						<p className="neo-text text-sm mb-2">
+							<strong>Colores = Tu Negocio:</strong> Usa los colores primario, secundario y acento de tu marca (configurados en Información del Negocio).
+						</p>
 						<p className="neo-text text-sm">
-							Elige un template y una fuente que reflejen la personalidad de tu negocio. La tipografía recomendada para cada template ha sido seleccionada para complementar su estilo, pero puedes cambiarla en cualquier momento.
+							<strong>Tipografía:</strong> Cada template tiene una fuente recomendada, pero puedes usar la que prefieras.
 						</p>
 					</div>
 				</div>

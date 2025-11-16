@@ -1,18 +1,13 @@
-/* Classic Template - Tradicional y atemporal - Ideal para asadores, steakhouses y restaurantes tradicionales */
-/* Paleta: Earth Tones - Claret, Cream, Earth Yellow, Sepia, Seal Brown */
+/* Classic Template - Tradicional: Bordes dobles, fuentes serif y diseño clásico */
+/* Este template define ESTILOS (bordes dobles, fuentes, sombras), los COLORES vienen del negocio */
 :root[data-template="classic"] {
-  --template-primary: linear-gradient(135deg, var(--brand-primary, #6e0d25) 0%, var(--brand-secondary, #6a381f) 100%);
-  --template-secondary: linear-gradient(135deg, var(--brand-secondary, #dcab6b) 0%, var(--brand-accent, #ffffb3) 100%);
-  --template-accent: linear-gradient(135deg, var(--brand-accent, #774e24) 0%, var(--brand-primary, #6e0d25) 100%);
+  --template-primary: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+  --template-secondary: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-accent) 100%);
+  --template-accent: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-primary) 100%);
   --template-bg: linear-gradient(135deg, #ffffb3 0%, #fff9e6 100%);
-  --template-card-shadow: 0 6px 20px var(--brand-shadow-color, rgba(110, 13, 37, 0.15));
-  --template-border: 3px solid var(--brand-secondary, #6a381f);
+  --template-card-shadow: 0 6px 20px var(--brand-shadow-color);
+  --template-border: 3px solid var(--brand-secondary);
   --template-border-radius: 8px;
-  --classic-claret: #6e0d25;
-  --classic-cream: #ffffb3;
-  --classic-earth-yellow: #dcab6b;
-  --classic-sepia: #774e24;
-  --classic-seal-brown: #6a381f;
 }
 
 [data-template="classic"] .menu-page {
@@ -29,17 +24,17 @@
 }
 
 [data-template="classic"] .category-nav {
-  background: var(--classic-cream);
-  border-bottom: 3px double var(--brand-secondary, var(--classic-seal-brown));
-  box-shadow: 0 2px 10px var(--brand-shadow-color, rgba(106, 56, 31, 0.15));
+  background: #fffef8;
+  border-bottom: 3px double var(--brand-secondary);
+  box-shadow: 0 2px 10px var(--brand-shadow-color);
 }
 
 [data-template="classic"] .category-chip {
-  background: var(--classic-cream);
-  border: 2px solid var(--brand-accent, var(--classic-sepia));
+  background: #fffef8;
+  border: 2px solid var(--brand-accent);
   border-radius: 6px;
-  color: var(--brand-accent, var(--classic-sepia));
-  box-shadow: 2px 2px 5px var(--brand-shadow-color, rgba(119, 78, 36, 0.2));
+  color: var(--brand-accent);
+  box-shadow: 2px 2px 5px var(--brand-shadow-color);
   font-weight: 600;
   transition: all 0.3s ease;
 }
@@ -47,25 +42,25 @@
 [data-template="classic"] .category-chip:hover,
 [data-template="classic"] .category-chip.active {
   background: var(--template-primary);
-  color: var(--brand-primary-contrast, var(--classic-cream));
-  border-color: var(--brand-primary, var(--classic-claret));
+  color: var(--brand-primary-contrast);
+  border-color: var(--brand-primary);
   transform: translateY(-2px);
-  box-shadow: 3px 3px 8px var(--brand-shadow-color, rgba(110, 13, 37, 0.3));
+  box-shadow: 3px 3px 8px var(--brand-shadow-color);
 }
 
 [data-template="classic"] .section-icon {
   background: var(--template-secondary);
-  border: 3px double var(--brand-secondary, var(--classic-seal-brown));
+  border: 3px double var(--brand-secondary);
   border-radius: 8px;
-  box-shadow: 3px 3px 10px var(--brand-shadow-color, rgba(106, 56, 31, 0.2));
+  box-shadow: 3px 3px 10px var(--brand-shadow-color);
 }
 
 [data-template="classic"] .section-header {
-  border-bottom: 3px double var(--brand-accent, var(--classic-sepia));
+  border-bottom: 3px double var(--brand-accent);
 }
 
 [data-template="classic"] .section-title {
-  color: var(--brand-primary, var(--classic-claret));
+  color: var(--brand-primary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 800;
@@ -73,12 +68,12 @@
 
 [data-template="classic"] .section-description {
   font-style: italic;
-  color: var(--brand-accent, var(--classic-sepia));
+  color: var(--brand-accent);
 }
 
 [data-template="classic"] .menu-item {
   background: #fffef8;
-  border: 2px solid var(--brand-secondary, var(--classic-earth-yellow));
+  border: 2px solid var(--brand-secondary);
   border-radius: var(--template-border-radius);
   box-shadow: var(--template-card-shadow);
   transition: all 0.3s ease;
@@ -86,26 +81,26 @@
 
 [data-template="classic"] .menu-item:hover {
   transform: translateY(-6px);
-  box-shadow: 0 10px 30px var(--brand-shadow-color, rgba(110, 13, 37, 0.25));
-  border-color: var(--brand-primary, var(--classic-claret));
+  box-shadow: 0 10px 30px var(--brand-shadow-color);
+  border-color: var(--brand-primary);
 }
 
 [data-template="classic"] .item-name {
-  color: var(--brand-primary, var(--classic-claret));
+  color: var(--brand-primary);
   font-weight: 700;
 }
 
 [data-template="classic"] .item-description {
   font-style: italic;
-  color: var(--brand-accent, var(--classic-sepia));
+  color: var(--brand-accent);
 }
 
 [data-template="classic"] .item-price-wrapper {
   background: var(--template-primary);
-  border: 2px solid var(--brand-primary, var(--classic-claret));
+  border: 2px solid var(--brand-primary);
   border-radius: 6px;
-  box-shadow: 2px 2px 5px var(--brand-shadow-color, rgba(110, 13, 37, 0.2));
-  color: var(--brand-primary-contrast, var(--classic-cream));
+  box-shadow: 2px 2px 5px var(--brand-shadow-color);
+  color: var(--brand-primary-contrast);
 }
 
 [data-template="classic"] .item-image-overlay {
@@ -115,71 +110,71 @@
 
 [data-template="classic"] .item-image-placeholder {
   background: var(--template-secondary);
-  border-bottom: 3px solid var(--brand-accent, var(--classic-sepia));
+  border-bottom: 3px solid var(--brand-accent);
 }
 
 [data-template="classic"] .btn--primary {
   background: var(--template-primary);
-  border: 3px solid var(--brand-primary, var(--classic-claret));
-  box-shadow: 3px 3px 10px var(--brand-shadow-color, rgba(110, 13, 37, 0.2));
+  border: 3px solid var(--brand-primary);
+  box-shadow: 3px 3px 10px var(--brand-shadow-color);
   border-radius: 6px;
-  color: var(--brand-primary-contrast, var(--classic-cream));
+  color: var(--brand-primary-contrast);
   font-weight: 700;
 }
 
 [data-template="classic"] .btn--secondary {
-  background: var(--classic-cream);
-  border: 3px solid var(--brand-accent, var(--classic-sepia));
-  color: var(--brand-accent, var(--classic-sepia));
-  box-shadow: 3px 3px 10px var(--brand-shadow-color, rgba(119, 78, 36, 0.2));
+  background: #fffef8;
+  border: 3px solid var(--brand-accent);
+  color: var(--brand-accent);
+  box-shadow: 3px 3px 10px var(--brand-shadow-color);
   border-radius: 6px;
   font-weight: 700;
 }
 
 [data-template="classic"] .loading-card,
 [data-template="classic"] .error-card {
-  background: var(--classic-cream);
-  border: 3px double var(--brand-secondary, var(--classic-seal-brown));
-  box-shadow: 0 8px 30px var(--brand-shadow-color, rgba(106, 56, 31, 0.15));
+  background: #fffef8;
+  border: 3px double var(--brand-secondary);
+  box-shadow: 0 8px 30px var(--brand-shadow-color);
 }
 
 [data-template="classic"] .loading-title,
 [data-template="classic"] .error-title {
-  color: var(--brand-primary, var(--classic-claret));
+  color: var(--brand-primary);
 }
 
 [data-template="classic"] .menu-footer {
-  background: var(--brand-primary, var(--classic-claret));
-  border-top: 3px double var(--brand-secondary, var(--classic-seal-brown));
-  color: var(--brand-primary-contrast, var(--classic-cream));
+  background: var(--brand-primary);
+  border-top: 3px double var(--brand-secondary);
+  color: var(--brand-primary-contrast);
 }
 
 [data-template="classic"] .footer-link {
-  color: var(--brand-secondary, var(--classic-earth-yellow));
+  color: var(--brand-secondary);
   font-weight: 700;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 [data-template="classic"] .footer-link:hover {
-  color: var(--brand-primary-contrast, var(--classic-cream));
-  text-shadow: 0 2px 8px var(--brand-shadow-color, rgba(220, 171, 107, 0.5));
+  color: var(--brand-accent);
+  text-shadow: 0 2px 8px var(--brand-shadow-color);
 }
 
 [data-template="classic"] .footer-logo span {
-  color: var(--brand-secondary, var(--classic-earth-yellow));
+  color: var(--brand-secondary);
 }
 
 [data-template="classic"] .empty-state {
-  background: var(--classic-cream);
-  border: 3px double var(--brand-secondary, var(--classic-seal-brown));
+  background: #fffef8;
+  border: 3px double var(--brand-secondary);
 }
 
 [data-template="classic"] .empty-title {
-  color: var(--brand-primary, var(--classic-claret));
+  color: var(--brand-primary);
 }
 
 [data-template="classic"] .empty-text {
-  color: var(--brand-accent, var(--classic-sepia));
+  color: var(--brand-accent);
   font-style: italic;
 }

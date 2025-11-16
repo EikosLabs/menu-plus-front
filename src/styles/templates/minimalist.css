@@ -1,18 +1,13 @@
-/* Minimalist Template - Limpio y minimalista para cafés, delis y negocios wellness */
-/* Paleta: Warm Neutrals - Buff, Desert Sand, Dun, Cambridge Blue, Dark Purple */
+/* Minimalist Template - Limpio: Bordes delgados, sombras suaves y diseño minimalista */
+/* Este template define ESTILOS (bordes finos, sombras sutiles), los COLORES vienen del negocio */
 :root[data-template="minimalist"] {
-  --template-primary: linear-gradient(135deg, var(--brand-primary, #86a397) 0%, var(--brand-accent, #361d2e) 100%);
-  --template-secondary: linear-gradient(135deg, var(--brand-secondary, #e1b07e) 0%, var(--brand-accent, #e5be9e) 100%);
-  --template-accent: linear-gradient(135deg, var(--brand-accent, #cbc0ad) 0%, var(--brand-primary, #86a397) 100%);
+  --template-primary: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+  --template-secondary: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-accent) 100%);
+  --template-accent: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-primary) 100%);
   --template-bg: #fdfcfa;
-  --template-card-shadow: 0 3px 12px var(--brand-shadow-color, rgba(54, 29, 46, 0.08));
-  --template-border: 1px solid var(--brand-secondary, #cbc0ad);
+  --template-card-shadow: 0 3px 12px var(--brand-shadow-color);
+  --template-border: 1px solid var(--brand-secondary);
   --template-border-radius: 10px;
-  --minimalist-buff: #e1b07e;
-  --minimalist-desert-sand: #e5be9e;
-  --minimalist-dun: #cbc0ad;
-  --minimalist-cambridge-blue: #86a397;
-  --minimalist-dark-purple: #361d2e;
 }
 
 [data-template="minimalist"] .menu-page {
@@ -34,15 +29,15 @@
 
 [data-template="minimalist"] .category-nav {
   background: white;
-  border-bottom: 1px solid var(--brand-secondary, var(--minimalist-dun));
-  box-shadow: 0 1px 4px var(--brand-shadow-color, rgba(54, 29, 46, 0.06));
+  border-bottom: 1px solid var(--brand-secondary);
+  box-shadow: 0 1px 4px var(--brand-shadow-color);
 }
 
 [data-template="minimalist"] .category-chip {
   background: white;
-  border: 1px solid var(--brand-secondary, var(--minimalist-cambridge-blue));
+  border: 1px solid var(--brand-secondary);
   border-radius: 8px;
-  color: var(--brand-primary, var(--minimalist-dark-purple));
+  color: var(--brand-primary);
   box-shadow: none;
   font-weight: 600;
   transition: all 0.25s ease;
@@ -50,34 +45,34 @@
 
 [data-template="minimalist"] .category-chip:hover,
 [data-template="minimalist"] .category-chip.active {
-  background: var(--brand-secondary, var(--minimalist-cambridge-blue));
-  color: var(--brand-secondary-contrast, #ffffff);
-  border-color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  background: var(--brand-secondary);
+  color: var(--brand-secondary-contrast);
+  border-color: var(--brand-secondary);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px var(--brand-shadow-color, rgba(134, 163, 151, 0.25));
+  box-shadow: 0 2px 8px var(--brand-shadow-color);
 }
 
 [data-template="minimalist"] .section-icon {
   background: white;
-  border: 2px solid var(--brand-secondary, var(--minimalist-cambridge-blue));
+  border: 2px solid var(--brand-secondary);
   border-radius: 10px;
   box-shadow: none;
-  color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  color: var(--brand-secondary);
   font-weight: 600;
 }
 
 [data-template="minimalist"] .section-header {
-  border-bottom: 2px solid var(--brand-secondary, var(--minimalist-dun));
+  border-bottom: 2px solid var(--brand-secondary);
 }
 
 [data-template="minimalist"] .section-title {
   font-weight: 700;
-  color: var(--brand-primary, var(--minimalist-dark-purple));
+  color: var(--brand-primary);
   letter-spacing: 0.01em;
 }
 
 [data-template="minimalist"] .section-description {
-  color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  color: var(--brand-secondary);
 }
 
 [data-template="minimalist"] .menu-item {
@@ -90,26 +85,26 @@
 
 [data-template="minimalist"] .menu-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 20px var(--brand-shadow-color, rgba(54, 29, 46, 0.12));
-  border-color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  box-shadow: 0 6px 20px var(--brand-shadow-color);
+  border-color: var(--brand-secondary);
 }
 
 [data-template="minimalist"] .item-name {
   font-weight: 700;
-  color: var(--brand-primary, var(--minimalist-dark-purple));
+  color: var(--brand-primary);
 }
 
 [data-template="minimalist"] .item-description {
-  color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  color: var(--brand-secondary);
   opacity: 0.9;
 }
 
 [data-template="minimalist"] .item-price-wrapper {
-  background: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  background: var(--brand-secondary);
   border: none;
   border-radius: 8px;
   box-shadow: none;
-  color: var(--brand-secondary-contrast, #ffffff);
+  color: var(--brand-secondary-contrast);
   font-weight: 700;
 }
 
@@ -120,29 +115,29 @@
 
 [data-template="minimalist"] .item-image-placeholder {
   background: var(--template-secondary);
-  border-bottom: 1px solid var(--brand-secondary, var(--minimalist-dun));
+  border-bottom: 1px solid var(--brand-secondary);
 }
 
 [data-template="minimalist"] .btn--primary {
-  background: var(--brand-secondary, var(--minimalist-cambridge-blue));
-  border: 2px solid var(--brand-secondary, var(--minimalist-cambridge-blue));
+  background: var(--brand-secondary);
+  border: 2px solid var(--brand-secondary);
   box-shadow: none;
   border-radius: 8px;
-  color: var(--brand-secondary-contrast, #ffffff);
+  color: var(--brand-secondary-contrast);
   font-weight: 600;
   transition: all 0.25s ease;
 }
 
 [data-template="minimalist"] .btn--primary:hover {
-  background: var(--brand-primary, var(--minimalist-dark-purple));
-  border-color: var(--brand-primary, var(--minimalist-dark-purple));
-  box-shadow: 0 4px 12px var(--brand-shadow-color, rgba(54, 29, 46, 0.2));
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  box-shadow: 0 4px 12px var(--brand-shadow-color);
 }
 
 [data-template="minimalist"] .btn--secondary {
   background: white;
-  border: 2px solid var(--brand-secondary, var(--minimalist-cambridge-blue));
-  color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  border: 2px solid var(--brand-secondary);
+  color: var(--brand-secondary);
   box-shadow: none;
   border-radius: 8px;
   font-weight: 600;
@@ -150,9 +145,9 @@
 }
 
 [data-template="minimalist"] .btn--secondary:hover {
-  background: var(--minimalist-dun);
-  border-color: var(--brand-primary, var(--minimalist-dark-purple));
-  color: var(--brand-primary, var(--minimalist-dark-purple));
+  background: var(--brand-secondary);
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
 }
 
 [data-template="minimalist"] .loading-card,
@@ -165,37 +160,37 @@
 
 [data-template="minimalist"] .loading-title,
 [data-template="minimalist"] .error-title {
-  color: var(--brand-primary, var(--minimalist-dark-purple));
+  color: var(--brand-primary);
 }
 
 [data-template="minimalist"] .empty-state {
   background: white;
-  border: 1px solid var(--brand-secondary, var(--minimalist-dun));
+  border: 1px solid var(--brand-secondary);
 }
 
 [data-template="minimalist"] .empty-title {
-  color: var(--brand-primary, var(--minimalist-dark-purple));
+  color: var(--brand-primary);
 }
 
 [data-template="minimalist"] .empty-text {
-  color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  color: var(--brand-secondary);
 }
 
 [data-template="minimalist"] .menu-footer {
-  background: var(--brand-primary, var(--minimalist-dark-purple));
-  border-top: 2px solid var(--brand-secondary, var(--minimalist-cambridge-blue));
-  color: var(--brand-primary-contrast, var(--minimalist-dun));
+  background: var(--brand-primary);
+  border-top: 2px solid var(--brand-secondary);
+  color: var(--brand-primary-contrast);
 }
 
 [data-template="minimalist"] .footer-link {
-  color: var(--brand-secondary, var(--minimalist-cambridge-blue));
+  color: var(--brand-secondary);
   font-weight: 600;
   text-decoration: none;
   transition: all 0.25s ease;
 }
 
 [data-template="minimalist"] .footer-link:hover {
-  color: var(--brand-accent, var(--minimalist-buff));
+  color: var(--brand-accent);
 }
 
 [data-template="minimalist"] .footer-logo {
@@ -203,5 +198,5 @@
 }
 
 [data-template="minimalist"] .footer-logo span {
-  color: var(--minimalist-cambridge-blue);
+  color: var(--brand-secondary);
 }

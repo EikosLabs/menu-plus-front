@@ -1,18 +1,13 @@
-/* Elegant Template - Sofisticado para restaurantes de alta gama, bistros elegantes y fine dining */
-/* Paleta: Purple Gradient - Russian Violet, Ultra Violet, African Violet, Lilac, Pink Lavender */
+/* Elegant Template - Sofisticado: Sin bordes, sombras suaves y transiciones elegantes */
+/* Este template define ESTILOS (sombras, radios, transiciones), los COLORES vienen del negocio */
 :root[data-template="elegant"] {
-  --template-primary: linear-gradient(135deg, var(--brand-primary, #231942) 0%, var(--brand-secondary, #5e548e) 100%);
-  --template-secondary: linear-gradient(135deg, var(--brand-secondary, #9f86c0) 0%, var(--brand-accent, #be95c4) 100%);
-  --template-accent: linear-gradient(135deg, var(--brand-accent, #e0b1cb) 0%, var(--brand-secondary, #be95c4) 100%);
+  --template-primary: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+  --template-secondary: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-accent) 100%);
+  --template-accent: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-secondary) 100%);
   --template-bg: linear-gradient(135deg, #faf8fc 0%, #f5f2f8 100%);
-  --template-card-shadow: 0 10px 35px var(--brand-shadow-color, rgba(35, 25, 66, 0.15));
+  --template-card-shadow: 0 10px 35px var(--brand-shadow-color);
   --template-border: none;
   --template-border-radius: 16px;
-  --elegant-russian-violet: #231942;
-  --elegant-ultra-violet: #5e548e;
-  --elegant-african-violet: #9f86c0;
-  --elegant-lilac: #be95c4;
-  --elegant-pink-lavender: #e0b1cb;
 }
 
 [data-template="elegant"] .menu-page {
@@ -30,15 +25,15 @@
 [data-template="elegant"] .category-nav {
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--brand-secondary, rgba(159, 134, 192, 0.3));
-  box-shadow: 0 2px 25px var(--brand-shadow-color, rgba(35, 25, 66, 0.08));
+  border-bottom: 1px solid var(--brand-secondary);
+  box-shadow: 0 2px 25px var(--brand-shadow-color);
 }
 
 [data-template="elegant"] .category-chip {
   background: white;
-  border: 2px solid var(--brand-secondary, var(--elegant-african-violet));
+  border: 2px solid var(--brand-secondary);
   border-radius: 30px;
-  color: var(--brand-primary, var(--elegant-ultra-violet));
+  color: var(--brand-primary);
   box-shadow: none;
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 600;
@@ -47,27 +42,27 @@
 [data-template="elegant"] .category-chip:hover,
 [data-template="elegant"] .category-chip.active {
   background: var(--template-secondary);
-  color: var(--brand-secondary-contrast, #ffffff);
-  border-color: var(--brand-secondary, var(--elegant-lilac));
+  color: var(--brand-secondary-contrast);
+  border-color: var(--brand-secondary);
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px var(--brand-shadow-color, rgba(159, 134, 192, 0.35));
+  box-shadow: 0 6px 20px var(--brand-shadow-color);
 }
 
 [data-template="elegant"] .section-icon {
   background: var(--template-secondary);
   border: none;
   border-radius: 16px;
-  box-shadow: 0 6px 20px var(--brand-shadow-color, rgba(159, 134, 192, 0.35));
-  color: var(--brand-secondary-contrast, #ffffff);
+  box-shadow: 0 6px 20px var(--brand-shadow-color);
+  color: var(--brand-secondary-contrast);
 }
 
 [data-template="elegant"] .section-header {
-  border-bottom: 2px solid var(--brand-secondary, var(--elegant-african-violet));
+  border-bottom: 2px solid var(--brand-secondary);
 }
 
 [data-template="elegant"] .menu-item {
   background: white;
-  border: 1px solid var(--brand-secondary, rgba(159, 134, 192, 0.15));
+  border: 1px solid var(--brand-secondary);
   border-radius: 16px;
   box-shadow: var(--template-card-shadow);
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -75,76 +70,77 @@
 
 [data-template="elegant"] .menu-item:hover {
   transform: translateY(-10px);
-  box-shadow: 0 15px 45px var(--brand-shadow-color, rgba(35, 25, 66, 0.2));
-  border-color: var(--brand-secondary, var(--elegant-lilac));
+  box-shadow: 0 15px 45px var(--brand-shadow-color);
+  border-color: var(--brand-secondary);
 }
 
 [data-template="elegant"] .item-price-wrapper {
   background: var(--template-secondary);
   border: none;
   border-radius: 30px;
-  box-shadow: 0 4px 15px var(--brand-shadow-color, rgba(159, 134, 192, 0.25));
-  color: var(--brand-secondary-contrast, #ffffff);
+  box-shadow: 0 4px 15px var(--brand-shadow-color);
+  color: var(--brand-secondary-contrast);
   font-weight: 700;
 }
 
 [data-template="elegant"] .item-image-overlay {
-  background: linear-gradient(135deg, rgba(35, 25, 66, 0.88) 0%, rgba(94, 84, 142, 0.88) 100%);
+  background: var(--template-primary);
+  opacity: 0.88;
 }
 
 [data-template="elegant"] .item-name {
   font-weight: 700;
-  color: var(--brand-primary, var(--elegant-russian-violet));
+  color: var(--brand-primary);
 }
 
 [data-template="elegant"] .item-description {
-  color: var(--brand-secondary, var(--elegant-ultra-violet));
+  color: var(--brand-secondary);
   opacity: 0.85;
 }
 
 [data-template="elegant"] .section-title {
-  color: var(--brand-primary, var(--elegant-russian-violet));
+  color: var(--brand-primary);
 }
 
 [data-template="elegant"] .btn--primary {
   background: var(--template-secondary);
-  border: 2px solid var(--brand-secondary, var(--elegant-african-violet));
-  box-shadow: 0 6px 20px var(--brand-shadow-color, rgba(159, 134, 192, 0.35));
-  color: var(--brand-secondary-contrast, #ffffff);
+  border: 2px solid var(--brand-secondary);
+  box-shadow: 0 6px 20px var(--brand-shadow-color);
+  color: var(--brand-secondary-contrast);
   font-weight: 700;
   transition: all 0.3s ease;
 }
 
 [data-template="elegant"] .btn--primary:hover {
-  box-shadow: 0 8px 25px var(--brand-shadow-color, rgba(159, 134, 192, 0.45));
+  box-shadow: 0 8px 25px var(--brand-shadow-color);
   transform: translateY(-2px);
 }
 
 [data-template="elegant"] .btn--secondary {
   background: white;
-  border: 2px solid var(--brand-primary, var(--elegant-ultra-violet));
-  color: var(--brand-primary, var(--elegant-ultra-violet));
+  border: 2px solid var(--brand-primary);
+  color: var(--brand-primary);
   font-weight: 600;
 }
 
 [data-template="elegant"] .menu-footer {
-  background: var(--brand-primary, var(--elegant-russian-violet));
-  border-top: 2px solid var(--brand-secondary, var(--elegant-african-violet));
-  color: var(--brand-primary-contrast, var(--elegant-pink-lavender));
+  background: var(--brand-primary);
+  border-top: 2px solid var(--brand-secondary);
+  color: var(--brand-primary-contrast);
 }
 
 [data-template="elegant"] .footer-link {
-  color: var(--brand-secondary, var(--elegant-lilac));
+  color: var(--brand-secondary);
   font-weight: 700;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 [data-template="elegant"] .footer-link:hover {
-  color: var(--brand-accent, var(--elegant-pink-lavender));
-  text-shadow: 0 2px 8px var(--brand-shadow-color, rgba(224, 177, 203, 0.4));
+  color: var(--brand-accent);
+  text-shadow: 0 2px 8px var(--brand-shadow-color);
 }
 
 [data-template="elegant"] .footer-logo span {
-  color: var(--brand-secondary, var(--elegant-african-violet));
+  color: var(--brand-secondary);
 }
