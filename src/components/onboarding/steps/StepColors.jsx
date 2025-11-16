@@ -49,7 +49,7 @@ export default function StepColors({
 
       <CircularColorPicker
         color={value}
-        onChange={(color) => handleColorChange(name, color)}
+        onChange={(selectedColor) => handleColorChange(name, selectedColor)}
         label={label}
       />
 
