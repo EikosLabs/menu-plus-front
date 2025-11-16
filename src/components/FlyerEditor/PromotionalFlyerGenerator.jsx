@@ -172,6 +172,26 @@ export default function PromotionalFlyerGenerator({
     }
   };
 
+  const handleExportPdf = async () => {
+    if (selectedItems.length === 0) return;
+    if (!previewRef.current) return;
+    setIsExporting(true);
+    try {
+      const paperSize = template.format === 'story-vertical' ? 'STORY' : template.format === 'instagram-portrait' ? 'IG_PORTRAIT' : 'A4';
+      const { exportToPDF } = await import('./utils/pdfExport');
+      await exportToPDF(previewRef.current, {
+        fileName: `${folletoName || business?.name || 'menu'}-${template.format === 'story-vertical' ? 'story' : template.format === 'instagram-portrait' ? 'post' : 'folleto'}.pdf`,
+        paperSize,
+        orientation: 'portrait',
+        quality: 2,
+      });
+    } catch (error) {
+      alert(`Error al exportar: ${error.message}`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4 overflow-auto"
@@ -227,6 +247,20 @@ export default function PromotionalFlyerGenerator({
             {/* Template Selection */}
             <div>
               <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Tipo de Folleto</h3>
+              <div className="flex gap-1.5 mb-1.5 sm:mb-2">
+                <button
+                  onClick={() => setSelectedTemplate('story')}
+                  className={`neo-btn neo-btn-sm text-xs ${selectedTemplate === 'story' ? 'neo-btn-primary' : 'neo-btn-white'}`}
+                >
+                  Historia IG
+                </button>
+                <button
+                  onClick={() => setSelectedTemplate('post')}
+                  className={`neo-btn neo-btn-sm text-xs ${selectedTemplate === 'post' ? 'neo-btn-primary' : 'neo-btn-white'}`}
+                >
+                  Post IG
+                </button>
+              </div>
               <div className="space-y-1.5 sm:space-y-2">
                 {Object.values(FOLLETO_TEMPLATES).map((tmpl) => (
                   <button
@@ -439,6 +473,14 @@ export default function PromotionalFlyerGenerator({
             >
               {isExporting ? '⏳' : '🖼️'}
               <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar JPG'}</span>
+            </button>
+            <button
+              onClick={handleExportPdf}
+              disabled={isExporting || selectedItems.length === 0}
+              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
+            >
+              {isExporting ? '⏳' : '📄'}
+              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
             </button>
           </div>
         </div>

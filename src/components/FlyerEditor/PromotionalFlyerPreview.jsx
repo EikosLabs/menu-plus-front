@@ -133,9 +133,13 @@ const PromotionalFlyerPreview = forwardRef(({
         }}
       >
         {template.style === 'featured' && (
-          /* Featured style - Large items with images */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' }}>
-            {items.map((item) => (
+            {(() => {
+              const contentH = parseInt(size.height) - parseInt(template.headerHeight) - parseInt(template.footerHeight);
+              const gaps = Math.max(items.length - 1, 0) * 12;
+              const itemH = Math.max(Math.floor((contentH - gaps) / Math.max(items.length, 1)), 110);
+              const imgWH = Math.max(Math.min(100, itemH - 40), 60);
+              return items.map((item) => (
               <div
                 key={item.id}
                 style={{
@@ -147,6 +151,7 @@ const PromotionalFlyerPreview = forwardRef(({
                   gap: '16px',
                   alignItems: 'center',
                   boxShadow: '4px 4px 0px rgba(0,0,0,0.1)',
+                  flex: `0 0 ${itemH}px`,
                 }}
               >
                 {item.imageUri && (
@@ -154,8 +159,8 @@ const PromotionalFlyerPreview = forwardRef(({
                     src={item.imageUri}
                     alt={item.name}
                     style={{
-                      width: '100px',
-                      height: '100px',
+                      width: `${imgWH}px`,
+                      height: `${imgWH}px`,
                       objectFit: 'cover',
                       borderRadius: '8px',
                       border: `2px solid ${colors.text}`,
@@ -206,18 +211,25 @@ const PromotionalFlyerPreview = forwardRef(({
                   </div>
                 </div>
               </div>
-            ))}
+              ));
+            })()}
           </div>
         )}
 
         {template.style === 'grid' && (
-          /* Grid style - Multiple columns */
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: template.itemsPerRow === 1 ? '1fr' : '1fr 1fr',
               gap: '12px',
               height: '100%',
+              gridAutoRows: (() => {
+                const rows = Math.ceil(items.length / (template.itemsPerRow || 1));
+                const contentH = parseInt(size.height) - parseInt(template.headerHeight) - parseInt(template.footerHeight);
+                const gaps = Math.max(rows - 1, 0) * 12;
+                const rH = Math.max(Math.floor((contentH - gaps) / Math.max(rows, 1)), 120);
+                return `${rH}px`;
+              })(),
             }}
           >
             {items.map((item) => (
@@ -239,7 +251,7 @@ const PromotionalFlyerPreview = forwardRef(({
                     alt={item.name}
                     style={{
                       width: '100%',
-                      height: '80px',
+                      height: '70px',
                       objectFit: 'cover',
                       borderRadius: '6px',
                       border: `2px solid ${colors.text}`,
@@ -299,9 +311,12 @@ const PromotionalFlyerPreview = forwardRef(({
         )}
 
         {template.style === 'simple' && (
-          /* Simple style - List format */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
-            {items.map((item) => (
+            {(() => {
+              const contentH = parseInt(size.height) - parseInt(template.headerHeight) - parseInt(template.footerHeight);
+              const gaps = Math.max(items.length - 1, 0) * 10;
+              const itemH = Math.max(Math.floor((contentH - gaps) / Math.max(items.length, 1)), 90);
+              return items.map((item) => (
               <div
                 key={item.id}
                 style={{
@@ -312,6 +327,7 @@ const PromotionalFlyerPreview = forwardRef(({
                   display: 'flex',
                   gap: '12px',
                   alignItems: 'center',
+                  flex: `0 0 ${itemH}px`,
                 }}
               >
                 {item.imageUri && template.format !== 'quarter-page' && (
@@ -370,7 +386,8 @@ const PromotionalFlyerPreview = forwardRef(({
                   ${item.price.toFixed(2)}
                 </div>
               </div>
-            ))}
+              ));
+            })()}
           </div>
         )}
       </div>

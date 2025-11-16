@@ -145,7 +145,7 @@ export const FOLLETO_TEMPLATES = {
     itemsPerRow: 1,
     showImages: true,
     imageSize: 'large',
-    maxItems: 5,
+    maxItems: 4,
     headerHeight: '90px',
     footerHeight: '45px',
     style: 'featured',
