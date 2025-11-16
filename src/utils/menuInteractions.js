@@ -163,24 +163,21 @@ function setupDishModal() {
 }
 
 function setupMobileCarousel() {
-  // Only run on mobile devices
-  if (window.innerWidth > 768) return;
-
   const track = document.querySelector('.category-nav-track');
   if (!track || track.children.length === 0) return;
 
   const chips = Array.from(track.children);
   if (chips.length === 0) return;
 
-  let currentIndex = 0;
-  let autoScrollInterval;
+  let animationFrameId;
   let isUserInteracting = false;
   let userInteractionTimeout;
-  let isResetting = false;
+  let scrollSpeed = 0.5; // pixels per frame
+  let lastScrollLeft = 0;
 
-  // Clone chips multiple times for smoother infinite effect
+  // Clone chips many times for truly infinite scroll
   const clonedChips = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 10; i++) {
     chips.forEach(chip => {
       const clone = chip.cloneNode(true);
       clone.classList.add('cloned-chip');
@@ -189,96 +186,70 @@ function setupMobileCarousel() {
     });
   }
 
-  function getScrollDistance() {
-    const firstChip = chips[0];
-    if (!firstChip) return 0;
+  // Calculate total width of original chips
+  function getOriginalChipsWidth() {
+    let totalWidth = 0;
     const style = window.getComputedStyle(track);
     const gap = parseFloat(style.gap) || 16;
-    return firstChip.offsetWidth + gap;
-  }
 
-  function scrollToIndex(index, smooth = true) {
-    const scrollDistance = getScrollDistance();
-    const scrollPosition = index * scrollDistance;
-    track.scrollTo({
-      left: scrollPosition,
-      behavior: smooth ? 'smooth' : 'auto'
+    chips.forEach(chip => {
+      totalWidth += chip.offsetWidth + gap;
     });
+
+    return totalWidth;
   }
 
-  function autoScroll() {
-    if (isUserInteracting || isResetting) return;
-
-    currentIndex++;
-
-    // If we've scrolled past the original items, reset to start
-    if (currentIndex >= chips.length) {
-      isResetting = true;
-      scrollToIndex(currentIndex, true);
-
-      // After smooth animation, snap back instantly
-      setTimeout(() => {
-        currentIndex = 0;
-        scrollToIndex(0, false);
-        setTimeout(() => {
-          isResetting = false;
-        }, 50);
-      }, 400);
-    } else {
-      scrollToIndex(currentIndex, true);
+  // Continuous auto-scroll animation
+  function continuousScroll() {
+    if (isUserInteracting) {
+      animationFrameId = requestAnimationFrame(continuousScroll);
+      return;
     }
+
+    const originalWidth = getOriginalChipsWidth();
+    track.scrollLeft += scrollSpeed;
+
+    // When we've scrolled past one complete set, reset seamlessly
+    if (track.scrollLeft >= originalWidth) {
+      track.scrollLeft = track.scrollLeft - originalWidth;
+    }
+
+    animationFrameId = requestAnimationFrame(continuousScroll);
   }
 
   function startAutoScroll() {
-    stopAutoScroll();
-    // Intervalo más rápido para movimiento más continuo
-    autoScrollInterval = setInterval(autoScroll, 1800);
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+    continuousScroll();
   }
 
   function stopAutoScroll() {
-    if (autoScrollInterval) {
-      clearInterval(autoScrollInterval);
-      autoScrollInterval = null;
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
     }
   }
 
   function handleUserInteraction() {
     isUserInteracting = true;
-    stopAutoScroll();
 
     clearTimeout(userInteractionTimeout);
-    // Tiempo de pausa más corto después de interacción
     userInteractionTimeout = setTimeout(() => {
       isUserInteracting = false;
-
-      // Calculate current index based on scroll position
-      const scrollDistance = getScrollDistance();
-      const scrollLeft = track.scrollLeft;
-      currentIndex = Math.round(scrollLeft / scrollDistance);
-
-      // If we're in the cloned section, snap to corresponding real chip
-      if (currentIndex >= chips.length) {
-        currentIndex = currentIndex % chips.length;
-        scrollToIndex(currentIndex, false);
-      }
-
-      startAutoScroll();
-    }, 800);
+    }, 1500);
   }
 
   // Event listeners
+  track.addEventListener('mouseenter', handleUserInteraction, { passive: true });
   track.addEventListener('touchstart', handleUserInteraction, { passive: true });
-  track.addEventListener('scroll', handleUserInteraction, { passive: true });
+  track.addEventListener('wheel', handleUserInteraction, { passive: true });
 
   // Handle chip clicks
-  track.querySelectorAll('.category-chip').forEach((chip, index) => {
+  track.querySelectorAll('.category-chip').forEach((chip) => {
     chip.addEventListener('click', (e) => {
       e.preventDefault();
       handleUserInteraction();
-
-      // Get the actual index (handle clones)
-      const actualIndex = index % chips.length;
-      currentIndex = actualIndex;
 
       // Scroll to section
       const targetId = chip.getAttribute('href').substring(1);
@@ -297,28 +268,12 @@ function setupMobileCarousel() {
     });
   });
 
-  // Start auto-scroll immediately for instant animation
+  // Start auto-scroll immediately
   setTimeout(() => {
     startAutoScroll();
   }, 500);
 
   // Pause on window blur, resume on focus
   window.addEventListener('blur', stopAutoScroll);
-  window.addEventListener('focus', () => {
-    if (!isUserInteracting) startAutoScroll();
-  });
-
-  // Clean up on resize to desktop
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      if (window.innerWidth > 768) {
-        stopAutoScroll();
-        clonedChips.forEach(clone => {
-          if (clone.parentNode) clone.remove();
-        });
-      }
-    }, 250);
-  });
+  window.addEventListener('focus', startAutoScroll);
 }

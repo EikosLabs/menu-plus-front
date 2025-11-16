@@ -9,9 +9,10 @@ const PromotionalFlyerPreview = forwardRef(({
   business,
   menu,
   items = [],
-  template
+  template,
+  colorPalette = null
 }, ref) => {
-  const colors = getColorScheme(business);
+  const colors = getColorScheme(business, colorPalette);
   const branding = getBusinessBranding(business);
   const contactInfo = formatContactInfo(branding);
   const socialMedia = formatSocialMedia(branding);
@@ -222,14 +223,8 @@ const PromotionalFlyerPreview = forwardRef(({
               display: 'grid',
               gridTemplateColumns: template.itemsPerRow === 1 ? '1fr' : '1fr 1fr',
               gap: '12px',
-              height: '100%',
-              gridAutoRows: (() => {
-                const rows = Math.ceil(items.length / (template.itemsPerRow || 1));
-                const contentH = parseInt(size.height) - parseInt(template.headerHeight) - parseInt(template.footerHeight);
-                const gaps = Math.max(rows - 1, 0) * 12;
-                const rH = Math.max(Math.floor((contentH - gaps) / Math.max(rows, 1)), 120);
-                return `${rH}px`;
-              })(),
+              gridAutoRows: 'min-content',
+              alignContent: 'start',
             }}
           >
             {items.map((item) => (

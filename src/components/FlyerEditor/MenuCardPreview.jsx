@@ -12,10 +12,11 @@ const MenuCardPreview = forwardRef(({
   items = [],
   template,
   paperSize = 'A4',
-  fontFamily = "'Poppins', sans-serif"
+  fontFamily = "'Poppins', sans-serif",
+  colorPalette = null
 }, ref) => {
   const paper = PAPER_SIZES[paperSize];
-  const colors = getColorScheme(business);
+  const colors = getColorScheme(business, colorPalette);
   const branding = getBusinessBranding(business);
   const contactInfo = formatContactInfo(branding);
   const socialMedia = formatSocialMedia(branding);
@@ -124,7 +125,8 @@ const MenuCardPreview = forwardRef(({
             display: 'grid',
             gridTemplateColumns: template.itemsPerRow === 1 ? '1fr' : '1fr 1fr',
             gap: template.itemSpacing === 'compact' ? '10px' : template.itemSpacing === 'generous' ? '24px' : '16px',
-            height: '100%',
+            gridAutoRows: 'min-content',
+            alignContent: 'start',
           }}
         >
           {items.map((item) => (

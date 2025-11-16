@@ -41,7 +41,6 @@ export function renderSection(section, items, index, business) {
       <article class="menu-item" data-item='${JSON.stringify(itemData).replace(/'/g, "&#39;").replace(/"/g, "&quot;")}' style="animation-delay:${idx * 0.05}s">
         <div class="item-image-wrapper"${!imageUrl ? ' style="display:none"' : ''}>
           <img src="${sanitizeUrl(imageUrl)}" alt="${sanitizeHtml(item.name)}" class="item-image" loading="${idx < 6 ? 'eager' : 'lazy'}" decoding="async" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex';">
-          <div class="item-image-overlay"><span>👁️</span></div>
         </div>
         <div class="item-image-placeholder"${imageUrl ? ' style="display:none"' : ''}><span class="placeholder-emoji">🍴</span></div>
         <div class="item-content">

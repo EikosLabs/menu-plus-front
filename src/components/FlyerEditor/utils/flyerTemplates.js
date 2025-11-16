@@ -185,9 +185,120 @@ export const FOLLETO_FORMATS = {
 };
 
 /**
+ * Predefined color palettes for different business types
+ */
+export const COLOR_PALETTES = {
+  comidaRapida: {
+    id: 'comidaRapida',
+    name: 'Comida Rápida',
+    icon: '🍔',
+    description: 'Colores vibrantes y enérgicos',
+    primary: '#FF4444',
+    secondary: '#FFC107',
+    accent: '#FF6B35',
+  },
+  cafeEstetico: {
+    id: 'cafeEstetico',
+    name: 'Café Estético',
+    icon: '☕',
+    description: 'Tonos cálidos y elegantes',
+    primary: '#8B6F47',
+    secondary: '#D4A574',
+    accent: '#5D4E37',
+  },
+  restauranteElegante: {
+    id: 'restauranteElegante',
+    name: 'Restaurante Elegante',
+    icon: '🍽️',
+    description: 'Negro, dorado y sofisticado',
+    primary: '#1A1A1A',
+    secondary: '#D4AF37',
+    accent: '#8B7355',
+  },
+  saludable: {
+    id: 'saludable',
+    name: 'Saludable',
+    icon: '🥗',
+    description: 'Verdes frescos y naturales',
+    primary: '#4CAF50',
+    secondary: '#8BC34A',
+    accent: '#009688',
+  },
+  pizzeria: {
+    id: 'pizzeria',
+    name: 'Pizzería',
+    icon: '🍕',
+    description: 'Rojo, blanco y verde italiano',
+    primary: '#E53935',
+    secondary: '#43A047',
+    accent: '#FFFFFF',
+  },
+  postres: {
+    id: 'postres',
+    name: 'Postres',
+    icon: '🍰',
+    description: 'Pasteles y tonos dulces',
+    primary: '#E91E63',
+    secondary: '#FF6EC7',
+    accent: '#9C27B0',
+  },
+  sushi: {
+    id: 'sushi',
+    name: 'Sushi',
+    icon: '🍣',
+    description: 'Minimalista japonés',
+    primary: '#1A1A1A',
+    secondary: '#E53935',
+    accent: '#FFC107',
+  },
+  mexicano: {
+    id: 'mexicano',
+    name: 'Mexicano',
+    icon: '🌮',
+    description: 'Colores vibrantes mexicanos',
+    primary: '#D32F2F',
+    secondary: '#FBC02D',
+    accent: '#388E3C',
+  },
+  marino: {
+    id: 'marino',
+    name: 'Mariscos',
+    icon: '🦞',
+    description: 'Azules del mar',
+    primary: '#0277BD',
+    secondary: '#03A9F4',
+    accent: '#00BCD4',
+  },
+  bar: {
+    id: 'bar',
+    name: 'Bar/Pub',
+    icon: '🍺',
+    description: 'Oscuro y moderno',
+    primary: '#37474F',
+    secondary: '#FF6F00',
+    accent: '#C62828',
+  },
+};
+
+/**
  * Color scheme helper
  */
-export function getColorScheme(business) {
+export function getColorScheme(business, customPalette = null) {
+  // If custom palette is provided, use it
+  if (customPalette && COLOR_PALETTES[customPalette]) {
+    const palette = COLOR_PALETTES[customPalette];
+    return {
+      primary: palette.primary,
+      secondary: palette.secondary,
+      accent: palette.accent,
+      text: '#1a1a1a',
+      textLight: '#666666',
+      background: '#ffffff',
+      backgroundAlt: '#f5f5f5',
+    };
+  }
+
+  // Otherwise use business colors
   return {
     primary: business?.primaryColor || '#ff6b35',
     secondary: business?.secondaryColor || '#f7931e',

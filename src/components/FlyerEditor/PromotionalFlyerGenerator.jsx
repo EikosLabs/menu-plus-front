@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { exportToImage } from './utils/pdfExport';
-import { FOLLETO_TEMPLATES, FOLLETO_FORMATS } from './utils/flyerTemplates';
+import { FOLLETO_TEMPLATES, FOLLETO_FORMATS, COLOR_PALETTES } from './utils/flyerTemplates';
 import PromotionalFlyerPreview from './PromotionalFlyerPreview';
 import menuService from '../../services/menuService';
 
@@ -28,6 +28,7 @@ export default function PromotionalFlyerGenerator({
   const [folletoName, setFolletoName] = useState(savedFlyer?.name || `Folleto ${business?.name || 'Menu'} - ${new Date().toLocaleDateString()}`);
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState(savedFlyer?.id || null);
+  const [selectedPalette, setSelectedPalette] = useState(savedFlyer?.colorPalette || null);
 
   const previewRef = useRef(null);
 
@@ -107,6 +108,7 @@ export default function PromotionalFlyerGenerator({
         selectedItemIds: JSON.stringify(selectedItems.map(item => item.id)),
         itemsOrder: JSON.stringify(selectedItems.map(item => item.id)),
         paperSize: 'A4',
+        colorPalette: selectedPalette,
       };
 
       if (savedId) {
@@ -293,6 +295,59 @@ export default function PromotionalFlyerGenerator({
               </div>
             </div>
 
+            {/* Color Palette Selection */}
+            <div>
+              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Paleta de Colores</h3>
+              <p className="neo-text text-xs opacity-70 mb-2">
+                Elige una paleta predeterminada o usa los colores de tu negocio
+              </p>
+              <div className="space-y-1.5 max-h-[200px] overflow-auto">
+                <button
+                  onClick={() => setSelectedPalette(null)}
+                  className={`w-full text-left p-2 neo-border rounded-lg transition-all ${
+                    selectedPalette === null
+                      ? 'neo-border-thick border-neo-flame bg-neo-lavender'
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🎨</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="neo-text-bold text-xs">Colores del Negocio</div>
+                      <div className="flex gap-1 mt-1">
+                        <span className="w-3 h-3 rounded-full border border-black" style={{ background: business?.primaryColor || '#ff6b35' }}></span>
+                        <span className="w-3 h-3 rounded-full border border-black" style={{ background: business?.secondaryColor || '#f7931e' }}></span>
+                        <span className="w-3 h-3 rounded-full border border-black" style={{ background: business?.accentColor || '#004e89' }}></span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+                {Object.values(COLOR_PALETTES).map((palette) => (
+                  <button
+                    key={palette.id}
+                    onClick={() => setSelectedPalette(palette.id)}
+                    className={`w-full text-left p-2 neo-border rounded-lg transition-all ${
+                      selectedPalette === palette.id
+                        ? 'neo-border-thick border-neo-flame bg-neo-lavender'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{palette.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="neo-text-bold text-xs">{palette.name}</div>
+                        <div className="flex gap-1 mt-1">
+                          <span className="w-3 h-3 rounded-full border border-black" style={{ background: palette.primary }}></span>
+                          <span className="w-3 h-3 rounded-full border border-black" style={{ background: palette.secondary }}></span>
+                          <span className="w-3 h-3 rounded-full border border-black" style={{ background: palette.accent }}></span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Selected Items */}
             <div>
               <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">
@@ -416,6 +471,7 @@ export default function PromotionalFlyerGenerator({
                   menu={menu}
                   items={selectedItems}
                   template={template}
+                  colorPalette={selectedPalette}
                 />
               ) : (
                 <div className="bg-white neo-border rounded-lg p-6 sm:p-8 md:p-12 text-center">

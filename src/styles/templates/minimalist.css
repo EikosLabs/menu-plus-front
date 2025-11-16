@@ -108,10 +108,7 @@
   font-weight: 700;
 }
 
-[data-template="minimalist"] .item-image-overlay {
-  background: var(--template-primary);
-  opacity: 0.88;
-}
+/* Image overlay removed */
 
 [data-template="minimalist"] .item-image-placeholder {
   background: var(--template-secondary);

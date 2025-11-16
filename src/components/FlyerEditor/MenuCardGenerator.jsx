@@ -4,7 +4,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { CSS } from '@dnd-kit/utilities';
 import { exportToPDF } from './utils/pdfExport';
 import { exportMultipleToPDF } from './utils/pdfExport';
-import { CARTA_TEMPLATES } from './utils/flyerTemplates';
+import { CARTA_TEMPLATES, COLOR_PALETTES } from './utils/flyerTemplates';
 import MenuCardPreview from './MenuCardPreview';
 import menuService from '../../services/menuService';
 
@@ -49,6 +49,7 @@ export default function MenuCardGenerator({
   const [savedId, setSavedId] = useState(savedFlyer?.id || null);
   const [autoSplit, setAutoSplit] = useState(true);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [selectedPalette, setSelectedPalette] = useState(savedFlyer?.colorPalette || null);
 
   const previewRef = useRef(null);
   const pageRefs = useRef([]);
@@ -95,6 +96,7 @@ export default function MenuCardGenerator({
         paperSize: paperSize,
         fontFamily: selectedFontKey,
         includePhotos: includePhotos,
+        colorPalette: selectedPalette,
       };
 
       if (savedId) {
@@ -249,6 +251,60 @@ export default function MenuCardGenerator({
               </select>
             </div>
 
+            {/* Color Palette Selection */}
+            <div>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Paleta de Colores</h3>
+              <p className="neo-text text-xs opacity-70 mb-2">
+                Elige una paleta predeterminada o usa los colores de tu negocio
+              </p>
+              <div className="space-y-2 max-h-[300px] overflow-auto">
+                <button
+                  onClick={() => setSelectedPalette(null)}
+                  className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
+                    selectedPalette === null
+                      ? 'neo-border-thick border-neo-flame bg-neo-lavender'
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🎨</span>
+                    <div className="flex-1">
+                      <div className="neo-text-bold text-xs sm:text-sm">Colores del Negocio</div>
+                      <div className="flex gap-1 mt-1">
+                        <span className="w-4 h-4 rounded-full border-2 border-black" style={{ background: business?.primaryColor || '#ff6b35' }}></span>
+                        <span className="w-4 h-4 rounded-full border-2 border-black" style={{ background: business?.secondaryColor || '#f7931e' }}></span>
+                        <span className="w-4 h-4 rounded-full border-2 border-black" style={{ background: business?.accentColor || '#004e89' }}></span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+                {Object.values(COLOR_PALETTES).map((palette) => (
+                  <button
+                    key={palette.id}
+                    onClick={() => setSelectedPalette(palette.id)}
+                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
+                      selectedPalette === palette.id
+                        ? 'neo-border-thick border-neo-flame bg-neo-lavender'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{palette.icon}</span>
+                      <div className="flex-1">
+                        <div className="neo-text-bold text-xs sm:text-sm">{palette.name}</div>
+                        <div className="neo-text text-xs opacity-70 hidden sm:block">{palette.description}</div>
+                        <div className="flex gap-1 mt-1">
+                          <span className="w-4 h-4 rounded-full border-2 border-black" style={{ background: palette.primary }}></span>
+                          <span className="w-4 h-4 rounded-full border-2 border-black" style={{ background: palette.secondary }}></span>
+                          <span className="w-4 h-4 rounded-full border-2 border-black" style={{ background: palette.accent }}></span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Incluir fotos */}
             <div>
               <h3 className="neo-h5 mb-2 text-sm sm:text-base">Fotos de platos</h3>
@@ -327,6 +383,7 @@ export default function MenuCardGenerator({
                 template={{ ...template, showImages: includePhotos }}
                 paperSize={paperSize}
                 fontFamily={FONT_MAP[selectedFontKey]}
+                colorPalette={selectedPalette}
               />
               <div style={{ position: 'absolute', left: '-10000px', top: '-10000px' }}>
                 {pages.map((items, idx) => (
@@ -339,6 +396,7 @@ export default function MenuCardGenerator({
                     template={{ ...template, showImages: includePhotos }}
                     paperSize={paperSize}
                     fontFamily={FONT_MAP[selectedFontKey]}
+                    colorPalette={selectedPalette}
                   />
                 ))}
               </div>
