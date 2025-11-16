@@ -169,11 +169,12 @@ function setupMobileCarousel() {
   const chips = Array.from(track.children);
   if (chips.length === 0) return;
 
-  let animationFrameId;
+  let animationFrameId = null;
   let isUserInteracting = false;
-  let userInteractionTimeout;
+  let userInteractionTimeout = null;
   let scrollSpeed = 0.5; // pixels per frame
-  let lastScrollLeft = 0;
+  let lastUserScrollTime = 0;
+  let isMouseOver = false;
 
   // Clone chips many times for truly infinite scroll
   const clonedChips = [];
@@ -201,7 +202,7 @@ function setupMobileCarousel() {
 
   // Continuous auto-scroll animation
   function continuousScroll() {
-    if (isUserInteracting) {
+    if (isUserInteracting || isMouseOver) {
       animationFrameId = requestAnimationFrame(continuousScroll);
       return;
     }
@@ -218,9 +219,7 @@ function setupMobileCarousel() {
   }
 
   function startAutoScroll() {
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId);
-    }
+    if (animationFrameId) return; // Ya está corriendo
     continuousScroll();
   }
 
@@ -231,25 +230,52 @@ function setupMobileCarousel() {
     }
   }
 
-  function handleUserInteraction() {
+  function handleUserScroll() {
+    lastUserScrollTime = Date.now();
     isUserInteracting = true;
 
     clearTimeout(userInteractionTimeout);
     userInteractionTimeout = setTimeout(() => {
       isUserInteracting = false;
-    }, 1500);
+    }, 800);
+  }
+
+  function handleMouseEnter() {
+    isMouseOver = true;
+  }
+
+  function handleMouseLeave() {
+    isMouseOver = false;
+  }
+
+  function handleTouch() {
+    isUserInteracting = true;
+    clearTimeout(userInteractionTimeout);
+    userInteractionTimeout = setTimeout(() => {
+      isUserInteracting = false;
+    }, 800);
   }
 
   // Event listeners
-  track.addEventListener('mouseenter', handleUserInteraction, { passive: true });
-  track.addEventListener('touchstart', handleUserInteraction, { passive: true });
-  track.addEventListener('wheel', handleUserInteraction, { passive: true });
+  track.addEventListener('mouseenter', handleMouseEnter, { passive: true });
+  track.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+  track.addEventListener('touchstart', handleTouch, { passive: true });
+  track.addEventListener('touchmove', handleTouch, { passive: true });
+  track.addEventListener('touchend', () => {
+    setTimeout(() => {
+      if (!isUserInteracting) {
+        isMouseOver = false;
+      }
+    }, 300);
+  }, { passive: true });
+  track.addEventListener('scroll', handleUserScroll, { passive: true });
+  track.addEventListener('wheel', handleUserScroll, { passive: true });
 
   // Handle chip clicks
   track.querySelectorAll('.category-chip').forEach((chip) => {
     chip.addEventListener('click', (e) => {
       e.preventDefault();
-      handleUserInteraction();
+      handleTouch();
 
       // Scroll to section
       const targetId = chip.getAttribute('href').substring(1);
@@ -274,6 +300,21 @@ function setupMobileCarousel() {
   }, 500);
 
   // Pause on window blur, resume on focus
-  window.addEventListener('blur', stopAutoScroll);
-  window.addEventListener('focus', startAutoScroll);
+  window.addEventListener('blur', () => {
+    stopAutoScroll();
+  });
+
+  window.addEventListener('focus', () => {
+    if (!isUserInteracting && !isMouseOver) {
+      startAutoScroll();
+    }
+  });
+
+  // Reintentar el inicio si no hay animación después de un tiempo
+  setTimeout(() => {
+    if (!animationFrameId) {
+      console.log('Restarting carousel animation');
+      startAutoScroll();
+    }
+  }, 2000);
 }
