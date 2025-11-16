@@ -20,13 +20,15 @@ const PromotionalFlyerPreview = forwardRef(({
   const getSizeForFormat = () => {
     switch (template.format) {
       case 'half-page':
-        return { width: '595px', height: '421px' }; // A5 landscape in pixels
+        return { width: '595px', height: '421px' };
       case 'third-page':
-        return { width: '595px', height: '281px' }; // ~1/3 of A4
+        return { width: '595px', height: '281px' };
       case 'quarter-page':
-        return { width: '420px', height: '297px' }; // A6 landscape
+        return { width: '420px', height: '297px' };
       case 'story-vertical':
-        return { width: '360px', height: '640px' }; // scaled preview for 9:16
+        return { width: '360px', height: '640px' };
+      case 'instagram-portrait':
+        return { width: '360px', height: '450px' };
       default:
         return { width: '595px', height: '421px' };
     }

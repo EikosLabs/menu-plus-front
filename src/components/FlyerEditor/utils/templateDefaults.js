@@ -22,6 +22,12 @@ export const PAPER_SIZES = {
     pxWidth: 1080,
     pxHeight: 1920,
   },
+  IG_PORTRAIT: {
+    width: 90, // mm approx for 1080x1350 preview
+    height: 112, // mm approx for 1350px
+    pxWidth: 1080,
+    pxHeight: 1350,
+  },
 };
 
 export const TEMPLATES = {

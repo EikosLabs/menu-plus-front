@@ -136,6 +136,20 @@ export const FOLLETO_TEMPLATES = {
     footerHeight: '50px',
     style: 'featured',
   },
+  post: {
+    id: 'post',
+    name: 'Post IG',
+    description: 'Formato vertical 4:5 para feed',
+    icon: '🖼️',
+    format: 'instagram-portrait',
+    itemsPerRow: 1,
+    showImages: true,
+    imageSize: 'large',
+    maxItems: 5,
+    headerHeight: '90px',
+    footerHeight: '45px',
+    style: 'featured',
+  },
 };
 
 /**
@@ -162,6 +176,11 @@ export const FOLLETO_FORMATS = {
     name: 'Historia IG',
     width: 'STORY',
     description: 'Formato vertical 9:16 (1080x1920)',
+  },
+  'instagram-portrait': {
+    name: 'Post IG',
+    width: 'IG_PORTRAIT',
+    description: 'Formato vertical 4:5 (1080x1350)',
   },
 };
 

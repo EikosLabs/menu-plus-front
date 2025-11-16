@@ -115,6 +115,40 @@ export async function exportToImage(element, options = {}) {
   }
 }
 
+export async function exportMultipleToPDF(elements, options = {}) {
+  const {
+    fileName = 'menu.pdf',
+    paperSize = 'A4',
+    orientation = 'portrait',
+    quality = 2,
+  } = options;
+
+  const paper = PAPER_SIZES[paperSize];
+  if (!paper) throw new Error(`Tamaño de papel no soportado: ${paperSize}`);
+
+  const pdf = new jsPDF({ orientation, unit: 'mm', format: paperSize.toLowerCase(), compress: true });
+
+  for (let i = 0; i < elements.length; i++) {
+    const el = elements[i];
+    if (!el) continue;
+    const canvas = await html2canvas(el, {
+      scale: quality,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      width: paper.pxWidth,
+      height: paper.pxHeight,
+    });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    if (i > 0) pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', 0, 0, paper.width, paper.height, undefined, 'FAST');
+  }
+
+  pdf.save(fileName);
+  return { success: true };
+}
+
 /**
  * Preview PDF in new window
  * @param {HTMLElement} element - The canvas element to preview

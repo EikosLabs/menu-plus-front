@@ -139,10 +139,29 @@ export default function PromotionalFlyerGenerator({
 
     setIsExporting(true);
     try {
-kk      const paperSize = template.format === 'story-vertical' ? 'STORY' : 'A4';
+      const paperSize = template.format === 'story-vertical' ? 'STORY' : template.format === 'instagram-portrait' ? 'IG_PORTRAIT' : 'A4';
       await exportToImage(previewRef.current, {
-        fileName: `${folletoName || business?.name || 'menu'}-${template.format === 'story-vertical' ? 'story' : 'folleto'}.png`,
+        fileName: `${folletoName || business?.name || 'menu'}-${template.format === 'story-vertical' ? 'story' : template.format === 'instagram-portrait' ? 'post' : 'folleto'}.png`,
         format: 'png',
+        paperSize,
+        quality: 2,
+      });
+    } catch (error) {
+      alert(`Error al exportar: ${error.message}`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportJpg = async () => {
+    if (selectedItems.length === 0) return;
+    if (!previewRef.current) return;
+    setIsExporting(true);
+    try {
+      const paperSize = template.format === 'story-vertical' ? 'STORY' : template.format === 'instagram-portrait' ? 'IG_PORTRAIT' : 'A4';
+      await exportToImage(previewRef.current, {
+        fileName: `${folletoName || business?.name || 'menu'}-${template.format === 'story-vertical' ? 'story' : template.format === 'instagram-portrait' ? 'post' : 'folleto'}.jpg`,
+        format: 'jpeg',
         paperSize,
         quality: 2,
       });
@@ -412,6 +431,14 @@ kk      const paperSize = template.format === 'story-vertical' ? 'STORY' : 'A4';
             >
               {isExporting ? '⏳' : '🖼️'}
               <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PNG'}</span>
+            </button>
+            <button
+              onClick={handleExportJpg}
+              disabled={isExporting || selectedItems.length === 0}
+              className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
+            >
+              {isExporting ? '⏳' : '🖼️'}
+              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar JPG'}</span>
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { exportToPDF } from './utils/pdfExport';
+import { exportMultipleToPDF } from './utils/pdfExport';
 import { CARTA_TEMPLATES } from './utils/flyerTemplates';
 import MenuCardPreview from './MenuCardPreview';
 import menuService from '../../services/menuService';
@@ -46,8 +47,11 @@ export default function MenuCardGenerator({
   const [cartaName, setCartaName] = useState(savedFlyer?.name || `Carta ${business?.name || 'Menu'} - ${new Date().toLocaleDateString()}`);
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState(savedFlyer?.id || null);
+  const [autoSplit, setAutoSplit] = useState(true);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   const previewRef = useRef(null);
+  const pageRefs = useRef([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -132,6 +136,14 @@ export default function MenuCardGenerator({
   };
 
   const template = CARTA_TEMPLATES[selectedTemplate];
+
+  const getItemsPerPage = () => {
+    const map = { elegante: 12, compacto: 36, moderno: 24, minimalista: 32 };
+    return map[selectedTemplate] || 24;
+  };
+
+  const pages = autoSplit ? Array.from({ length: Math.ceil(orderedItems.length / getItemsPerPage()) }, (_, i) => orderedItems.slice(i * getItemsPerPage(), (i + 1) * getItemsPerPage())) : [orderedItems];
+  const currentItems = pages[currentPageIndex] || [];
 
   // Block body scroll when modal is open
   useEffect(() => {
@@ -311,11 +323,25 @@ export default function MenuCardGenerator({
                 ref={previewRef}
                 business={business}
                 menu={menu}
-                items={orderedItems}
+                items={currentItems}
                 template={{ ...template, showImages: includePhotos }}
                 paperSize={paperSize}
                 fontFamily={FONT_MAP[selectedFontKey]}
               />
+              <div style={{ position: 'absolute', left: '-10000px', top: '-10000px' }}>
+                {pages.map((items, idx) => (
+                  <MenuCardPreview
+                    key={idx}
+                    ref={(el) => { pageRefs.current[idx] = el; }}
+                    business={business}
+                    menu={menu}
+                    items={items}
+                    template={{ ...template, showImages: includePhotos }}
+                    paperSize={paperSize}
+                    fontFamily={FONT_MAP[selectedFontKey]}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -332,6 +358,16 @@ export default function MenuCardGenerator({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1">
+              <button onClick={() => setAutoSplit(!autoSplit)} className="neo-btn neo-btn-white text-xs px-2 py-1.5">{autoSplit ? 'Auto dividir' : 'Sin dividir'}</button>
+              {pages.length > 1 && (
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setCurrentPageIndex(Math.max(0, currentPageIndex - 1))} className="neo-btn neo-btn-white text-xs px-2 py-1.5">◀</button>
+                  <span className="neo-text text-xs">{currentPageIndex + 1}/{pages.length}</span>
+                  <button onClick={() => setCurrentPageIndex(Math.min(pages.length - 1, currentPageIndex + 1))} className="neo-btn neo-btn-white text-xs px-2 py-1.5">▶</button>
+                </div>
+              )}
+            </div>
             <button
               onClick={onClose}
               className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
@@ -354,6 +390,31 @@ export default function MenuCardGenerator({
               {isExporting ? '⏳' : '📄'}
               <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
             </button>
+            {pages.length > 1 && (
+              <button
+                onClick={async () => {
+                  if (pageRefs.current.length === 0) return;
+                  setIsExporting(true);
+                  try {
+                    await exportMultipleToPDF(pageRefs.current, {
+                      fileName: `${cartaName || business?.name || 'menu'}-carta.pdf`,
+                      paperSize,
+                      orientation: 'portrait',
+                      quality: 2,
+                    });
+                  } catch (error) {
+                    alert(`Error al exportar: ${error.message}`);
+                  } finally {
+                    setIsExporting(false);
+                  }
+                }}
+                disabled={isExporting}
+                className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
+              >
+                {isExporting ? '⏳' : '📄'}
+                <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'PDF multipágina'}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
