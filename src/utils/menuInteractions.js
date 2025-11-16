@@ -178,13 +178,16 @@ function setupMobileCarousel() {
   let userInteractionTimeout;
   let isResetting = false;
 
-  // Clone chips for infinite effect
-  const clonedChips = chips.map(chip => {
-    const clone = chip.cloneNode(true);
-    clone.classList.add('cloned-chip');
-    return clone;
-  });
-  clonedChips.forEach(chip => track.appendChild(chip));
+  // Clone chips multiple times for smoother infinite effect
+  const clonedChips = [];
+  for (let i = 0; i < 3; i++) {
+    chips.forEach(chip => {
+      const clone = chip.cloneNode(true);
+      clone.classList.add('cloned-chip');
+      clonedChips.push(clone);
+      track.appendChild(clone);
+    });
+  }
 
   function getScrollDistance() {
     const firstChip = chips[0];
@@ -220,7 +223,7 @@ function setupMobileCarousel() {
         setTimeout(() => {
           isResetting = false;
         }, 50);
-      }, 500);
+      }, 400);
     } else {
       scrollToIndex(currentIndex, true);
     }
@@ -228,7 +231,8 @@ function setupMobileCarousel() {
 
   function startAutoScroll() {
     stopAutoScroll();
-    autoScrollInterval = setInterval(autoScroll, 2500);
+    // Intervalo más rápido para movimiento más continuo
+    autoScrollInterval = setInterval(autoScroll, 1800);
   }
 
   function stopAutoScroll() {
@@ -243,6 +247,7 @@ function setupMobileCarousel() {
     stopAutoScroll();
 
     clearTimeout(userInteractionTimeout);
+    // Tiempo de pausa más corto después de interacción
     userInteractionTimeout = setTimeout(() => {
       isUserInteracting = false;
 
@@ -258,7 +263,7 @@ function setupMobileCarousel() {
       }
 
       startAutoScroll();
-    }, 1500);
+    }, 800);
   }
 
   // Event listeners
@@ -292,10 +297,10 @@ function setupMobileCarousel() {
     });
   });
 
-  // Start auto-scroll after a brief delay
+  // Start auto-scroll immediately for instant animation
   setTimeout(() => {
     startAutoScroll();
-  }, 1000);
+  }, 500);
 
   // Pause on window blur, resume on focus
   window.addEventListener('blur', stopAutoScroll);

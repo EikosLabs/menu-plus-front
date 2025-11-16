@@ -725,7 +725,7 @@
 }
 .dish-modal-content.active { transform: scale(1) translateY(0); opacity: 1; }
 .dish-modal-close {
-  position: absolute;
+  position: fixed;
   top: 1.25rem;
   right: 1.25rem;
   width: 52px;
@@ -738,8 +738,8 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 4px 4px 0 var(--primary-dark, #000);
-  z-index: 10;
+  box-shadow: 4px 4px 0 var(--primary-dark, #000), 0 0 20px rgba(0,0,0,0.3);
+  z-index: 1001;
 }
 .dish-modal-close:hover {
   transform: translate(-2px, -2px);
@@ -904,6 +904,18 @@
     scroll-snap-type: x proximity;
     overflow-x: scroll;
     scroll-padding: 1rem;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Animación suave para el carrusel */
+  .category-nav-track {
+    animation: carousel-breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes carousel-breathe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
   }
 
   .category-chip {
@@ -914,12 +926,19 @@
     box-shadow: 2px 2px 0 #000;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    animation: chip-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes chip-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
   }
 
   .category-chip:hover,
   .category-chip.active {
     transform: translate(-1px, -1px) scale(1.02);
     box-shadow: 3px 3px 0 #000;
+    animation: none;
   }
 
   /* Other Responsive */
@@ -933,8 +952,14 @@
   .dish-modal-body { grid-template-columns: 1fr; }
   .dish-modal-image-wrapper { border-right: none; border-bottom: var(--template-border, 4px solid var(--primary-dark, #000)); min-height: 280px; max-height: 280px; }
   .dish-modal-info { padding: 1.75rem 1.5rem; gap: 1.25rem; }
-  .dish-modal-close { width: 44px; height: 44px; top: 1rem; right: 1rem; }
-  .dish-modal-close svg { width: 24px; height: 24px; }
+  .dish-modal-close {
+    width: 48px;
+    height: 48px;
+    top: 0.75rem;
+    right: 0.75rem;
+    box-shadow: 4px 4px 0 var(--primary-dark, #000), 0 0 25px rgba(0,0,0,0.5);
+  }
+  .dish-modal-close svg { width: 26px; height: 26px; }
   .dish-modal-title { font-size: 1.65rem; }
   .dish-modal-price-badge { font-size: 1.35rem; padding: 0.75rem 1.25rem; }
   .dish-modal-description { font-size: 1rem; }
