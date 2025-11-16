@@ -28,13 +28,13 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
 
   // Convertir hex a HSL al cargar
   useEffect(() => {
-    if (value) {
+    if (value && value !== '#000000') {
       const hsl = hexToHSL(value);
       setHue(hsl.h);
       setSaturation(hsl.s);
       setLightness(hsl.l);
     }
-  }, []);
+  }, [value]);
 
   // Convertir HSL a Hex
   const hslToHex = (h, s, l) => {
@@ -132,14 +132,14 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
   };
 
   const handleHexChange = (e) => {
-    const hex = e.target.value;
+    const hex = e.target.value || '#000000';
     if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
       const hsl = hexToHSL(hex);
       setHue(hsl.h);
       setSaturation(hsl.s);
       setLightness(hsl.l);
       onChange({ target: { value: hex, name: name } });
-    } else if (hex.startsWith('#')) {
+    } else if (hex && hex.startsWith('#')) {
       onChange({ target: { value: hex, name: name } });
     }
   };
@@ -168,10 +168,10 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
       >
         <div
           className="w-12 h-12 rounded-lg border-2 border-slate-200 flex-shrink-0 neo-shadow-md"
-          style={{ backgroundColor: value }}
+          style={{ backgroundColor: value || '#000000' }}
         />
         <div className="flex-1 text-left">
-          <div className="font-medium text-slate-900">{value.toUpperCase()}</div>
+          <div className="font-medium text-slate-900">{(value || '#000000').toUpperCase()}</div>
           <div className="text-slate-500 text-xs">HSL({hue}°, {saturation}%, {lightness}%)</div>
         </div>
         <svg
@@ -290,7 +290,7 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
             </label>
             <input
               type="text"
-              value={value}
+              value={value || '#000000'}
               onChange={handleHexChange}
               className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg font-mono text-sm focus:border-neo-flame focus:outline-none"
               placeholder="#000000"
