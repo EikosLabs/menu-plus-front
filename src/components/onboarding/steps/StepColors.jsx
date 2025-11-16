@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import OnboardingStep from '../OnboardingStep';
 import { validateStepColors } from '../../../utils/onboardingValidation';
+import CircularColorPicker from '../../../components/ui/CircularColorPicker';
 
 /**
  * Paso 5: Personalización de Colores
@@ -39,53 +40,31 @@ export default function StepColors({
     });
   };
 
-  const ColorPicker = ({ label, name, value, error }) => (
-    <div className="form-field">
-      <label htmlFor={name} className="form-label">
+  const ColorPickerField = ({ label, name, value, error }) => (
+    <div className="form-field mb-6">
+      <label className="form-label mb-4 block">
         {label}
         <span className="required">*</span>
       </label>
-      
-      <div className="flex gap-3 items-center">
-        {/* Color Picker */}
-        <div className="relative">
-          <input
-            type="color"
-            id={name}
-            name={name}
-            value={value}
-            onChange={(e) => handleColorChange(name, e.target.value)}
-            className="w-16 h-16 rounded-lg cursor-pointer border-2 border-gray-300"
-            aria-label={`Selector de color para ${label}`}
-          />
-        </div>
-        
-        {/* Hex Input */}
-        <div className="flex-1">
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => handleColorChange(name, e.target.value)}
-            placeholder="#000000"
-            maxLength={7}
-            className={`form-input ${error ? 'error' : ''}`}
-            aria-invalid={error ? 'true' : 'false'}
-            aria-describedby={error ? `${name}-error` : undefined}
-          />
-        </div>
-      </div>
-      
+
+      <CircularColorPicker
+        color={value}
+        onChange={(color) => handleColorChange(name, color)}
+        label={label}
+      />
+
       {error && (
-        <div id={`${name}-error`} className="form-error" role="alert">
-          <svg 
-            fill="none" 
-            stroke="currentColor" 
+        <div className="form-error mt-2" role="alert">
+          <svg
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
+            className="w-4 h-4 inline mr-2"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
@@ -118,21 +97,21 @@ export default function StepColors({
       icon={icon}
       isActive={isActive}
     >
-      <ColorPicker
+      <ColorPickerField
         label="Color Primario"
         name="primaryColor"
         value={formData.primaryColor}
         error={errors.primaryColor}
       />
 
-      <ColorPicker
+      <ColorPickerField
         label="Color Secundario"
         name="secondaryColor"
         value={formData.secondaryColor}
         error={errors.secondaryColor}
       />
 
-      <ColorPicker
+      <ColorPickerField
         label="Color de Acento"
         name="accentColor"
         value={formData.accentColor}

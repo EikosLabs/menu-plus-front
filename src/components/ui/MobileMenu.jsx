@@ -55,18 +55,23 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 	];
 
 	return (
-		<div className="absolute top-16 right-0 left-0 z-40 origin-top transform animate-slideDown bg-white px-4 py-4 shadow-xl transition-all duration-300 md:hidden border-neo-black border-l-neo-thick border-r-neo-thick border-b-neo-thick">
-			<div className="flex flex-col space-y-3">
-				<div className="flex items-center border-gray-100 border-b py-3">
-					<div className="mr-3 rounded-full bg-[#004E71] bg-opacity-10 p-2">
-						<svg className="h-5 w-5 text-[#003A57]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+		<div className="fixed top-14 sm:top-16 right-0 left-0 z-50 bg-white shadow-2xl md:hidden border-l-neo-thick border-r-neo-thick border-b-neo-thick border-neo-black max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto">
+			<div className="px-4 py-4 sm:px-6 sm:py-6">
+				{/* User Info */}
+				<div className="flex items-center border-b border-gray-200 pb-4 sm:pb-6 mb-4 sm:mb-6">
+					<div className="mr-3 sm:mr-4 rounded-full bg-neo-lavender p-2 sm:p-3 border-2 border-neo-flame">
+						<svg className="h-5 w-5 sm:h-6 sm:w-6 text-neo-flame" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 						</svg>
 					</div>
-					<span className="font-medium text-[#003A57]">{userData?.name}</span>
+					<div className="min-w-0">
+						<p className="neo-text-bold text-neo-black text-sm sm:text-base truncate">{userData?.name}</p>
+						<p className="neo-text text-neo-gray text-xs sm:text-sm truncate">{userData?.email}</p>
+					</div>
 				</div>
 
-				<div className="flex flex-col space-y-1">
+				{/* Menu Items */}
+				<div className="flex flex-col space-y-1 sm:space-y-2 mb-4 sm:mb-6">
 					{menuItems.map((item) => (
 						<button
 							key={item.id}
@@ -74,31 +79,32 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 								setActiveSection(item.id);
 								setShowMobileMenu(false);
 							}}
-							className={`flex items-center rounded-lg px-4 py-3 ${
+							className={`flex items-center rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 transition-all duration-200 ${
 								activeSection === item.id
-									? "bg-blue-50 font-medium text-blue-600"
-									: "text-gray-700 hover:bg-gray-50"
+									? "neo-card-3d-sunset bg-neo-flame text-white"
+									: "neo-card-3d text-neo-black hover:bg-neo-lavender"
 							}`}
 						>
-							<svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<svg className="mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								{item.icon}
 							</svg>
-							{item.label}
+							<span className="neo-text-bold text-sm sm:text-base truncate">{item.label}</span>
 						</button>
 					))}
 				</div>
 
-				<div className="mt-2 border-gray-100 border-t pt-2">
+				{/* Logout Button */}
+				<div className="border-t border-gray-200 pt-4 sm:pt-6">
 					<button
 						onClick={onLogout}
-						className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-[#1a1a1a] to-[#404040] px-4 py-3 font-medium text-white shadow-md"
+						className="neo-btn neo-btn-danger w-full flex items-center justify-center text-sm sm:text-base py-2.5 sm:py-3"
 					>
-						<svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<svg className="mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
 						</svg>
-                        {t("auth.logout")}
-                    </button>
-                </div>
+						{t("auth.logout")}
+					</button>
+				</div>
 			</div>
 		</div>
 	);

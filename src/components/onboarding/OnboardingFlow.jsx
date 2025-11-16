@@ -143,9 +143,7 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
 
   // Manejar la finalización del onboarding
   const handleContinue = () => {
-    // Guardar el businessId para el onboarding del menú
-    localStorage.setItem('needs_menu_onboarding', 'true');
-    window.location.href = '/menu-onboarding';
+    window.location.href = '/dashboard';
   };
 
   // Mostrar loading mientras se obtiene el userId
