@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * Componente Modal reutilizable
@@ -42,7 +43,7 @@ export default function Modal({
 
 	if (!isOpen) return null;
 
-	return (
+	const modalContent = (
 		<div
 			className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-all duration-300 p-4"
 			onClick={onClose}
@@ -96,4 +97,9 @@ export default function Modal({
 			</div>
 		</div>
 	);
+
+	// Renderizar el modal en el nivel raíz del documento usando portal
+	return typeof document !== 'undefined'
+		? createPortal(modalContent, document.body)
+		: null;
 }

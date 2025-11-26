@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { exportToImage } from './utils/pdfExport';
 import { FOLLETO_TEMPLATES, FOLLETO_FORMATS, COLOR_PALETTES } from './utils/flyerTemplates';
 import PromotionalFlyerPreview from './PromotionalFlyerPreview';
@@ -194,9 +195,9 @@ export default function PromotionalFlyerGenerator({
     }
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4 overflow-auto"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4 overflow-auto"
       onClick={(e) => {
         // Close on backdrop click
         if (e.target === e.currentTarget) {
@@ -543,4 +544,8 @@ export default function PromotionalFlyerGenerator({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : null;
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "../i18n/utils";
 import menuService from "../services/menuService";
 
@@ -320,7 +321,7 @@ export default function QRCodeComponent({
 		}
 	};
 
-	return (
+	const modalContent = (
 		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 p-4">
 			<div className="relative bg-white neo-border neo-shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto">
 				{/* Header con título y botón cerrar */}
@@ -570,4 +571,8 @@ export default function QRCodeComponent({
 			</div>
 		</div>
 	);
+
+	return typeof document !== 'undefined'
+		? createPortal(modalContent, document.body)
+		: null;
 }

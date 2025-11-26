@@ -80,7 +80,7 @@ export default function UserDashboard() {
 				/>
 			)}
 
-			<main className="container mx-auto flex-grow px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8 xl:py-10 relative z-0">
+			<main className="container mx-auto flex-grow px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8 xl:py-10 pb-20 relative z-0">
 				<DashboardHeader activeSection={activeSection} />
 				<ErrorAlert error={error} onClose={() => setError(null)} />
 
@@ -109,12 +109,6 @@ export default function UserDashboard() {
 					{activeSection === "perfil" && <ProfileSection />}
 				</Suspense>
 			</main>
-
-			<footer className="mt-auto bg-neo-black text-white border-t-neo-thick border-neo-flame py-6 relative z-0">
-				<div className="container mx-auto px-4 text-center">
-					<p className="neo-text text-white/80">© {new Date().getFullYear()} Menu Plus. Todos los derechos reservados.</p>
-				</div>
-			</footer>
 
 			<style jsx={true}>{`
 				@keyframes slideDown {
