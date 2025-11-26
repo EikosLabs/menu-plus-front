@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import authService from "../services/authService";
 import { useErrorHandler } from "../hooks/useErrorHandler";
 import ErrorAlert, { SuccessAlert, FieldError } from "./shared/ErrorAlert";
+import PasswordInput from "./shared/PasswordInput";
 import { validateEmail, validateRequired } from "../utils/validation";
 import { useTranslation } from "../i18n/utils";
 import { ERROR_TYPES } from "../utils/errorTypes";
@@ -108,28 +109,18 @@ export default function LoginForm() {
             </div>
 
             {/* Password Field */}
-            <div>
-                <label
-                    htmlFor="password"
-                    className="neo-text-bold block mb-2"
-                >
-                    {t("auth.password")}
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  className={`neo-input ${(getFieldError('password') || fieldErrors?.password) ? 'border-red-500' : ''}`}
-                  placeholder={t("auth.passwordPlaceholder")}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (touched.password) clearFieldError('password');
-                  }}
-                  onBlur={() => handleBlur('password')}
-                />
-                <FieldError error={getFieldError('password') || fieldErrors?.password || (error?.type === ERROR_TYPES.UNAUTHORIZED ? t('auth.invalidCredentials') || 'Email o contraseña incorrectos.' : null)} />
-            </div>
+            <PasswordInput
+              label={t("auth.password")}
+              name="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (touched.password) clearFieldError('password');
+              }}
+              onBlur={() => handleBlur('password')}
+              placeholder={t("auth.passwordPlaceholder")}
+              error={getFieldError('password') || fieldErrors?.password || (error?.type === ERROR_TYPES.UNAUTHORIZED ? t('auth.invalidCredentials') || 'Email o contraseña incorrectos.' : null)}
+            />
 
             {/* Forgot Password Link */}
             <div className="text-right">
@@ -143,9 +134,17 @@ export default function LoginForm() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="neo-btn neo-btn-primary w-full"
+                  className={`neo-btn neo-btn-primary w-full flex justify-center items-center gap-2 ${loading ? 'opacity-80 cursor-not-allowed' : ''}`}
                 >
-                  {loading ? `${t("common.loading")}` : t("auth.loginButton")}
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {t("common.loading")}
+                    </>
+                  ) : t("auth.loginButton")}
                 </button>
             </div>
         </form>

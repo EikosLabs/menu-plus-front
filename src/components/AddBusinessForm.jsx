@@ -96,6 +96,18 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 		}
 	};
 
+	const handleColorChange = (name, color) => {
+		setFormData((prev) => ({
+			...prev,
+			[name]: color,
+		}));
+
+		// Clear field error when user changes color
+		if (fieldErrors[name]) {
+			clearFieldError(name);
+		}
+	};
+
 	const handleBlur = (field) => {
 		setTouched(prev => ({ ...prev, [field]: true }));
 	};
@@ -723,23 +735,20 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 				<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 					<CircularColorPicker
 						label="🎯 Color Primario"
-						name="primaryColor"
-						value={formData.primaryColor}
-						onChange={handleChange}
+						color={formData.primaryColor}
+						onChange={(color) => handleColorChange('primaryColor', color)}
 					/>
 
 					<CircularColorPicker
 						label="🌟 Color Secundario"
-						name="secondaryColor"
-						value={formData.secondaryColor}
-						onChange={handleChange}
+						color={formData.secondaryColor}
+						onChange={(color) => handleColorChange('secondaryColor', color)}
 					/>
 
 					<CircularColorPicker
 						label="✨ Color de Acento"
-						name="accentColor"
-						value={formData.accentColor}
-						onChange={handleChange}
+						color={formData.accentColor}
+						onChange={(color) => handleColorChange('accentColor', color)}
 					/>
 				</div>
 

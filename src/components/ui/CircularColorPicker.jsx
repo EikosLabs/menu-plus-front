@@ -26,9 +26,9 @@ export default function CircularColorPicker({ color, onChange, label }) {
     }
   }, [isOpen]);
 
-  // Convertir hex a HSL al cargar
+  // Convertir hex a HSL al cargar o cuando cambia
   useEffect(() => {
-    if (color && color !== '#000000') {
+    if (color) {
       const hsl = hexToHSL(color);
       setHue(hsl.h);
       setSaturation(hsl.s);
