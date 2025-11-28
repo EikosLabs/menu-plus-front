@@ -252,20 +252,41 @@ export default function BusinessList({
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6 sm:space-y-8 lg:space-y-10">
 			{businesses.map((business) => (
 				<div
 					key={business.id}
-					className="neo-card-3d overflow-hidden transform transition-all duration-300"
+					className="neo-card-3d overflow-hidden transform transition-all duration-300 hover:scale-[1.02]"
 				>
-					<div className="relative bg-neo-flame border-b-neo-thick border-neo-black p-4 sm:p-5 md:p-6 text-white">
-						<div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
-							<div className="flex-1 min-w-0">
-								<h2 className="text-xl sm:text-2xl font-bold mb-1 truncate">{business.name}</h2>
-								<p className="text-white text-opacity-90 text-xs sm:text-sm">
-									Categoría:{" "}
-									{business.businessCategory?.name || "Sin categoría"}
-								</p>
+					<div className="relative bg-neo-flame border-b-neo-thick border-neo-black p-4 sm:p-5 lg:p-6 text-white">
+						<div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
+							<div className="lg:col-span-8">
+								<div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+									{business.imageKey && (
+										<div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white rounded-lg overflow-hidden border-2 border-white/20">
+											<img
+												src={business.imageKey}
+												alt={business.name}
+												className="w-full h-full object-cover"
+												onError={(e) => {
+													e.target.style.display = 'none';
+													e.target.nextElementSibling.style.display = 'flex';
+												}}
+											/>
+											<div className="w-full h-full bg-white/10 flex items-center justify-center" style={{display: 'none'}}>
+												<svg className="w-6 h-6 sm:w-8 sm:h-8 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+												</svg>
+											</div>
+										</div>
+									)}
+									<div className="min-w-0 flex-1">
+										<h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 lg:mb-2 truncate">{business.name}</h2>
+										<p className="text-white text-opacity-90 text-sm sm:text-base lg:text-lg">
+											{business.businessCategory?.name || "Sin categoría"}
+										</p>
+									</div>
+								</div>
 								<div className="mt-2 sm:mt-3 flex flex-wrap gap-1.5 sm:gap-2">
 									{business.address && (
 										<span className="bg-white bg-opacity-10 py-1 px-2 sm:px-3 rounded-full text-xs flex items-center">

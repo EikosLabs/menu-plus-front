@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
  * Circular Color Picker con teoría del color
  * Permite seleccionar colores de forma visual y genera paletas armónicas
  */
-export default function CircularColorPicker({ value, onChange, label, name }) {
+export default function CircularColorPicker({ color, onChange, label }) {
   const [isOpen, setIsOpen] = useState(false);
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(100);
@@ -26,15 +26,15 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
     }
   }, [isOpen]);
 
-  // Convertir hex a HSL al cargar
+  // Convertir hex a HSL al cargar o cuando cambia
   useEffect(() => {
-    if (value) {
-      const hsl = hexToHSL(value);
+    if (color) {
+      const hsl = hexToHSL(color);
       setHue(hsl.h);
       setSaturation(hsl.s);
       setLightness(hsl.l);
     }
-  }, []);
+  }, [color]);
 
   // Convertir HSL a Hex
   const hslToHex = (h, s, l) => {
@@ -110,7 +110,7 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
 
   const handleColorChange = (newHue, newSat, newLight) => {
     const newColor = hslToHex(newHue, newSat, newLight);
-    onChange({ target: { value: newColor, name: name } });
+    onChange(newColor);
   };
 
   const handleHueChange = (e) => {
@@ -132,24 +132,24 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
   };
 
   const handleHexChange = (e) => {
-    const hex = e.target.value;
+    const hex = e.target.value || '#000000';
     if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
       const hsl = hexToHSL(hex);
       setHue(hsl.h);
       setSaturation(hsl.s);
       setLightness(hsl.l);
-      onChange({ target: { value: hex, name: name } });
-    } else if (hex.startsWith('#')) {
-      onChange({ target: { value: hex, name: name } });
+      onChange(hex);
+    } else if (hex && hex.startsWith('#')) {
+      onChange(hex);
     }
   };
 
-  const selectSchemeColor = (color) => {
-    const hsl = hexToHSL(color);
+  const selectSchemeColor = (selectedColor) => {
+    const hsl = hexToHSL(selectedColor);
     setHue(hsl.h);
     setSaturation(hsl.s);
     setLightness(hsl.l);
-    onChange({ target: { value: color, name: name } });
+    onChange(selectedColor);
   };
 
   const colorSchemes = generateColorScheme();
@@ -168,10 +168,10 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
       >
         <div
           className="w-12 h-12 rounded-lg border-2 border-slate-200 flex-shrink-0 neo-shadow-md"
-          style={{ backgroundColor: value }}
+          style={{ backgroundColor: color || '#000000' }}
         />
         <div className="flex-1 text-left">
-          <div className="font-medium text-slate-900">{value.toUpperCase()}</div>
+          <div className="font-medium text-slate-900">{(color || '#000000').toUpperCase()}</div>
           <div className="text-slate-500 text-xs">HSL({hue}°, {saturation}%, {lightness}%)</div>
         </div>
         <svg
@@ -290,7 +290,7 @@ export default function CircularColorPicker({ value, onChange, label, name }) {
             </label>
             <input
               type="text"
-              value={value}
+              value={color || '#000000'}
               onChange={handleHexChange}
               className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg font-mono text-sm focus:border-neo-flame focus:outline-none"
               placeholder="#000000"

@@ -56,68 +56,96 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 
 	return (
 		<nav className="sticky top-0 z-50 bg-white border-b-neo-extra border-neo-black shadow-lg">
-			<div className="container mx-auto flex items-center justify-between p-4">
-				<div className="flex items-center space-x-3">
-					<div className="neo-icon-3d neo-icon-3d-flame w-10 h-10">
-						<img src="/favicon.svg" alt="Menu Plus Logo" className="h-5 w-5" />
+			<div className="container mx-auto px-3 sm:px-4">
+				<div className="flex items-center justify-between h-14 sm:h-16">
+					{/* Logo and Brand */}
+					<div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+						<div className="neo-icon-3d neo-icon-3d-flame w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+							<img src="/favicon.svg" alt="Menu Plus Logo" className="h-4 w-4 sm:h-5 sm:w-5" />
+						</div>
+						<h1 className="neo-heading neo-h4 text-neo-flame mb-0 truncate text-sm sm:text-base">Menu Plus</h1>
 					</div>
-					<h1 class="neo-heading neo-h4 text-neo-flame mb-0">Menu Plus</h1>
-				</div>
 
-				{/* Desktop Navigation Menu */}
-				<div className="hidden lg:flex items-center space-x-2">
-					{navItems.map((item) => (
-						<button
-							key={item.id}
-							onClick={() => setActiveSection(item.id)}
-							className={`flex items-center px-4 py-2 rounded-lg transition-all duration-200 ${
-								activeSection === item.id
-									? "bg-neo-flame text-white neo-shadow"
-									: "text-neo-black hover:bg-neo-lavender"
-							}`}
-						>
-							<svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								{item.icon}
+					{/* Desktop Navigation Menu */}
+					<div className="hidden lg:flex items-center space-x-1 sm:space-x-2">
+						{navItems.map((item) => (
+							<button
+								key={item.id}
+								onClick={() => setActiveSection(item.id)}
+								className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base ${
+									activeSection === item.id
+										? "bg-neo-flame text-white neo-shadow"
+										: "text-neo-black hover:bg-neo-lavender"
+								}`}
+							>
+								<svg className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									{item.icon}
+								</svg>
+								<span className="neo-text-bold truncate">{item.label}</span>
+							</button>
+						))}
+					</div>
+
+					{/* User Actions - Desktop */}
+					<div className="hidden md:flex items-center space-x-3 sm:space-x-4 lg:space-x-6">
+						<div className="flex items-center neo-text neo-text-bold min-w-0">
+							<svg className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 text-neo-flame flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 							</svg>
-							<span className="neo-text-bold text-sm">{item.label}</span>
-						</button>
-					))}
-				</div>
+							<span className="truncate text-sm sm:text-base">{userData?.name}</span>
+						</div>
 
-				<div className="hidden items-center space-x-6 md:flex">
-					<div className="flex items-center neo-text neo-text-bold">
-						<svg className="mr-2 h-5 w-5 text-neo-flame" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-						</svg>
-						<span>{userData?.name}</span>
+						<button
+							onClick={onLogout}
+							className="neo-btn neo-btn-primary flex items-center text-sm sm:text-base px-3 py-2 sm:px-4"
+						>
+							<svg className="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+							</svg>
+							<span className="hidden sm:inline">{t("auth.logout")}</span>
+							<span className="sm:hidden">Salir</span>
+						</button>
 					</div>
 
-                    <button
-                        onClick={onLogout}
-                        className="neo-btn neo-btn-primary flex items-center"
-                    >
-						<svg className="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-						</svg>
-                        {t("auth.logout")}
-                    </button>
-                </div>
+					{/* Mobile Menu Button */}
+					<button
+						className="p-2 neo-btn neo-btn-outline md:hidden rounded-lg hover:bg-neo-lavender transition-colors"
+						onClick={() => setShowMobileMenu(!showMobileMenu)}
+						aria-label={showMobileMenu ? t("common.close") : t("common.open")}
+					>
+						{showMobileMenu ? (
+							<svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						) : (
+							<svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+							</svg>
+						)}
+					</button>
+				</div>
 
-				<button
-					className="p-2 neo-btn neo-btn-outline md:hidden"
-					onClick={() => setShowMobileMenu(!showMobileMenu)}
-                    aria-label={showMobileMenu ? t("common.close") : t("common.open")}
-                >
-					{showMobileMenu ? (
-						<svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-						</svg>
-					) : (
-						<svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-						</svg>
-					)}
-				</button>
+				{/* Mobile Navigation Bar */}
+				<div className="hidden md:flex lg:hidden border-t border-gray-200 py-2">
+					<div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto">
+						{navItems.map((item) => (
+							<button
+								key={item.id}
+								onClick={() => setActiveSection(item.id)}
+								className={`flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${
+									activeSection === item.id
+										? "bg-neo-flame text-white neo-shadow"
+										: "text-neo-black hover:bg-neo-lavender"
+								}`}
+							>
+								<svg className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									{item.icon}
+								</svg>
+								<span className="neo-text-bold truncate">{item.label}</span>
+							</button>
+						))}
+					</div>
+				</div>
 			</div>
 		</nav>
 	);

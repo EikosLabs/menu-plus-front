@@ -35,21 +35,7 @@ export default function UserDashboard() {
 			return;
 		}
 		
-		// 2. Si tiene negocio pero no tiene menú, redirigir a onboarding del menú
-		if (hasBusinesses) {
-			const business = businesses[0];
-			const hasMenu = business.menus && business.menus.length > 0;
-			
-			if (!hasMenu) {
-				// No tiene menú, activar onboarding del menú
-				localStorage.setItem('needs_menu_onboarding', 'true');
-				window.location.href = '/menu-onboarding';
-			} else {
-				// Ya tiene menú, limpiar el flag si existe
-				localStorage.removeItem('needs_menu_onboarding');
-			}
-		}
-	}, [businesses, businessLoading]);
+			}, [businesses, businessLoading]);
 
 	const handleBusinessAdded = async (newBusiness) => {
 		try {
@@ -94,7 +80,7 @@ export default function UserDashboard() {
 				/>
 			)}
 
-			<main className="container mx-auto flex-grow px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8 relative z-0">
+			<main className="container mx-auto flex-grow px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8 xl:py-10 pb-20 relative z-0">
 				<DashboardHeader activeSection={activeSection} />
 				<ErrorAlert error={error} onClose={() => setError(null)} />
 
@@ -123,12 +109,6 @@ export default function UserDashboard() {
 					{activeSection === "perfil" && <ProfileSection />}
 				</Suspense>
 			</main>
-
-			<footer className="mt-auto bg-neo-black text-white border-t-neo-thick border-neo-flame py-6 relative z-0">
-				<div className="container mx-auto px-4 text-center">
-					<p className="neo-text text-white/80">© {new Date().getFullYear()} Menu Plus. Todos los derechos reservados.</p>
-				</div>
-			</footer>
 
 			<style jsx={true}>{`
 				@keyframes slideDown {

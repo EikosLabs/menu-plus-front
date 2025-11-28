@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import menuService from "../services/menuService";
 
 export default function SectionManager({
@@ -146,7 +147,7 @@ export default function SectionManager({
 		};
 	}, [isLoading, onClose]);
 
-	return (
+	const modalContent = (
 		<div
 			className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-all duration-300 p-4"
 			onClick={onClose}
@@ -402,4 +403,8 @@ export default function SectionManager({
       `}</style>
 		</div>
 	);
+
+	return typeof document !== 'undefined'
+		? createPortal(modalContent, document.body)
+		: null;
 }

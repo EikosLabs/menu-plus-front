@@ -121,7 +121,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		currentPath === "/register" ||
 		currentPath.startsWith("/login/") ||
 		currentPath.startsWith("/register/") ||
-		currentPath.startsWith("/menu/");
+		currentPath.startsWith("/menu/") ||
+		currentPath.startsWith("/business/");
 
 	const token = context.cookies.get("auth_token")?.value;
 	const refreshToken = context.cookies.get("refresh_token")?.value;
