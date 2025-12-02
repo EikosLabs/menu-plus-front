@@ -27,8 +27,11 @@ export default function QRCodeComponent({
 	}, [qrCodeId]);
 
 	const menuUrl = useMemo(() => {
+		const frontendUrl = import.meta.env.PUBLIC_FRONTEND_URL || 'https://menusesqr.online';
+		console.log('QR Code usando frontend URL:', frontendUrl, 'para QR ID:', qrCodeId);
+
 		return qrCodeId
-			? `${window.location.origin}/menu/${qrCodeId}`
+			? `${frontendUrl}/menu/${qrCodeId}`
 			: "";
 	}, [qrCodeId]);
 

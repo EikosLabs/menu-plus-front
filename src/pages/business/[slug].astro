@@ -10,7 +10,7 @@ let business = null;
 let error = null;
 
 try {
-  const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.PUBLIC_API_URL || 'https://menusesqr.online/api';
   const response = await fetch(`${API_URL}/api/business-landing/${slug}`);
 
   if (!response.ok) {

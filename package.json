@@ -17,6 +17,8 @@
 		"@dnd-kit/core": "^6.3.1",
 		"@dnd-kit/sortable": "^10.0.0",
 		"@dnd-kit/utilities": "^3.2.2",
+		"@sentry/astro": "^10.27.0",
+		"@sentry/node": "^10.27.0",
 		"astro": "^5.7.12",
 		"html2canvas": "^1.4.1",
 		"jspdf": "^3.0.3",

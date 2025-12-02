@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import authService from "../services/authService";
 import { useErrorHandler } from "../hooks/useErrorHandler";
-import ErrorAlert, { SuccessAlert, FieldError } from "./shared/ErrorAlert";
+import ErrorAlert, { FieldError } from "./shared/ErrorAlert";
 import PasswordInput from "./shared/PasswordInput";
 import { validateEmail, validateRequired } from "../utils/validation";
 import { useTranslation } from "../i18n/utils";
 import { ERROR_TYPES } from "../utils/errorTypes";
+import LoginSuccessNotification from "./ui/LoginSuccessNotification";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -58,9 +59,7 @@ export default function LoginForm() {
 
       if (result && result.token) {
         setSuccess(true);
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 1000);
+        // La notificación se encargará de la redirección
       }
     } catch (err) {
       handleError(err);
@@ -81,7 +80,12 @@ export default function LoginForm() {
       )}
 
       {success && (
-        <SuccessAlert message={t("auth.loginSuccess") || "¡Inicio de sesión exitoso! Redirigiendo..."} />
+        <LoginSuccessNotification
+          visible={success}
+          onComplete={() => {
+            window.location.href = "/dashboard";
+          }}
+        />
       )}
 
             {/* Email Field */}

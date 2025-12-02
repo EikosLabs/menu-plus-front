@@ -130,17 +130,35 @@ export async function loadMenu(qrCodeId) {
       applyTheme(business);
     }
 
+    // Filtrar secciones duplicadas por ID
+    const uniqueSections = [];
+    const seenIds = new Set();
     const itemsBySection = {};
+
+    console.log('Secciones originales recibidas:', menu.sections.length);
+    console.log('IDs de secciones recibidas:', menu.sections.map(s => ({ id: s.id, name: s.name })));
+
     menu.sections.forEach((section) => {
-      const key = String(section.id).toLowerCase();
-      itemsBySection[key] = section.menuItems || [];
+      const sectionId = String(section.id).toLowerCase();
+
+      if (!seenIds.has(sectionId)) {
+        seenIds.add(sectionId);
+        uniqueSections.push(section);
+        itemsBySection[sectionId] = section.menuItems || [];
+      } else {
+        console.warn('Sección duplicada detectada y eliminada:', section.id, section.name);
+      }
     });
+
+    console.log('Secciones únicas después de filtrar:', uniqueSections.length);
 
     if (menu.menuItems?.length) {
       itemsBySection['no-section'] = menu.menuItems;
     }
 
-    renderMenu(menu, business, itemsBySection);
+    // Usar menú con secciones únicas filtradas
+    const filteredMenu = { ...menu, sections: uniqueSections };
+    renderMenu(filteredMenu, business, itemsBySection);
 
     loadingState.style.display = 'none';
     menuContent.style.display = 'block';

@@ -5,6 +5,7 @@ export const useBusinesses = () => {
 	const [businesses, setBusinesses] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const fetchBusinesses = async () => {
 		setLoading(true);
@@ -24,6 +25,40 @@ export const useBusinesses = () => {
 	useEffect(() => {
 		fetchBusinesses();
 	}, []);
+
+	// Función para refrescar datos manualmente
+	const refreshBusinesses = async () => {
+		try {
+			setIsRefreshing(true);
+			console.log('Refrescando negocios en dashboard...');
+
+			const userBusinesses = await menuService.getUserBusinesses();
+			setBusinesses(userBusinesses);
+			setError(null);
+
+			console.log('Negocios del dashboard actualizados');
+		} catch (error) {
+			console.error('Error al refrescar negocios:', error);
+			setError("No se pudieron actualizar los datos. Por favor, intente de nuevo.");
+		} finally {
+			setIsRefreshing(false);
+		}
+	};
+
+	// Polling automático cada 30 segundos
+	useEffect(() => {
+		const refreshInterval = setInterval(async () => {
+			try {
+				const userBusinesses = await menuService.getUserBusinesses();
+				setBusinesses(userBusinesses);
+				console.log('Refresco automático de negocios completado');
+			} catch (error) {
+				console.error('Error en refresco automático de negocios:', error);
+			}
+		}, 30000); // 30 segundos
+
+		return () => clearInterval(refreshInterval);
+	}, []); // Array vacío para ejecutar solo una vez
 
 	const addBusiness = async (newBusiness) => {
 		try {
@@ -56,8 +91,10 @@ export const useBusinesses = () => {
 		loading,
 		error,
 		setError,
+		isRefreshing,
 		addBusiness,
 		addMenu,
-		fetchBusinesses
+		fetchBusinesses,
+		refreshBusinesses
 	};
 };

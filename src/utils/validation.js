@@ -197,7 +197,7 @@ export const validateFileType = (file, allowedTypes = ['image/jpeg', 'image/png'
 };
 
 /**
- * Valida tamaño de archivo
+ * Valida tamaño de archivo con feedback mejorado
  */
 export const validateFileSize = (file, maxSizeMB = 5) => {
   if (!file) return null;
@@ -205,10 +205,37 @@ export const validateFileSize = (file, maxSizeMB = 5) => {
   const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
   if (file.size > maxSizeBytes) {
-    return `El archivo es demasiado grande. Máximo ${maxSizeMB}MB`;
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    const excessMB = (fileSizeMB - maxSizeMB).toFixed(1);
+
+    return {
+      isValid: false,
+      message: `El archivo es demasiado grande (${fileSizeMB}MB). Máximo permitido: ${maxSizeMB}MB.`,
+      details: {
+        currentSize: `${fileSizeMB}MB`,
+        maxSize: `${maxSizeMB}MB`,
+        excess: `${excessMB}MB`,
+        fileSize: file.size,
+        maxFileSize: maxSizeBytes
+      },
+      suggestions: [
+        'Usa una imagen más pequeña',
+        'Comprime la imagen antes de subirla',
+        'Reduce la resolución de la imagen',
+        'Usa formato JPEG en lugar de PNG',
+        'Recorta la imagen al tamaño necesario'
+      ]
+    };
   }
 
-  return null;
+  return {
+    isValid: true,
+    message: `Tamaño de archivo válido: ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+    details: {
+      currentSize: `${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+      fileSize: file.size
+    }
+  };
 };
 
 /**
@@ -223,6 +250,154 @@ export const validateField = (value, rules = []) => {
   }
   return null;
 };
+
+/**
+ * Validación mejorada para archivos de imagen
+ */
+export const validateImageFile = (file, options = {}) => {
+  const {
+    maxSizeMB = 5,
+    allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
+    minWidth = 1,
+    minHeight = 1,
+    maxWidth = 10000,
+    maxHeight = 10000,
+    recommendedMinWidth = 800,
+    recommendedMinHeight = 600
+  } = options;
+
+  if (!file) {
+    return {
+      isValid: false,
+      message: 'Por favor selecciona una imagen',
+      type: 'no_file'
+    };
+  }
+
+  // Validar tipo de archivo
+  if (!allowedTypes.includes(file.type)) {
+    const allowedExtensions = allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ');
+    return {
+      isValid: false,
+      message: `Tipo de archivo no válido: ${file.type}`,
+      details: {
+        fileType: file.type,
+        allowedTypes: allowedTypes,
+        allowedExtensions
+      },
+      type: 'invalid_type',
+      suggestions: [
+        `Usa formatos: ${allowedExtensions}`,
+        'Verifica que el archivo sea realmente una imagen'
+      ]
+    };
+  }
+
+  // Validar tamaño
+  const sizeValidation = validateFileSize(file, maxSizeMB);
+  if (!sizeValidation.isValid) {
+    return {
+      ...sizeValidation,
+      type: 'file_too_large'
+    };
+  }
+
+  // Analizar nombre del archivo para sugerencias
+  const fileExtension = file.name.split('.').pop()?.toLowerCase();
+  const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+  // Recomendaciones basadas en el tamaño
+  let recommendations = [];
+
+  if (file.size > 2 * 1024 * 1024) { // > 2MB
+    recommendations.push('Considera comprimir la imagen para tiempos de carga más rápidos');
+  }
+
+  if (fileExtension === 'png' && file.size > 1024 * 1024) { // PNG > 1MB
+    recommendations.push('Los archivos PNG grandes pueden convertirse a JPEG para reducir tamaño');
+  }
+
+  return {
+    isValid: true,
+    message: `Imagen válida (${fileSizeMB}MB, ${file.type.split('/')[1].toUpperCase()})`,
+    details: {
+      fileName: file.name,
+      fileSize: `${fileSizeMB}MB`,
+      fileType: file.type,
+      fileExtension
+    },
+    recommendations: recommendations.length > 0 ? recommendations : undefined,
+    type: 'valid'
+  };
+};
+
+/**
+ * Obtiene información detallada del archivo de imagen
+ */
+export const getImageFileInfo = (file) => {
+  if (!file) return null;
+
+  const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+  const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'unknown';
+  const fileType = file.type.split('/')[1]?.toUpperCase() || 'UNKNOWN';
+
+  // Calcular densidad de píxeles estimada si tenemos dimensiones (requeriría Image API)
+  let estimatedDimensions = null;
+  let quality = 'good';
+
+  // Estimaciones basadas en el tamaño y tipo
+  if (fileExtension === 'png' && file.size > 2 * 1024 * 1024) {
+    quality = 'large_png';
+  } else if (fileExtension === 'jpg' && file.size < 100 * 1024) {
+    quality = 'small_jpg';
+  } else if (file.size > 5 * 1024 * 1024) {
+    quality = 'very_large';
+  }
+
+  return {
+    name: file.name,
+    size: file.size,
+    sizeMB: parseFloat(fileSizeMB),
+    sizeFormatted: `${fileSizeMB}MB`,
+    type: file.type,
+    extension: fileExtension,
+    typeFormatted: fileType,
+    lastModified: new Date(file.lastModified).toISOString(),
+    quality,
+    recommendations: getFileRecommendations(file, fileExtension, fileSizeMB)
+  };
+};
+
+/**
+ * Genera recomendaciones para optimizar imágenes
+ */
+function getFileRecommendations(file, extension, sizeMB) {
+  const recommendations = [];
+
+  // Recomendaciones basadas en el tamaño
+  const sizeNum = parseFloat(sizeMB);
+  if (sizeNum > 5) {
+    recommendations.push('La imagen es muy grande. Considera reducirla a menos de 2MB para mejor rendimiento.');
+  } else if (sizeNum > 2) {
+    recommendations.push('La imagen es grande. La compresión automática ayudará a optimizarla.');
+  }
+
+  // Recomendaciones basadas en el formato
+  if (extension === 'png' && sizeNum > 1) {
+    recommendations.push('PNGs grandes pueden convertirse a JPEG para reducir significativamente el tamaño.');
+  }
+
+  if (extension === 'gif' && !file.name.toLowerCase().includes('animado')) {
+    recommendations.push('Los GIFs estáticos pueden ser más eficientes como PNG o JPEG.');
+  }
+
+  // Recomendaciones generales
+  if (!file.name.toLowerCase().includes('min') && !file.name.toLowerCase().includes('opt')) {
+    recommendations.push('Considera optimizar la imagen antes de subirla para mejores resultados.');
+  }
+
+  return recommendations;
+}
 
 /**
  * Valida un objeto completo con reglas por campo

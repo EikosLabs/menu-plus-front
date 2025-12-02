@@ -14,7 +14,8 @@ const BusinessSection = ({
 	selectedBusinessId,
 	setSelectedBusinessId,
 	onBusinessAdded,
-	onMenuAdded
+	onMenuAdded,
+	onMenuScanner
 }) => {
 	const [editingBusiness, setEditingBusiness] = React.useState(null);
 
@@ -132,6 +133,7 @@ const BusinessSection = ({
 						onAddMenuClick={handleAddMenuClick}
 						onEditBusinessClick={handleEditBusinessClick}
 						setBusinesses={setBusinesses}
+						onMenuScanner={onMenuScanner}
 					/>
 				</div>
 			)}

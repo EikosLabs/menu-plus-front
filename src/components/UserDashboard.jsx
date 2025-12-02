@@ -6,6 +6,9 @@ import MobileMenu from "./ui/MobileMenu";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import ErrorAlert from "./ui/ErrorAlert";
 import DashboardHeader from "./ui/DashboardHeader";
+import Footer from "./ui/Footer";
+import MenuScanner from "./MenuScanner";
+import MenuAnalysisReview from "./MenuAnalysisReview";
 
 const BusinessSection = lazy(() => import("./sections/BusinessSection"));
 const StatsSection = lazy(() => import("./sections/StatsSection"));
@@ -21,6 +24,11 @@ export default function UserDashboard() {
 	const [selectedBusinessId, setSelectedBusinessId] = useState(null);
 	const [showMobileMenu, setShowMobileMenu] = useState(false);
 	const [activeSection, setActiveSection] = useState("negocios");
+	const [showMenuScanner, setShowMenuScanner] = useState(false);
+	const [showAnalysisReview, setShowAnalysisReview] = useState(false);
+	const [analysisData, setAnalysisData] = useState(null);
+	const [selectedMenuId, setSelectedMenuId] = useState(null);
+	const [selectedFoodBusinessId, setSelectedFoodBusinessId] = useState(null);
 
 	// Verificar si el usuario necesita completar el onboarding
 	useEffect(() => {
@@ -50,6 +58,38 @@ export default function UserDashboard() {
 	const handleMenuAdded = (newMenu) => {
 		addMenu(newMenu);
 		setShowAddMenu(false);
+	};
+
+	const handleMenuScanner = (businessId, menuId) => {
+		setSelectedFoodBusinessId(businessId);
+		setSelectedMenuId(menuId);
+		setShowMenuScanner(true);
+	};
+
+	const handleAnalysisComplete = (data) => {
+		setAnalysisData(data);
+		setShowMenuScanner(false);
+		setShowAnalysisReview(true);
+	};
+
+	const handleAnalysisBack = () => {
+		setShowAnalysisReview(false);
+		setShowMenuScanner(true);
+	};
+
+	const handleAnalysisSaveComplete = () => {
+		setShowAnalysisReview(false);
+		setAnalysisData(null);
+		setSelectedMenuId(null);
+		setSelectedFoodBusinessId(null);
+		// Refresh businesses to show new menu items
+		fetchBusinesses();
+	};
+
+	const handleScannerCancel = () => {
+		setShowMenuScanner(false);
+		setSelectedMenuId(null);
+		setSelectedFoodBusinessId(null);
 	};
 
 	if (authLoading || businessLoading) {
@@ -99,6 +139,7 @@ export default function UserDashboard() {
 							setSelectedBusinessId={setSelectedBusinessId}
 							onBusinessAdded={handleBusinessAdded}
 							onMenuAdded={handleMenuAdded}
+							onMenuScanner={handleMenuScanner}
 						/>
 					)}
 
@@ -108,7 +149,38 @@ export default function UserDashboard() {
 					{activeSection === "estadisticas" && <StatsSection />}
 					{activeSection === "perfil" && <ProfileSection />}
 				</Suspense>
+
+				{/* Menu Scanner Modal */}
+				{showMenuScanner && (
+					<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+						<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto">
+							<MenuScanner
+								onAnalysisComplete={handleAnalysisComplete}
+								onCancel={handleScannerCancel}
+								menuId={selectedMenuId}
+								foodBusinessId={selectedFoodBusinessId}
+							/>
+						</div>
+					</div>
+				)}
+
+				{/* Analysis Review Modal */}
+				{showAnalysisReview && analysisData && (
+					<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+						<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto">
+							<MenuAnalysisReview
+								analysisData={analysisData}
+								onBack={handleAnalysisBack}
+								onComplete={handleAnalysisSaveComplete}
+								menuId={selectedMenuId}
+								foodBusinessId={selectedFoodBusinessId}
+							/>
+						</div>
+					</div>
+				)}
 			</main>
+
+			<Footer />
 
 			<style jsx={true}>{`
 				@keyframes slideDown {

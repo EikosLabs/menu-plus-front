@@ -528,6 +528,12 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   transition: scroll-left 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Hardware acceleration optimizations */
+  transform: translateZ(0);
+  will-change: scroll-position;
+  contain: layout style paint;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 .category-nav-track::-webkit-scrollbar { display: none; }
 .category-chip {
@@ -546,13 +552,32 @@
   white-space: nowrap;
   transition: all 0.3s ease;
   box-shadow: 3px 3px 0 #000;
+  /* Hardware acceleration optimizations */
+  transform: translateZ(0);
+  will-change: transform;
+  contain: layout style;
+  backface-visibility: hidden;
 }
 .category-chip:hover,
 .category-chip.active {
   background: linear-gradient(135deg, var(--brand-primary, #667eea) 0%, var(--brand-secondary, #764ba2) 100%);
   color: white;
-  transform: translate(-2px, -2px);
+  transform: translate(-2px, -2px) translateZ(0);
   box-shadow: 5px 5px 0 #000;
+}
+
+/* Optimized styles for cloned chips */
+.category-chip.cloned-chip {
+  opacity: 0.9;
+  pointer-events: auto; /* Allow interaction with clones */
+  position: relative;
+  z-index: 1;
+}
+
+.category-chip.cloned-chip:hover,
+.category-chip.cloned-chip.active {
+  opacity: 1;
+  z-index: 2;
 }
 
 @supports not (position: sticky) {
@@ -1003,6 +1028,14 @@
     scroll-padding: 1rem;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    /* Enhanced mobile optimizations */
+    transform: translateZ(0);
+    will-change: scroll-position;
+    contain: layout style paint;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    touch-action: pan-x;
+    overscroll-behavior: contain;
   }
 
   /* Animación suave para el carrusel */
@@ -1024,6 +1057,12 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     animation: chip-pulse 2s ease-in-out infinite;
+    /* Enhanced mobile hardware acceleration */
+    transform: translateZ(0);
+    will-change: transform;
+    contain: layout style;
+    backface-visibility: hidden;
+    touch-action: manipulation;
   }
 
   @keyframes chip-pulse {

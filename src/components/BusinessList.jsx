@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import menuService from "../services/menuService";
 import AddMenuItem from "./AddMenuItem";
 import QRCodeComponent from "./QRCodeComponent";
@@ -6,12 +6,14 @@ import SectionManager from "./SectionManager";
 import MenuCardGenerator from "./FlyerEditor/MenuCardGenerator";
 import PromotionalFlyerGenerator from "./FlyerEditor/PromotionalFlyerGenerator";
 import SavedFlyersList from "./FlyerEditor/SavedFlyersList";
+import { compareIds, normalizeMenuItemIds } from '../utils/idNormalization';
 
 export default function BusinessList({
 	businesses,
 	onAddMenuClick,
 	onEditBusinessClick,
 	setBusinesses,
+	onMenuScanner,
 }) {
 	const [showAddMenuItem, setShowAddMenuItem] = useState({});
 	const [menuItemToEdit, setMenuItemToEdit] = useState(null);
@@ -23,6 +25,40 @@ export default function BusinessList({
 	const [showMenuCard, setShowMenuCard] = useState(null); // { businessId, menuId }
 	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null); // { businessId, menuId }
 	const [showSavedFlyers, setShowSavedFlyers] = useState(null); // { menuId }
+	const [isRefreshing, setIsRefreshing] = useState(false);
+
+	// Función para refrescar datos desde el servidor
+	const handleRefreshBusinessData = async () => {
+		try {
+			setIsRefreshing(true);
+			console.log('Refrescando datos de negocios desde servidor...');
+
+			// Obtener datos actualizados del servidor
+			const updatedBusinesses = await menuService.getBusinesses();
+			setBusinesses(updatedBusinesses);
+
+			console.log('Datos de negocios actualizados correctamente');
+		} catch (error) {
+			console.error('Error al refrescar datos:', error);
+		} finally {
+			setIsRefreshing(false);
+		}
+	};
+
+	// Polling automático cada 30 segundos
+	useEffect(() => {
+		const refreshInterval = setInterval(async () => {
+			try {
+				const updatedBusinesses = await menuService.getBusinesses();
+				setBusinesses(updatedBusinesses);
+				console.log('Refresco automático completado');
+			} catch (error) {
+				console.error('Error en refresco automático:', error);
+			}
+		}, 30000); // 30 segundos
+
+		return () => clearInterval(refreshInterval);
+	}, []); // Array vacío para ejecutar solo una vez
 
 	const handleShowAddMenuItem = (menuId, sectionId = null, businessCurrency = 0) => {
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
@@ -81,69 +117,79 @@ export default function BusinessList({
 
 	const handleItemUpdated = async (updatedItem) => {
 		try {
+			const normalizedItem = normalizeMenuItemIds(updatedItem);
+			console.log('Actualizando item con IDs normalizados:', normalizedItem);
+
 			setBusinesses((prevBusinesses) =>
 				prevBusinesses.map((business) => ({
 					...business,
 					menus: business.menus?.map((menu) => {
-						// Encontrar el item actual y ver si cambió de sección
+						// Encontrar el item actual y ver si cambió de sección usando comparaciones seguras
 						let oldSectionId = null;
 						menu.sections?.forEach((section) => {
-							const found = section.menuItems?.find(item => item.id === updatedItem.id);
+							const found = section.menuItems?.find(item => compareIds(item.id, normalizedItem.id));
 							if (found) {
 								oldSectionId = section.id;
 							}
 						});
 
-						// Normalizar IDs para comparación (pueden ser strings o numbers)
-						const normalizedOldSectionId = oldSectionId ? Number(oldSectionId) : null;
-						const normalizedNewSectionId = updatedItem.sectionId ? Number(updatedItem.sectionId) : null;
-						const changedSection = normalizedOldSectionId !== normalizedNewSectionId;
+						const changedSection = !compareIds(oldSectionId, normalizedItem.sectionId);
+
+						// Actualizar en menuItems general del menú
+						const updatedMenuItems = menu.menuItems?.map((item) =>
+							compareIds(item.id, normalizedItem.id)
+								? { ...item, ...normalizedItem }
+								: item
+						) || [];
+
+						// Actualizar en secciones
+						const updatedSections = menu.sections?.map((section) => {
+							// Si cambió de sección
+							if (changedSection) {
+								// Eliminar de la sección anterior
+								if (compareIds(section.id, oldSectionId)) {
+									return {
+										...section,
+										menuItems: section.menuItems?.filter((item) => !compareIds(item.id, normalizedItem.id)) || [],
+									};
+								}
+								// Agregar a la nueva sección
+								if (compareIds(section.id, normalizedItem.sectionId)) {
+									return {
+										...section,
+										menuItems: [...(section.menuItems || []), normalizedItem],
+									};
+								}
+								// Otras secciones: sin cambios
+								return section;
+							}
+
+							// Si NO cambió de sección, solo actualizar en su sección actual
+							if (compareIds(section.id, oldSectionId)) {
+								return {
+									...section,
+									menuItems: section.menuItems?.map((item) =>
+										compareIds(item.id, normalizedItem.id)
+											? { ...item, ...normalizedItem }
+											: item
+									) || [],
+								};
+							}
+
+							// Otras secciones: sin cambios
+							return section;
+						}) || [];
 
 						return {
 							...menu,
-							menuItems: menu.menuItems?.map((item) =>
-								item.id === updatedItem.id ? { ...item, ...updatedItem } : item,
-							),
-							sections: menu.sections?.map((section) => {
-								const sectionIdNum = Number(section.id);
-
-								// Si cambió de sección
-								if (changedSection) {
-									// Eliminar de la sección anterior
-									if (sectionIdNum === normalizedOldSectionId) {
-										return {
-											...section,
-											menuItems: section.menuItems?.filter((item) => item.id !== updatedItem.id) || [],
-										};
-									}
-									// Agregar a la nueva sección
-									if (sectionIdNum === normalizedNewSectionId) {
-										return {
-											...section,
-											menuItems: [...(section.menuItems || []), updatedItem],
-										};
-									}
-									// Otras secciones: sin cambios
-									return section;
-								}
-
-								// Si NO cambió de sección, solo actualizar en su sección actual
-								if (sectionIdNum === normalizedOldSectionId) {
-									return {
-										...section,
-										menuItems: section.menuItems?.map((item) =>
-											item.id === updatedItem.id ? { ...item, ...updatedItem } : item,
-										),
-									};
-								}
-
-								// Otras secciones: sin cambios
-								return section;
-							}),
+							menuItems: updatedMenuItems,
+							sections: updatedSections,
 						};
 					}),
 				})),
 			);
+
+			console.log('Item actualizado correctamente');
 		} catch (error) {
 			console.error('Error updating item:', error);
 		}
@@ -253,6 +299,14 @@ export default function BusinessList({
 
 	return (
 		<div className="space-y-6 sm:space-y-8 lg:space-y-10">
+			{/* Indicador de refresco */}
+			{isRefreshing && (
+				<div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mb-6 flex items-center">
+					<div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent mr-3"></div>
+					<p className="text-blue-700 font-medium">Actualizando datos...</p>
+				</div>
+			)}
+
 			{businesses.map((business) => (
 				<div
 					key={business.id}
@@ -573,6 +627,34 @@ export default function BusinessList({
 												</svg>
 												Añadir Plato
 											</button>
+											{onMenuScanner && (
+												<button
+													onClick={() => onMenuScanner(business.id, menu.id)}
+													className="neo-btn neo-btn-secondary text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
+													title="Escanear menú con IA"
+												>
+													<svg
+														className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0"
+														fill="none"
+														viewBox="0 0 24 24"
+														stroke="currentColor"
+													>
+														<path
+															strokeLinecap="round"
+															strokeLinejoin="round"
+															strokeWidth={2}
+															d="M3 9a2 2 0 00-2 2v4a2 2 0 002 2h2a2 2 0 002 2v4a2 2 0 002 2H7a2 2 0 00-2-2V9a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+														/>
+														<path
+															strokeLinecap="round"
+															strokeLinejoin="round"
+															strokeWidth={2}
+															d="M12 2l3.096 3.096m0 0L7.804 7.804m8.192 8.192a1 1 0 011.414 0l3.096 3.096m-3.096 0L7.804 7.804m8.192 8.192a1 1 0 011.414 0l3.096 3.096"
+														/>
+													</svg>
+													Escanear Menu
+												</button>
+											)}
 										</div>
 									</div>
 
@@ -799,6 +881,7 @@ export default function BusinessList({
 							: handleCancelAddMenuItem(selectedMenuId);
 						setSelectedSection(null);
 					}}
+					onRefresh={handleRefreshBusinessData}
 					existingItem={menuItemToEdit}
 					isEditing={!!menuItemToEdit}
 				/>
