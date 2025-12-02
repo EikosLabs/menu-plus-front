@@ -91,19 +91,22 @@ export default function BusinessList({
 
 	const handleItemAdded = async (menuId, newItem) => {
 		try {
+			const normalizedNewItem = normalizeMenuItemIds(newItem);
+			console.log('Agregando item con IDs normalizados:', normalizedNewItem);
+
 			setBusinesses((prevBusinesses) =>
 				prevBusinesses.map((business) => ({
 					...business,
 					menus: business.menus?.map((menu) =>
-						menu.id === menuId
+						compareIds(menu.id, menuId)  // ← COMPARACIÓN SEGURA
 							? {
 									...menu,
-									menuItems: [...(menu.menuItems || []), newItem],
+									menuItems: [...(menu.menuItems || []), normalizedNewItem],
 									sections: menu.sections?.map((section) =>
-										section.id === newItem.sectionId
+										compareIds(section.id, normalizedNewItem.sectionId)  // ← COMPARACIÓN SEGURA
 											? {
 													...section,
-													menuItems: [...(section.menuItems || []), newItem],
+													menuItems: [...(section.menuItems || []), normalizedNewItem],
 												}
 											: section,
 									),
@@ -112,7 +115,9 @@ export default function BusinessList({
 					),
 				})),
 			);
-		} catch (error) {}
+		} catch (error) {
+			console.error('Error adding item:', error);
+		}
 	};
 
 	const handleItemUpdated = async (updatedItem) => {
@@ -249,18 +254,19 @@ export default function BusinessList({
 
 		try {
 			await menuService.deleteMenuItem(itemId);
+			console.log('Eliminando item con ID:', itemId);
 
 			setBusinesses((prevBusinesses) =>
 				prevBusinesses.map((business) => ({
 					...business,
 					menus: business.menus?.map((menu) => ({
 						...menu,
-						menuItems: menu.menuItems?.filter((item) => item.id !== itemId),
+						menuItems: menu.menuItems?.filter((item) => !compareIds(item.id, itemId)) || [],  // ← COMPARACIÓN SEGURA
 						sections: menu.sections?.map((section) => ({
 							...section,
 							menuItems: section.menuItems?.filter(
-								(item) => item.id !== itemId,
-							),
+								(item) => !compareIds(item.id, itemId),  // ← COMPARACIÓN SEGURA
+							) || [],
 						})),
 					})),
 				})),

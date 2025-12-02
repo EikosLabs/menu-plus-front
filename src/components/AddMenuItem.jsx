@@ -128,7 +128,7 @@ export default function AddMenuItem({
 				price: existingItem.price?.toString() || "",
 				isAvailable: existingItem.isAvailable !== undefined ? existingItem.isAvailable : true,
 				menuItemCategoryId: existingItem.menuItemCategoryId || null,
-				sectionId: existingItem.sectionId || sectionId || null,
+				sectionId: normalizeId(existingItem.sectionId || sectionId || null),  // ← NORMALIZADO A STRING
 				menuId: existingItem.menuId || menuId,
 			});
 			if (existingItem.imageUri) {
@@ -141,8 +141,8 @@ export default function AddMenuItem({
 				price: "",
 				isAvailable: true,
 				menuItemCategoryId: null,
-				sectionId: sectionId || null,
-				menuId: menuId,
+				sectionId: normalizeId(sectionId || null),  // ← NORMALIZADO A STRING
+				menuId: normalizeId(menuId),             // ← NORMALIZADO A STRING
 			});
 			clearImage();
 		}
@@ -254,7 +254,7 @@ export default function AddMenuItem({
 	}));
 
 	const sectionOptions = sections.map(sec => ({
-		value: sec.id,
+		value: normalizeId(sec.id),  // ← NORMALIZADO A STRING PARA CONSISTENCIA
 		label: sec.name
 	}));
 
