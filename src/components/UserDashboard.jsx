@@ -17,7 +17,7 @@ const TemplateSection = lazy(() => import("./sections/TemplateSection"));
 
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
-	const { businesses, setBusinesses, loading: businessLoading, error, setError, addBusiness, addMenu, fetchBusinesses } = useBusinesses();
+	const { businesses, setBusinesses, loading: businessLoading, error, setError, addBusiness, addMenu, fetchBusinesses, refreshBusinesses } = useBusinesses();
 	
 	const [showAddBusiness, setShowAddBusiness] = useState(false);
 	const [showAddMenu, setShowAddMenu] = useState(false);
@@ -140,6 +140,7 @@ export default function UserDashboard() {
 							onBusinessAdded={handleBusinessAdded}
 							onMenuAdded={handleMenuAdded}
 							onMenuScanner={handleMenuScanner}
+							onRefresh={refreshBusinesses}
 						/>
 					)}
 
