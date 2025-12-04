@@ -173,6 +173,94 @@ class ErrorLogger {
   setEnabled(enabled) {
     this.enabled = enabled;
   }
+
+  /**
+  * Log específico para análisis de imágenes
+  */
+  logImageAnalysis(event, data = {}) {
+    const logEntry = {
+      event,
+      component: 'ImageAnalysis',
+      timestamp: new Date().toISOString(),
+      ...data,
+      userAgent: navigator.userAgent,
+      url: window.location.href
+    };
+
+    this.logs.push(logEntry);
+    if (this.logs.length > this.maxLogs) {
+      this.logs.shift();
+    }
+
+    // Log a console en desarrollo
+    if (this.logToConsole) {
+      console.log(`[ImageAnalysis] ${event}`, data);
+    }
+
+    // En producción, enviar eventos importantes al remoto
+    if (import.meta.env.PROD && ['error', 'analysis_failed'].includes(event)) {
+      this._sendToRemote({
+        ...logEntry,
+        level: LOG_LEVELS.ERROR
+      });
+    }
+  }
+
+  /**
+  * Obtiene estadísticas de análisis de imágenes
+  */
+  getImageAnalysisStats() {
+    const imageLogs = this.logs.filter(log => log.component === 'ImageAnalysis');
+
+    const stats = {
+      total: imageLogs.length,
+      successful: imageLogs.filter(log => log.event === 'analysis_completed').length,
+      failed: imageLogs.filter(log => log.event === 'analysis_failed').length,
+      validationFailed: imageLogs.filter(log => log.event === 'validation_failed').length,
+      retried: imageLogs.filter(log => log.event?.includes('retry')).length,
+      errorTypes: {},
+      averageConfidence: 0,
+      recentErrors: []
+    };
+
+    // Calcular tipos de error más comunes
+    imageLogs.forEach(log => {
+      if (log.errorType) {
+        stats.errorTypes[log.errorType] = (stats.errorTypes[log.errorType] || 0) + 1;
+      }
+
+      // Calcular confidence score promedio
+      if (log.confidenceScore) {
+        stats.averageConfidence += log.confidenceScore;
+      }
+    });
+
+    // Promedio de confidence
+    const successfulAnalyses = imageLogs.filter(log => log.confidenceScore);
+    if (successfulAnalyses.length > 0) {
+      stats.averageConfidence = stats.averageConfidence / successfulAnalyses.length;
+    }
+
+    // Errores recientes (últimas 24 horas)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    stats.recentErrors = imageLogs.filter(log =>
+      ['analysis_failed', 'validation_failed', 'error'].includes(log.event) &&
+      new Date(log.timestamp) > oneDayAgo
+    ).slice(-10); // Últimos 10 errores
+
+    return stats;
+  }
+
+  /**
+  * Limpia logs antiguos de análisis de imágenes (más de 7 días)
+  */
+  cleanupOldImageLogs() {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    this.logs = this.logs.filter(log =>
+      log.component !== 'ImageAnalysis' || new Date(log.timestamp) > sevenDaysAgo
+    );
+  }
 }
 
 // Instancia singleton

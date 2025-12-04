@@ -82,11 +82,20 @@ export function renderMenu(menu, business, itemsBySection) {
 
   // Category Nav
   if (menu.sections && menu.sections.length > 0) {
+    console.log('Renderizando carrusel de secciones - Total:', menu.sections.length);
+    console.log('Secciones a renderizar:', menu.sections.map(s => ({
+      id: s.id,
+      name: s.name,
+      itemsCount: s.menuItems?.length || 0
+    })));
+
     html += '<nav class="category-nav"><div class="category-nav-track">';
     menu.sections.forEach((section, index) => {
       const emoji = getEmojiForSection(section.name, index);
+      console.log(`Renderizando sección ${index + 1}:`, { id: section.id, name: section.name });
+
       html += `
-        <a href="#section-${section.id}" class="category-chip">
+        <a href="#section-${section.id}" class="category-chip" data-section-id="${section.id}">
           <span class="category-emoji">${emoji}</span>
           <span class="category-name">${sanitizeHtml(section.name)}</span>
         </a>

@@ -7,6 +7,7 @@ import { AppError } from '../utils/AppError';
 import { ERROR_TYPES } from '../utils/errorTypes';
 import { errorLogger } from '../utils/errorLogger';
 import { validateRequired, validatePrice, validateFileType, validateFileSize } from '../utils/validation';
+import { normalizeId, normalizeMenuItemIds } from '../utils/idNormalization';
 
 /**
  * Retry helper con exponential backoff para operaciones de red
@@ -297,6 +298,70 @@ class ImageUploader {
 		this.endpoint = "/images";
 	}
 
+	/**
+	 * Handles 413 Payload Too Large errors with specific messaging
+	 */
+	handle413Error(error, file) {
+		const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+		const maxAllowedMB = 10; // Updated to match frontend validation
+
+		return new AppError(
+			ERROR_TYPES.PAYLOAD_TOO_LARGE,
+			`La imagen es demasiado grande para el servidor (${fileSizeMB}MB). ` +
+			`Intenta con una imagen más pequeña o comprímela antes de subirla. ` +
+			`Tamaño recomendado: menos de ${maxAllowedMB}MB.`,
+			{
+				fileName: file.name,
+				fileSize: file.size,
+				fileSizeMB: parseFloat(fileSizeMB),
+				maxAllowedMB,
+				suggestions: [
+					'Usa una imagen más pequeña',
+					'Comprime la imagen antes de subirla',
+					'Reduce la calidad o resolución de la imagen',
+					'Usa formato JPEG en lugar de PNG'
+				]
+			}
+		);
+	}
+
+	/**
+	 * Attempts to upload with automatic retry on 413 error
+	 */
+	async uploadWithRetry(file, maxRetries = 2) {
+		let lastError;
+
+		for (let attempt = 0; attempt <= maxRetries; attempt++) {
+			try {
+				return await this.upload(file);
+			} catch (error) {
+				lastError = error;
+
+				// Check if it's a 413 error and we have retries left
+				if (error instanceof AppError &&
+					(error.status === 413 || error.type === ERROR_TYPES.PAYLOAD_TOO_LARGE) &&
+					attempt < maxRetries) {
+
+					errorLogger.warn(`Upload 413 error, retry ${attempt + 1}/${maxRetries}`, {
+						fileName: file.name,
+						fileSize: file.size,
+						attempt: attempt + 1,
+						error: error.message
+					});
+
+					// Wait a bit before retry
+					await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+					continue;
+				}
+
+				// For non-413 errors or no retries left, throw the error
+				break;
+			}
+		}
+
+		throw lastError;
+	}
+
 	async upload(file) {
 		if (!file) {
 			return null;
@@ -308,10 +373,19 @@ class ImageUploader {
 			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, typeError);
 		}
 
-		// Validar tamaño (5MB max)
-		const sizeError = validateFileSize(file, 5);
-		if (sizeError) {
-			throw new AppError(ERROR_TYPES.VALIDATION_ERROR, sizeError);
+		// Validar tamaño (aumentado a 10MB temporalmente para mejor manejo de 413)
+		const sizeValidation = validateFileSize(file, 10);
+		if (sizeValidation && !sizeValidation.isValid) {
+			// validateFileSize retorna un objeto con message, details y suggestions solo cuando es inválido
+			throw new AppError(
+				ERROR_TYPES.VALIDATION_ERROR,
+				sizeValidation.message,
+				{
+					...sizeValidation.details,
+					suggestions: sizeValidation.suggestions,
+					fileName: file.name
+				}
+			);
 		}
 
 		const formData = new FormData();
@@ -319,7 +393,9 @@ class ImageUploader {
 
 		const token = this.apiClient.getAuthToken();
 		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), 30000);
+		const timeoutId = setTimeout(() => controller.abort(), 45000); // Aumentado a 45s
+
+		const uploadStartTime = performance.now();
 
 		try {
 			const response = await fetch(
@@ -336,42 +412,120 @@ class ImageUploader {
 			clearTimeout(timeoutId);
 
 			if (!response.ok) {
-				throw await AppError.fromResponse(response, 'Error al subir la imagen', {
+				const uploadTime = performance.now() - uploadStartTime;
+
+				// Special handling for 413 Payload Too Large
+				if (response.status === 413) {
+					const error413 = this.handle413Error(
+						new Error('Payload Too Large'),
+						file
+					);
+					error413.status = 413;
+					errorLogger.error(error413, {
+						endpoint: this.endpoint,
+						fileName: file.name,
+						fileSize: file.size,
+						uploadTime: uploadTime.toFixed(0),
+						httpStatus: response.status
+					});
+					throw error413;
+				}
+
+				// Handle other HTTP errors
+				const appError = await AppError.fromResponse(response, 'Error al subir la imagen', {
 					endpoint: this.endpoint,
 					fileName: file.name,
 					fileSize: file.size,
+					uploadTime: uploadTime.toFixed(0),
 				});
+
+				// Add specific error context
+				if (response.status >= 400 && response.status < 500) {
+					appError.type = ERROR_TYPES.CLIENT_ERROR;
+				} else if (response.status >= 500) {
+					appError.type = ERROR_TYPES.SERVER_ERROR;
+				}
+
+				errorLogger.error(appError, {
+					endpoint: this.endpoint,
+					fileName: file.name,
+					fileSize: file.size,
+					httpStatus: response.status,
+					uploadTime: uploadTime.toFixed(0)
+				});
+
+				throw appError;
 			}
 
 			const data = await response.json();
 			const imageKey = data.key || data.Key || data;
+			const uploadTime = performance.now() - uploadStartTime;
 
 			errorLogger.info('Image uploaded successfully', {
 				fileName: file.name,
 				fileSize: file.size,
 				imageKey,
+				uploadTime: uploadTime.toFixed(0),
+				uploadSpeed: `${(file.size / (uploadTime / 1000) / 1024).toFixed(1)} KB/s`
 			});
 
 			return imageKey;
 		} catch (error) {
 			clearTimeout(timeoutId);
+			const uploadTime = performance.now() - uploadStartTime;
 
 			if (error instanceof AppError) {
-				errorLogger.error(error, { endpoint: this.endpoint, fileName: file.name });
+				errorLogger.error(error, {
+					endpoint: this.endpoint,
+					fileName: file.name,
+					uploadTime: uploadTime.toFixed(0)
+				});
 				throw error;
 			}
 
 			if (error.name === "AbortError") {
 				const timeoutError = new AppError(
 					ERROR_TYPES.TIMEOUT_ERROR,
-					'La subida de imagen excedió el tiempo límite. Por favor intenta con una imagen más pequeña.'
+					'La subida de imagen excedió el tiempo límite. Por favor intenta con una imagen más pequeña o verifica tu conexión.',
+					{
+						fileName: file.name,
+						fileSize: file.size,
+						timeout: 45000,
+						uploadTime: uploadTime.toFixed(0),
+						suggestions: [
+							'Usa una imagen más pequeña',
+							'Verifica tu conexión a internet',
+							'Intenta comprimir la imagen antes de subirla'
+						]
+					}
 				);
-				errorLogger.error(timeoutError, { fileName: file.name, fileSize: file.size });
+				errorLogger.error(timeoutError, {
+					fileName: file.name,
+					fileSize: file.size,
+					uploadTime: uploadTime.toFixed(0)
+				});
 				throw timeoutError;
 			}
 
-			const networkError = AppError.fromNetworkError(error, { endpoint: this.endpoint, fileName: file.name });
-			errorLogger.error(networkError, { fileName: file.name });
+			const networkError = AppError.fromNetworkError(error, {
+				endpoint: this.endpoint,
+				fileName: file.name,
+				uploadTime: uploadTime.toFixed(0)
+			});
+
+			// Add specific context for network errors
+			if (error.message.includes('fetch')) {
+				networkError.suggestions = [
+					'Verifica tu conexión a internet',
+					'El servidor puede estar temporalmente fuera de servicio',
+					'Intenta nuevamente en unos minutos'
+				];
+			}
+
+			errorLogger.error(networkError, {
+				fileName: file.name,
+				uploadTime: uploadTime.toFixed(0)
+			});
 			throw networkError;
 		}
 	}
@@ -806,9 +960,9 @@ class MenuService {
 						? true
 						: menuItemData.isAvailable,
 				MenuItemCategoryId: menuItemData.menuItemCategoryId || null,
-				SectionId: menuItemData.sectionId,
+				SectionId: normalizeId(menuItemData.sectionId),  // ← NORMALIZADO A STRING
 				Order: menuItemData.order,
-				MenuId: menuItemData.menuId ? Number.parseInt(menuItemData.menuId, 10) : undefined,
+				MenuId: normalizeId(menuItemData.menuId),        // ← NORMALIZADO A STRING
 				...(imageKey && { ImageKey: imageKey }),
 			};
 
@@ -823,15 +977,16 @@ class MenuService {
 
 			if (response.isEmpty) {
 				errorLogger.warn('Menu item update returned empty response', { itemId, menuItemData });
-				return {
+				const fallbackResponse = {
 					id: itemId,
 					...payload,
 					updatedAt: new Date().toISOString(),
 				};
+				return normalizeMenuItemIds(fallbackResponse);
 			}
 
 			errorLogger.info('Menu item updated successfully', { itemId });
-			return response.data;
+			return normalizeMenuItemIds(response.data);
 		} catch (error) {
 			if (error instanceof AppError) {
 				errorLogger.error(error, { itemId, menuItemData });
@@ -894,8 +1049,10 @@ class MenuService {
 	async getMenuItemCategories() {
 		try {
 			const response = await this.apiClient.get("/menu-item-category");
+			console.log('[MenuService] getMenuItemCategories - Response:', response);
 			return response.isEmpty ? [] : response.data;
 		} catch (error) {
+			console.error('[MenuService] getMenuItemCategories - Error:', error);
 			errorLogger.warn('Failed to load menu item categories', { error: error.message });
 			return [];
 		}
@@ -940,13 +1097,20 @@ class MenuService {
 		// El backend devuelve sections dentro del menú completo en /menus/food-business
 		try {
 			const response = await this.apiClient.get(`/menus/food-business`);
+			console.log('[MenuService] getSections - Full response:', response);
+			
 			if (response.isEmpty || !response.data) {
+				console.log('[MenuService] getSections - Empty response');
 				return [];
 			}
 
 			const menu = response.data;
+			console.log('[MenuService] getSections - Menu data:', menu);
+			console.log('[MenuService] getSections - Sections:', menu.sections);
+			
 			return menu.sections || [];
 		} catch (error) {
+			console.error('[MenuService] getSections - Error:', error);
 			if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
 				return [];
 			}

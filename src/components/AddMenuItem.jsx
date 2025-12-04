@@ -10,7 +10,10 @@ import { ERROR_TYPES } from "../utils/errorTypes";
 import { errorLogger } from "../utils/errorLogger";
 import Modal from "./shared/Modal";
 import ImageUploader from "./shared/ImageUploader";
-import { FormField, TextAreaField, SelectField, CheckboxField } from "./shared/FormField";
+import { FormField, SelectField, CheckboxField } from "./shared/FormField";
+import TextImprovementButton from "./ai/TextImprovementButton";
+import ImageAnalysisButton from "./ai/ImageAnalysisButton";
+import { normalizeId } from '../utils/idNormalization';
 
 export default function AddMenuItem({
 	menuId,
@@ -18,6 +21,7 @@ export default function AddMenuItem({
 	businessCurrency = 0,
 	onItemAdded,
 	onCancel,
+	onRefresh,
 	existingItem,
 	isEditing,
 }) {
@@ -67,17 +71,20 @@ export default function AddMenuItem({
 			try {
 				setLoadingCategories(true);
 				const categoriesData = await menuService.getMenuItemCategories();
+				console.log('[AddMenuItem] Categories loaded:', categoriesData);
 				if (mounted) {
 					setCategories(categoriesData || []);
-					errorLogger.info('Menu item categories loaded', { count: categoriesData.length });
+					errorLogger.info('Menu item categories loaded', { count: categoriesData?.length || 0 });
 				}
 			} catch (err) {
+				console.error('[AddMenuItem] Error loading categories:', err);
 				if (mounted) {
 					const appError = err instanceof AppError
 						? err
 						: new AppError(ERROR_TYPES.SERVER_ERROR, "No se pudieron cargar las categorías");
 					errorLogger.error(appError, { context: 'loadCategories' });
-					handleError(appError);
+					// Don't call handleError here to avoid infinite loop
+					setCategories([]);
 				}
 			} finally {
 				if (mounted) setLoadingCategories(false);
@@ -86,15 +93,21 @@ export default function AddMenuItem({
 			if (menuId) {
 				try {
 					setLoadingSections(true);
-					const sectionsData = await menuService.getSections(menuId);
+					const sectionsData = await menuService.getSections();
+					console.log('[AddMenuItem] Sections loaded:', sectionsData);
 					if (mounted) {
 						setSections(sectionsData || []);
-						errorLogger.info('Menu sections loaded', { menuId, count: sectionsData.length });
+						errorLogger.info('Menu sections loaded', { menuId, count: sectionsData?.length || 0, sections: sectionsData });
 					}
 				} catch (err) {
+					console.error('[AddMenuItem] Error loading sections:', err);
 					// Sections are optional, just log the error
 					if (mounted && err instanceof AppError && err.type !== ERROR_TYPES.NOT_FOUND) {
 						errorLogger.warn('Failed to load sections', { menuId, error: err.message });
+					}
+					// Set empty array on error
+					if (mounted) {
+						setSections([]);
 					}
 				} finally {
 					if (mounted) setLoadingSections(false);
@@ -104,7 +117,7 @@ export default function AddMenuItem({
 
 		fetchData();
 		return () => { mounted = false; };
-	}, [menuId, handleError]);
+	}, [menuId]); // Removed handleError to prevent infinite loop
 
 	// Load existing item data - only run once on mount or when editing changes
 	useEffect(() => {
@@ -115,7 +128,7 @@ export default function AddMenuItem({
 				price: existingItem.price?.toString() || "",
 				isAvailable: existingItem.isAvailable !== undefined ? existingItem.isAvailable : true,
 				menuItemCategoryId: existingItem.menuItemCategoryId || null,
-				sectionId: existingItem.sectionId || sectionId || null,
+				sectionId: normalizeId(existingItem.sectionId || sectionId || null),  // ← NORMALIZADO A STRING
 				menuId: existingItem.menuId || menuId,
 			});
 			if (existingItem.imageUri) {
@@ -128,8 +141,8 @@ export default function AddMenuItem({
 				price: "",
 				isAvailable: true,
 				menuItemCategoryId: null,
-				sectionId: sectionId || null,
-				menuId: menuId,
+				sectionId: normalizeId(sectionId || null),  // ← NORMALIZADO A STRING
+				menuId: normalizeId(menuId),             // ← NORMALIZADO A STRING
 			});
 			clearImage();
 		}
@@ -157,10 +170,10 @@ export default function AddMenuItem({
 				description: values.description || "",
 				price: parseFloat(values.price),
 				currencyType: businessCurrency,
-				menuId: menuId,
+				menuId: normalizeId(menuId),                          // ← NORMALIZADO A STRING
 				isAvailable: values.isAvailable,
 				menuItemCategoryId: values.menuItemCategoryId === "" ? null : values.menuItemCategoryId ? parseInt(values.menuItemCategoryId) : null,
-				sectionId: values.sectionId === "" ? null : values.sectionId ? parseInt(values.sectionId) : null,
+				sectionId: normalizeId(values.sectionId === "" ? null : values.sectionId ? parseInt(values.sectionId) : null),  // ← NORMALIZADO A STRING
 				image: image,
 			};
 
@@ -177,7 +190,7 @@ export default function AddMenuItem({
 					image: image, // Include image for update
 				};
 
-				await menuService.updateMenuItem(existingItem.id, payload);
+				const result = await menuService.updateMenuItem(existingItem.id, payload);
 
 				errorLogger.info('Menu item updated successfully', {
 					itemId: existingItem.id,
@@ -185,11 +198,12 @@ export default function AddMenuItem({
 				});
 
 				if (onItemAdded) {
-					onItemAdded({
+					// Use the result from backend to ensure all fields are present
+					onItemAdded(result || {
 						...existingItem,
 						...payload,
 						id: existingItem.id,
-						menuId: existingItem.menuId,
+						menuId: existingItem.menuId || menuId,
 					});
 				}
 
@@ -211,6 +225,10 @@ export default function AddMenuItem({
 			setLoading(false);
 			setTimeout(() => {
 				if (onCancel) onCancel();
+				if (onRefresh) {
+					console.log('Refrescando datos después de agregar plato...');
+					onRefresh();
+				}
 			}, 1500);
 		} catch (err) {
 			setLoading(false);
@@ -236,9 +254,12 @@ export default function AddMenuItem({
 	}));
 
 	const sectionOptions = sections.map(sec => ({
-		value: sec.id,
+		value: normalizeId(sec.id),  // ← NORMALIZADO A STRING PARA CONSISTENCIA
 		label: sec.name
 	}));
+
+	console.log('[AddMenuItem] Render - categories:', categories, 'categoryOptions:', categoryOptions);
+	console.log('[AddMenuItem] Render - sections:', sections, 'sectionOptions:', sectionOptions);
 
 	const icon = isEditing ? (
 		<svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,6 +308,25 @@ export default function AddMenuItem({
 					/>
 
 					<div className="space-y-3">
+						<ImageAnalysisButton
+							onAnalysisComplete={(suggestions) => {
+								// Apply AI suggestions to form - SOLO nombre y descripción
+								if (suggestions.title) {
+									handleChange({ target: { name: 'name', value: suggestions.title } });
+								}
+								if (suggestions.description) {
+									handleChange({ target: { name: 'description', value: suggestions.description } });
+								}
+								// NO aplicar precio automáticamente según preferencia del usuario
+							}}
+							entityType="MenuItem"
+							disabled={loading}
+							// NUEVAS PROPS - conectar con useImageUpload
+							imageFile={image}           // File object del hook (línea 55)
+							imagePreview={preview}      // Preview URL del hook (línea 56)
+							allowManualUpload={false}   // Solo usar imagen compartida
+						/>
+
 						<FormField
 							label="Nombre del Plato"
 							name="name"
@@ -336,6 +376,17 @@ export default function AddMenuItem({
 							disabled={loading || loadingCategories}
 							placeholder="Sin categoría"
 						/>
+						
+						{/* Debug info */}
+						{process.env.NODE_ENV !== 'production' && (
+							<div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+								Debug: {categories.length} categorías, {sections.length} secciones
+								{loadingCategories && " (Cargando categorías...)"}
+								{loadingSections && " (Cargando secciones...)"}
+								<br />
+								SectionId: {values.sectionId} (prop: {sectionId})
+							</div>
+						)}
 
 						<SelectField
 							label="Sección"
@@ -357,14 +408,14 @@ export default function AddMenuItem({
 					</div>
 				</div>
 
-				<TextAreaField
+				<TextImprovementButton
 					label="Descripción"
-					name="description"
-					value={values.description}
-					onChange={handleChange}
-					rows={3}
-					disabled={loading}
+					originalText={values.description}
+					onTextImproved={(text) => handleChange({ target: { name: 'description', value: text } })}
 					placeholder="Describe los ingredientes y características del plato..."
+					entityType="MenuItem"
+					entityId={existingItem?.id}
+					disabled={loading}
 				/>
 
 				<div className="flex flex-col-reverse gap-3 pt-2 sm:pt-4 sm:flex-row sm:justify-end">

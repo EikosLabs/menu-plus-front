@@ -5,6 +5,7 @@ export const useBusinesses = () => {
 	const [businesses, setBusinesses] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const fetchBusinesses = async () => {
 		setLoading(true);
@@ -24,6 +25,28 @@ export const useBusinesses = () => {
 	useEffect(() => {
 		fetchBusinesses();
 	}, []);
+
+	// Función para refrescar datos manualmente
+	const refreshBusinesses = async () => {
+		console.log('🔄 refreshBusinesses called - Function exists!');
+		try {
+			setIsRefreshing(true);
+			console.log('Refrescando negocios en dashboard...');
+
+			const userBusinesses = await menuService.getUserBusinesses();
+			setBusinesses(userBusinesses);
+			setError(null);
+
+			console.log('Negocios del dashboard actualizados');
+		} catch (error) {
+			console.error('Error al refrescar negocios:', error);
+			setError("No se pudieron actualizar los datos. Por favor, intente de nuevo.");
+		} finally {
+			setIsRefreshing(false);
+		}
+	};
+
+	// Sin polling automático - las actualizaciones ocurren solo cuando el usuario realiza acciones
 
 	const addBusiness = async (newBusiness) => {
 		try {
@@ -56,8 +79,10 @@ export const useBusinesses = () => {
 		loading,
 		error,
 		setError,
+		isRefreshing,
 		addBusiness,
 		addMenu,
-		fetchBusinesses
+		fetchBusinesses,
+		refreshBusinesses
 	};
 };
