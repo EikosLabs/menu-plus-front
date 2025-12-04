@@ -28,6 +28,7 @@ export const useBusinesses = () => {
 
 	// Función para refrescar datos manualmente
 	const refreshBusinesses = async () => {
+		console.log('🔄 refreshBusinesses called - Function exists!');
 		try {
 			setIsRefreshing(true);
 			console.log('Refrescando negocios en dashboard...');
@@ -45,20 +46,7 @@ export const useBusinesses = () => {
 		}
 	};
 
-	// Polling automático cada 30 segundos
-	useEffect(() => {
-		const refreshInterval = setInterval(async () => {
-			try {
-				const userBusinesses = await menuService.getUserBusinesses();
-				setBusinesses(userBusinesses);
-				console.log('Refresco automático de negocios completado');
-			} catch (error) {
-				console.error('Error en refresco automático de negocios:', error);
-			}
-		}, 30000); // 30 segundos
-
-		return () => clearInterval(refreshInterval);
-	}, []); // Array vacío para ejecutar solo una vez
+	// Sin polling automático - las actualizaciones ocurren solo cuando el usuario realiza acciones
 
 	const addBusiness = async (newBusiness) => {
 		try {

@@ -14,6 +14,7 @@ export default function BusinessList({
 	onEditBusinessClick,
 	setBusinesses,
 	onMenuScanner,
+	onRefresh,
 }) {
 	const [showAddMenuItem, setShowAddMenuItem] = useState({});
 	const [menuItemToEdit, setMenuItemToEdit] = useState(null);
@@ -33,11 +34,16 @@ export default function BusinessList({
 			setIsRefreshing(true);
 			console.log('Refrescando datos de negocios desde servidor...');
 
-			// Obtener datos actualizados del servidor
-			const updatedBusinesses = await menuService.getBusinesses();
-			setBusinesses(updatedBusinesses);
-
-			console.log('Datos de negocios actualizados correctamente');
+			// Usar el callback onRefresh proporcionado por UserDashboard
+			if (onRefresh && typeof onRefresh === 'function') {
+				await onRefresh();
+				console.log('Datos de negocios actualizados correctamente vía callback');
+			} else {
+				console.error('onRefresh no es una función o no está disponible');
+				// Fallback: Obtener datos actualizados del servidor
+				const updatedBusinesses = await menuService.getUserBusinesses();
+				setBusinesses(updatedBusinesses);
+			}
 		} catch (error) {
 			console.error('Error al refrescar datos:', error);
 		} finally {
@@ -45,20 +51,7 @@ export default function BusinessList({
 		}
 	};
 
-	// Polling automático cada 30 segundos
-	useEffect(() => {
-		const refreshInterval = setInterval(async () => {
-			try {
-				const updatedBusinesses = await menuService.getBusinesses();
-				setBusinesses(updatedBusinesses);
-				console.log('Refresco automático completado');
-			} catch (error) {
-				console.error('Error en refresco automático:', error);
-			}
-		}, 30000); // 30 segundos
-
-		return () => clearInterval(refreshInterval);
-	}, []); // Array vacío para ejecutar solo una vez
+	// Sin polling automático - las actualizaciones ocurren solo cuando el usuario realiza acciones
 
 	const handleShowAddMenuItem = (menuId, sectionId = null, businessCurrency = 0) => {
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
