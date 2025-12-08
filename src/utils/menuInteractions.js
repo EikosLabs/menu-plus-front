@@ -1,4 +1,4 @@
-import { getCurrencySymbol } from './currencies.js';
+import { getCurrencySymbol, getCurrencyCode } from './currencies.js';
 
 export function initializeInteractiveElements() {
   setupCategoryNavigation();
@@ -6,6 +6,30 @@ export function initializeInteractiveElements() {
   setupActiveCategory();
   setupDishModal();
   setupMobileCarousel();
+  setupHeroParallax();
+  setupMenuSearch();
+  setupStickyNavObserver();
+}
+
+function setupStickyNavObserver() {
+  const categoryNav = document.querySelector('.category-nav');
+  if (!categoryNav) return;
+
+  // Create a sentinel element to detect when nav becomes sticky
+  const sentinel = document.createElement('div');
+  sentinel.className = 'sticky-sentinel';
+  sentinel.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; height: 1px; pointer-events: none;';
+  categoryNav.parentNode.insertBefore(sentinel, categoryNav);
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      // When sentinel is not visible (scrolled past), nav is stuck
+      categoryNav.classList.toggle('is-stuck', !entry.isIntersecting);
+    },
+    { threshold: 0, rootMargin: '0px 0px 0px 0px' }
+  );
+
+  observer.observe(sentinel);
 }
 
 function setupCategoryNavigation() {
@@ -46,10 +70,109 @@ function setupScrollAnimations() {
   });
 }
 
+function setupHeroParallax() {
+  const glow1 = document.querySelector('.hero-glow-1');
+  const glow2 = document.querySelector('.hero-glow-2');
+  const pattern = document.querySelector('.hero-pattern');
+  let ticking = false;
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const y = window.scrollY || 0;
+        const factor = Math.min(1, y / 400);
+        if (glow1) {
+          glow1.style.transform = `translate3d(${factor * -20}px, ${factor * -30}px, 0)`;
+          glow1.style.opacity = String(0.08 - factor * 0.04);
+        }
+        if (glow2) {
+          glow2.style.transform = `translate3d(${factor * 25}px, ${factor * 35}px, 0)`;
+          glow2.style.opacity = String(0.08 - factor * 0.04);
+        }
+        if (pattern) {
+          pattern.style.transform = `translate3d(0, ${factor * -15}px, 0)`;
+          pattern.style.opacity = String(0.03 - factor * 0.015);
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+function setupMenuSearch() {
+  const input = document.getElementById('menu-search-input');
+  const countEl = document.getElementById('menu-search-count');
+  if (!input) return;
+
+  const items = Array.from(document.querySelectorAll('.menu-item'));
+  const sections = Array.from(document.querySelectorAll('.menu-section'));
+
+  let debounceId = null;
+
+  function normalize(text) {
+    return (text || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+  }
+
+  function filter(query) {
+    const q = normalize(query);
+    let visibleCount = 0;
+
+    // Filter items
+    items.forEach(item => {
+      const name = normalize(item.querySelector('.item-name')?.textContent || '');
+      const desc = normalize(item.querySelector('.item-description')?.textContent || '');
+      const match = q.length === 0 || name.includes(q) || desc.includes(q);
+      item.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+
+    // Hide sections without visible items
+    sections.forEach(section => {
+      const anyVisible = Array.from(section.querySelectorAll('.menu-item')).some(el => el.style.display !== 'none');
+      section.style.display = anyVisible ? '' : 'none';
+    });
+
+    // Update count
+    if (countEl) {
+      countEl.textContent = q.length ? `${visibleCount} resultados` : '';
+    }
+  }
+
+  input.addEventListener('input', () => {
+    clearTimeout(debounceId);
+    debounceId = setTimeout(() => filter(input.value), 120);
+  });
+
+  // Clear with ESC
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      input.value = '';
+      filter('');
+    }
+  });
+}
+
 function setupActiveCategory() {
   const sections = document.querySelectorAll('.menu-section');
   const navLinks = document.querySelectorAll('.category-chip');
   const categoryNav = document.querySelector('.category-nav');
+  const track = document.querySelector('.category-nav-track');
+  let lastActiveId = '';
+
+  function centerActiveChip() {
+    const activeChip = document.querySelector('.category-chip.active');
+    if (!track || !activeChip) return;
+    const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!isMobile) return;
+
+    const paddingLeft = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+    const targetLeft = activeChip.offsetLeft - paddingLeft + (activeChip.offsetWidth / 2) - (track.clientWidth / 2);
+    const clamped = Math.max(0, targetLeft);
+    track.scrollTo({ left: clamped, behavior: 'smooth' });
+  }
 
   window.addEventListener('scroll', () => {
     const categoryNavHeight = categoryNav?.offsetHeight || 80;
@@ -63,20 +186,34 @@ function setupActiveCategory() {
       }
     });
 
-    navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === '#' + current) {
-        link.classList.add('active');
-      }
-    });
+    if (current && current !== lastActiveId) {
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+      lastActiveId = current;
+      centerActiveChip();
+    }
   });
 }
 
 
 function setupDishModal() {
   const modal = document.getElementById('dish-modal');
+  if (!modal) {
+    console.warn('Dish modal not found');
+    return;
+  }
+  
   const modalBackdrop = modal.querySelector('.dish-modal-backdrop');
   const modalClose = modal.querySelector('.dish-modal-close');
+
+  if (!modalBackdrop || !modalClose) {
+    console.warn('Modal elements not found');
+    return;
+  }
 
   document.querySelectorAll('.menu-item').forEach(item => {
     item.addEventListener('click', function() {
@@ -93,7 +230,7 @@ function setupDishModal() {
   modalBackdrop.addEventListener('click', closeDishModal);
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.style.display !== 'none') {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
       closeDishModal();
     }
   });
@@ -109,7 +246,7 @@ function setupDishModal() {
     };
 
     elements.name.textContent = item.name;
-    elements.price.textContent = `${getCurrencySymbol(item.currencyType)}${item.price.toFixed(2)}`;
+    elements.price.innerHTML = `<span class="text-2xl font-bold">${getCurrencySymbol(item.currencyType)}${item.price.toFixed(2)}</span> <span class="text-sm font-medium opacity-60 uppercase ml-1">${getCurrencyCode(item.currencyType)}</span>`;
     elements.description.textContent = item.description || '';
     elements.description.style.display = item.description ? 'block' : 'none';
 
@@ -137,6 +274,7 @@ function setupDishModal() {
     }
 
     const showModal = () => {
+      modal.classList.remove('hidden');
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     };
@@ -154,6 +292,7 @@ function setupDishModal() {
 
     setTimeout(() => {
       const hideModal = () => {
+        modal.classList.add('hidden');
         modal.style.display = 'none';
         document.body.style.overflow = '';
       };
@@ -356,6 +495,15 @@ class DynamicCarouselManager {
         behavior: 'smooth'
       });
     }
+
+    // Center the clicked chip
+    const track = document.querySelector('.category-nav-track');
+    if (track && chip) {
+      const paddingLeft = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+      const targetLeft = chip.offsetLeft - paddingLeft + (chip.offsetWidth / 2) - (track.clientWidth / 2);
+      const clamped = Math.max(0, targetLeft);
+      track.scrollTo({ left: clamped, behavior: 'smooth' });
+    }
   }
 
   startAutoScroll() {
@@ -436,7 +584,7 @@ function setupMobileCarousel() {
 
   // Aplicar scroll snap a los chips originales
   originalChips.forEach((chip, index) => {
-    chip.style.scrollSnapAlign = 'start';
+    chip.style.scrollSnapAlign = 'center';
     chip.style.flexShrink = '0'; // Evitar que los chips se encojan
   });
 

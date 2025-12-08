@@ -13,21 +13,18 @@ export const languages = {
 };
 
 export function getCurrentLang() {
-	if (typeof window !== "undefined") {
-		const savedLang = localStorage.getItem("preferred-language");
-		if (savedLang && languages[savedLang]) {
-			return savedLang;
-		}
+    if (typeof window !== "undefined") {
+        // Preferir el idioma del path para coincidir con SSR
+        const path = window.location.pathname;
+        const langFromPath = path.split("/")[1];
+        if (languages[langFromPath]) {
+            return langFromPath;
+        }
 
-		const path = window.location.pathname;
-		const langFromPath = path.split("/")[1];
-		if (languages[langFromPath]) {
-			return langFromPath;
-		}
-
-		const browserLang = navigator.language.split("-")[0];
-		return languages[browserLang] ? browserLang : defaultLang;
-	}
+        // Si no hay idioma en el path, usar el idioma por defecto
+        // para evitar desajustes de hidratación con el HTML del servidor
+        return defaultLang;
+    }
 
 	try {
 		if (typeof globalThis !== "undefined" && globalThis.Astro?.url) {
@@ -38,7 +35,7 @@ export function getCurrentLang() {
 			}
 		}
 
-		return defaultLang;
+        return defaultLang;
 	} catch (_error) {
 		return defaultLang;
 	}

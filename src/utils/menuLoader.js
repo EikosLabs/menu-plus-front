@@ -1,8 +1,9 @@
 import { sanitizeMenuData, sanitizeColor } from './security.js';
 import { renderMenu } from './menuRenderer.js';
 import { initializeInteractiveElements } from './menuInteractions.js';
+import { getPaletteByBusinessType } from './themePalettes.js';
 
-const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api';
 
 function getContrastColor(hex, alphaFactor = 1) {
   try {
@@ -10,8 +11,14 @@ function getContrastColor(hex, alphaFactor = 1) {
     const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16) / 255;
     const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16) / 255;
     const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16) / 255;
+    
+    // Calculate relative luminance
     const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    const color = lum > 0.5 ? '#111111' : '#FFFFFF';
+    
+    // Use a slightly lower threshold for better readability on colored backgrounds
+    // This prefers white text on more backgrounds
+    const color = lum > 0.6 ? '#111111' : '#FFFFFF';
+    
     if (color === '#FFFFFF' && alphaFactor < 1) {
       return `rgba(255,255,255,${alphaFactor})`;
     }
@@ -32,6 +39,48 @@ function hexToRgba(hex, alpha = 1) {
   } catch { return `rgba(0,0,0,${alpha})`; }
 }
 
+// Helper to darken/lighten color
+function adjustColorBrightness(hex, percent) {
+    try {
+        const clean = hex.replace('#', '');
+        const num = parseInt(clean, 16);
+        let amt = Math.round(2.55 * percent);
+        let R = (num >> 16) + amt;
+        let G = (num >> 8 & 0x00FF) + amt;
+        let B = (num & 0x0000FF) + amt;
+        
+        return '#' + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
+    } catch { return hex; }
+}
+
+// Foreground color for background to maximize contrast
+function getForegroundOnBackground(hex) {
+  try {
+    const clean = hex.replace('#','');
+    const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16) / 255;
+    const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16) / 255;
+    const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16) / 255;
+    const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return lum > 0.6 ? '#111111' : '#FFFFFF';
+  } catch { return '#111111'; }
+}
+
+// Helper to ensure text color is readable on light background
+function getReadableTextColor(hex) {
+    try {
+        const clean = hex.replace('#', '');
+        const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16) / 255;
+        const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16) / 255;
+        const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16) / 255;
+        
+        const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        
+        // If color is too light (lum > 0.4), return a dark gray/black
+        // Otherwise return the color itself
+        return lum > 0.4 ? '#1a1a1a' : hex;
+    } catch { return '#1a1a1a'; }
+}
+
 function applyTheme(business) {
   const templateMap = {
     '0': 'modern', '1': 'elegant', '2': 'casual', '3': 'minimalist',
@@ -41,25 +90,33 @@ function applyTheme(business) {
   const templateName = templateMap[String(business.template)] || 'modern';
   document.documentElement.setAttribute('data-template', templateName);
 
+  const businessType = business.businessType || business.category || 'restaurant';
+  const palette = getPaletteByBusinessType(businessType);
+
   const fontMap = {
     'poppins': "'Poppins', sans-serif",
+    'playfair display': "'Playfair Display', serif", // Add explicit support
     'playfair': "'Playfair Display', serif",
     'roboto': "'Roboto', sans-serif",
     'montserrat': "'Montserrat', sans-serif",
     'lora': "'Lora', serif",
+    'open sans': "'Open Sans', sans-serif", // Add explicit support
     'opensans': "'Open Sans', sans-serif",
     'raleway': "'Raleway', sans-serif",
     'merriweather': "'Merriweather', serif"
   };
 
-  const fontFamily = (business.fontFamily || 'poppins').toLowerCase();
-  const fontFamilyValue = fontMap[fontFamily] || fontMap['poppins'];
+  const fontFamilyName = (business.fontFamily || palette.fontFamily || 'poppins').toLowerCase().replace(/'/g, "").replace(/"/g, "");
+  const fontFamilyValue = fontMap[fontFamilyName] || fontMap['poppins'];
 
   const customColors = {
-    primary: sanitizeColor(business.primaryColor) || null,
-    secondary: sanitizeColor(business.secondaryColor) || null,
-    accent: sanitizeColor(business.accentColor) || null
+    primary: sanitizeColor(business.primaryColor) || palette.primary,
+    secondary: sanitizeColor(business.secondaryColor) || palette.secondary,
+    accent: sanitizeColor(business.accentColor) || palette.accent
   };
+  const backgroundColor = sanitizeColor(business.backgroundColor) || palette.background;
+  const pageText = getForegroundOnBackground(backgroundColor || '#ffffff');
+  const pageMuted = pageText === '#FFFFFF' ? 'rgba(255,255,255,0.78)' : 'rgba(17,17,17,0.74)';
 
   const styleEl = document.createElement('style');
   styleEl.innerHTML = `
@@ -70,16 +127,46 @@ function applyTheme(business) {
       ${customColors.primary ? `--brand-primary: ${customColors.primary};` : ''}
       ${customColors.secondary ? `--brand-secondary: ${customColors.secondary};` : ''}
       ${customColors.accent ? `--brand-accent: ${customColors.accent};` : ''}
+      ${backgroundColor ? `--brand-background: ${backgroundColor};` : ''}
+      ${backgroundColor ? `--page-text-color: ${pageText};` : '--page-text-color: #111111;'}
+      ${backgroundColor ? `--page-muted-text-color: ${pageMuted};` : '--page-muted-text-color: rgba(17,17,17,0.74);'}
       ${customColors.primary ? `--brand-primary-contrast: ${getContrastColor(customColors.primary)};` : '--brand-primary-contrast: #ffffff;'}
       ${customColors.secondary ? `--brand-secondary-contrast: ${getContrastColor(customColors.secondary)};` : '--brand-secondary-contrast: #ffffff;'}
       ${customColors.accent ? `--brand-accent-contrast: ${getContrastColor(customColors.accent)};` : '--brand-accent-contrast: #ffffff;'}
       ${customColors.primary ? `--brand-shadow-color: ${hexToRgba(customColors.primary, 0.25)};` : '--brand-shadow-color: rgba(0,0,0,0.2);'}
       --font-display: ${fontFamilyValue};
-      ${customColors.primary ? `--hero-text-color: ${getContrastColor(customColors.primary)};` : '--hero-text-color: #ffffff;'}
-      ${customColors.primary ? `--hero-subtitle-color: ${getContrastColor(customColors.primary, 0.85)};` : '--hero-subtitle-color: rgba(255,255,255,0.95);'}
+      ${backgroundColor ? `--hero-text-color: ${getForegroundOnBackground(backgroundColor)};` : '--hero-text-color: #111111;'}
+      ${backgroundColor ? `--hero-subtitle-color: ${getForegroundOnBackground(backgroundColor) === '#FFFFFF' ? 'rgba(255,255,255,0.78)' : 'rgba(17,17,17,0.74)'};` : '--hero-subtitle-color: rgba(17,17,17,0.74);'}
+      
+      /* Readable Text Colors for Light Backgrounds */
+      ${customColors.primary ? `--brand-primary-text: ${getReadableTextColor(customColors.primary)};` : '--brand-primary-text: #1a1a1a;'}
+      ${customColors.secondary ? `--brand-secondary-text: ${getReadableTextColor(customColors.secondary)};` : '--brand-secondary-text: #4a4a4a;'}
+      ${customColors.accent ? `--brand-accent-text: ${getReadableTextColor(customColors.accent)};` : '--brand-accent-text: #1a1a1a;'}
+
+      /* Derived colors for better UI */
+      ${customColors.primary ? `--brand-primary-light: ${adjustColorBrightness(customColors.primary, 20)};` : ''}
+      ${customColors.primary ? `--brand-primary-dark: ${adjustColorBrightness(customColors.primary, -20)};` : ''}
     }
 
     body, .menu-page, * { font-family: ${fontFamilyValue} !important; }
+ 
+     .category-chip.active { 
+         background: var(--brand-primary) !important; 
+         color: var(--brand-primary-contrast) !important;
+         border-color: var(--brand-primary) !important;
+     }
+    
+    .category-chip:not(.active) {
+        border: 2px solid var(--brand-primary) !important;
+        color: var(--brand-primary) !important;
+        background: transparent !important;
+    }
+    
+    .category-chip:not(.active):hover {
+        background: var(--brand-primary-light) !important;
+        color: var(--brand-primary-contrast) !important;
+        border-color: var(--brand-primary-light) !important;
+    }
 
     .hero-title-main, .section-title, .item-name, .dish-modal-title,
     .loading-title, .error-title, .empty-title, .footer-logo,

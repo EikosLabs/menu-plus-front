@@ -5,7 +5,7 @@ import authService from "./authService";
 
 class AIService {
 	constructor() {
-		const apiUrl = import.meta.env.PUBLIC_API_URL || "/api";
+		const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:5000/api";
 		this.baseUrl = `${apiUrl}/ai`;
 
 		// Cache simple para análisis de imágenes (evita análisis duplicados)
@@ -210,7 +210,7 @@ class AIService {
 							},
 							body: JSON.stringify({
 								image: imageBase64,
-								entityType,
+								entityType: entityType,
 							}),
 						},
 						this.timeouts.imageAnalysis,
@@ -501,7 +501,8 @@ class AIService {
 			});
 
 			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+				const error = await AppError.fromResponse(response);
+				throw error;
 			}
 
 			return await response.json();
@@ -535,7 +536,8 @@ class AIService {
 			});
 
 			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+				const error = await AppError.fromResponse(response);
+				throw error;
 			}
 
 			return await response.json();

@@ -37,7 +37,7 @@
   background: white;
   border: 1px solid var(--brand-secondary);
   border-radius: 8px;
-  color: var(--brand-primary);
+  color: var(--brand-primary-text);
   box-shadow: none;
   font-weight: 600;
   transition: all 0.25s ease;
@@ -67,12 +67,12 @@
 
 [data-template="minimalist"] .section-title {
   font-weight: 700;
-  color: var(--brand-primary);
+  color: var(--brand-primary-text);
   letter-spacing: 0.01em;
 }
 
 [data-template="minimalist"] .section-description {
-  color: var(--brand-secondary);
+  color: var(--brand-secondary-text);
 }
 
 [data-template="minimalist"] .menu-item {
@@ -91,11 +91,11 @@
 
 [data-template="minimalist"] .item-name {
   font-weight: 700;
-  color: var(--brand-primary);
+  color: var(--brand-primary-text);
 }
 
 [data-template="minimalist"] .item-description {
-  color: var(--brand-secondary);
+  color: var(--brand-secondary-text);
   opacity: 0.9;
 }
 
@@ -134,7 +134,7 @@
 [data-template="minimalist"] .btn--secondary {
   background: white;
   border: 2px solid var(--brand-secondary);
-  color: var(--brand-secondary);
+  color: var(--brand-secondary-text);
   box-shadow: none;
   border-radius: 8px;
   font-weight: 600;
@@ -144,7 +144,7 @@
 [data-template="minimalist"] .btn--secondary:hover {
   background: var(--brand-secondary);
   border-color: var(--brand-primary);
-  color: var(--brand-primary);
+  color: var(--brand-primary-contrast);
 }
 
 [data-template="minimalist"] .loading-card,
@@ -196,4 +196,7 @@
 
 [data-template="minimalist"] .footer-logo span {
   color: var(--brand-secondary);
+}
+[data-template="minimalist"] .menu-page {
+  background: var(--brand-background, var(--template-bg));
 }

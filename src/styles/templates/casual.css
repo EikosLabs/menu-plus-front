@@ -36,7 +36,7 @@
   border-radius: 50px;
   font-weight: 800;
   box-shadow: 4px 4px 0 var(--brand-shadow-color);
-  color: var(--brand-accent);
+  color: var(--brand-accent-text);
   transition: all 0.2s ease;
 }
 
@@ -63,7 +63,7 @@
 }
 
 [data-template="casual"] .section-title {
-  color: var(--brand-accent);
+  color: var(--brand-accent-text);
   font-weight: 800;
 }
 
@@ -86,12 +86,12 @@
 }
 
 [data-template="casual"] .item-name {
-  color: var(--brand-accent);
+  color: var(--brand-accent-text);
   font-weight: 800;
 }
 
 [data-template="casual"] .item-description {
-  color: var(--brand-secondary);
+  color: var(--brand-secondary-text);
 }
 
 [data-template="casual"] .item-price-wrapper {
@@ -158,4 +158,7 @@
 
 [data-template="casual"] .footer-logo span {
   color: var(--brand-secondary);
+}
+[data-template="casual"] .menu-page {
+  background: var(--brand-background, var(--template-bg));
 }

@@ -11,99 +11,98 @@ import '../../styles/templates/dark.css';
 import '../../styles/templates/classic.css';
 import '../../styles/business-info.css';
 import '../../styles/menu-qr-page.css';
+import '../../styles/neobrutalist.css';
 
 const { qrCodeId } = Astro.params;
 ---
 
 <Layout title="Menu">
-  <main class="menu-page">
-    <div class="bg-decoration">
-      <div class="bg-decoration__circle bg-decoration__circle--1"></div>
-      <div class="bg-decoration__circle bg-decoration__circle--2"></div>
-      <div class="bg-decoration__circle bg-decoration__circle--3"></div>
-      <div class="bg-decoration__dots"></div>
-    </div>
+  <main class="menu-page min-h-screen relative">
 
-    <div id="loading-state" class="loading-state">
-      <div class="loading-card">
-        <div class="loading-spinner">
-          <div class="spinner-ring"></div>
-          <div class="spinner-ring"></div>
-          <div class="spinner-ring"></div>
-          <div class="spinner-plate">
-            <span class="plate-emoji">🍽️</span>
+    {/* LOADING STATE */}
+    <div id="loading-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 backdrop-blur-sm">
+      <div class="neo-card bg-white border-4 border-black p-8 md:p-12 max-w-md w-full text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] animate-bounce-slight">
+        <div class="mb-8 relative mx-auto w-24 h-24">
+          <div class="absolute inset-0 border-4 border-black rounded-full border-t-neo-flame animate-spin"></div>
+          <div class="absolute inset-4 border-4 border-black rounded-full border-b-neo-sunset animate-spin-reverse"></div>
+          <div class="absolute inset-0 flex items-center justify-center text-3xl">
+            🍽️
           </div>
         </div>
-        <h2 class="loading-title">Preparing your menu...</h2>
-        <p class="loading-subtitle">Crafting the perfect dining experience</p>
-        <div class="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
+        <h2 class="text-3xl font-black uppercase tracking-tight mb-2">Preparando tu menú</h2>
+        <p class="text-neo-gray font-medium">Creando la experiencia perfecta...</p>
+        <div class="mt-6 flex justify-center gap-2">
+          <div class="w-3 h-3 bg-neo-flame rounded-full animate-bounce"></div>
+          <div class="w-3 h-3 bg-neo-sunset rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+          <div class="w-3 h-3 bg-neo-black rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
         </div>
       </div>
     </div>
 
-    <div id="error-state" class="error-state" style="display: none;">
-      <div class="error-card">
-        <div class="error-icon-wrapper">
-          <div class="error-icon">⚠️</div>
-          <div class="error-icon-bg"></div>
-        </div>
-        <h2 class="error-title">Oops! Menu Not Found</h2>
-        <p class="error-message" id="error-message"></p>
-        <div class="error-details">
-          <div class="error-info-card">
-            <h3 class="error-info-title">Possible causes:</h3>
-            <ul class="error-list">
-              <li>🔧 Restaurant hasn't set up their digital menu yet</li>
-              <li>📅 QR code is outdated or inactive</li>
-              <li>📱 Error scanning the code</li>
+    {/* ERROR STATE */}
+    <div id="error-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 hidden backdrop-blur-sm">
+      <div class="neo-card bg-white border-4 border-black p-8 max-w-lg w-full shadow-[12px_12px_0px_0px_rgba(207,92,54,1)] relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-red-100 rounded-full border-4 border-black z-0"></div>
+        
+        <div class="relative z-10 text-center">
+          <div class="mx-auto w-20 h-20 bg-neo-flame border-4 border-black rounded-full flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <span class="text-4xl text-white">⚠️</span>
+          </div>
+          
+          <h2 class="text-3xl font-black uppercase mb-2">¡Ups! Menú no encontrado</h2>
+          <p id="error-message" class="text-lg font-medium text-neo-gray mb-6 border-b-2 border-dashed border-gray-300 pb-4">
+            No pudimos cargar el menú solicitado.
+          </p>
+
+          <div class="bg-yellow-50 border-2 border-black p-4 mb-8 text-left rounded-lg">
+            <h3 class="font-bold uppercase text-sm mb-2">Posibles causas:</h3>
+            <ul class="list-disc list-inside text-sm space-y-1 font-medium text-gray-700">
+              <li>El restaurante no ha configurado su menú digital.</li>
+              <li>El código QR es antiguo o está inactivo.</li>
+              <li>Error de conexión o escaneo.</li>
             </ul>
           </div>
-          <div class="error-code">
-            <span class="error-code-label">QR Code ID:</span>
-            <code class="error-code-value">{qrCodeId}</code>
+
+          <div class="bg-gray-100 border-2 border-black p-2 rounded mb-6 inline-block">
+            <span class="text-xs font-bold uppercase text-gray-500 mr-2">ID:</span>
+            <code class="font-mono font-bold text-neo-flame">{qrCodeId}</code>
           </div>
-        </div>
-        <div class="error-actions">
-          <button class="btn btn--primary" onclick="window.location.reload()">
-            <span>🔄</span>
-            <span>Try Again</span>
-          </button>
-          <a href="/" class="btn btn--secondary">
-            <span>🏠</span>
-            <span>Go Home</span>
-          </a>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button onclick="window.location.reload()" class="neo-btn bg-neo-sunset hover:bg-yellow-300 text-black border-2 border-black px-6 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
+              🔄 Reintentar
+            </button>
+            <a href="/" class="neo-btn bg-white hover:bg-gray-50 text-black border-2 border-black px-6 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
+              🏠 Ir al Inicio
+            </a>
+          </div>
         </div>
       </div>
     </div>
 
-    <div id="menu-content" style="display: none;"></div>
+    <div id="menu-content" style="display: none;" class="relative z-10"></div>
 
-    <div id="dish-modal" class="dish-modal" style="display: none;">
-      <div class="dish-modal-backdrop"></div>
-      <div class="dish-modal-content">
-        <button class="dish-modal-close" aria-label="Cerrar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    <div id="dish-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+      <div class="dish-modal-backdrop absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+      <div class="dish-modal-content relative animate-up">
+        <button class="dish-modal-close">
+          <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+        
+        <div class="dish-modal-image-wrapper">
+          <img id="modal-dish-image" class="w-full h-full object-cover" alt="" />
+          <div class="dish-modal-image-placeholder absolute inset-0 flex items-center justify-center text-6xl text-gray-300">
+            <span>🥘</span>
+          </div>
+        </div>
+        
         <div class="dish-modal-body">
-          <div class="dish-modal-image-wrapper">
-            <img id="modal-dish-image" class="dish-modal-image" alt="" />
-            <div class="dish-modal-image-placeholder">
-              <span class="placeholder-emoji">🍴</span>
-            </div>
-          </div>
-          <div class="dish-modal-info">
-            <div class="dish-modal-header">
-              <h2 id="modal-dish-name" class="dish-modal-title"></h2>
-              <div id="modal-dish-price" class="dish-modal-price-badge"></div>
-            </div>
-            <p id="modal-dish-description" class="dish-modal-description"></p>
-            <div id="modal-dish-allergens" class="dish-modal-allergens"></div>
-          </div>
+          <h2 id="modal-dish-name"></h2>
+          <div id="modal-dish-price"></div>
+          <p id="modal-dish-description"></p>
+          <div id="modal-dish-allergens"></div>
         </div>
       </div>
     </div>

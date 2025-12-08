@@ -1,46 +1,61 @@
 import { forwardRef } from 'react';
-import { getColorScheme, getBusinessBranding, formatContactInfo, formatSocialMedia } from './utils/flyerTemplates';
+import { getColorScheme, getBusinessBranding, formatSocialMedia } from './utils/flyerTemplates';
 
 /**
  * Promotional Flyer Preview Component
- * Renders the promotional flyer for PDF export
+ * Renders promotional flyers WITHOUT images - text-based design
+ * Optimized for Instagram formats
  */
 const PromotionalFlyerPreview = forwardRef(({
   business,
   menu,
   items = [],
   template,
-  colorPalette = null
+  colorPalette = null,
+  showCurrency = true
 }, ref) => {
   const colors = getColorScheme(business, colorPalette);
   const branding = getBusinessBranding(business);
-  const contactInfo = formatContactInfo(branding);
   const socialMedia = formatSocialMedia(branding);
 
-  // Calculate size based on format
+  // Calculate size based on format - All IG compatible
   const getSizeForFormat = () => {
     switch (template.format) {
-      case 'half-page':
-        return { width: '595px', height: '421px' };
-      case 'third-page':
-        return { width: '595px', height: '281px' };
-      case 'quarter-page':
-        return { width: '420px', height: '297px' };
       case 'story-vertical':
         return { width: '360px', height: '640px' };
       case 'instagram-portrait':
         return { width: '360px', height: '450px' };
+      case 'instagram-square':
+        return { width: '360px', height: '360px' };
       default:
-        return { width: '595px', height: '421px' };
+        return { width: '360px', height: '450px' };
     }
   };
 
   const size = getSizeForFormat();
+  const isStory = template.format === 'story-vertical';
+  const isSquare = template.format === 'instagram-square';
+
+  // Get badge text based on template style
+  const getBadgeText = () => {
+    switch (template.style) {
+      case 'promo': return '🎯 PROMOCIÓN';
+      case 'featured': return '⭐ ESPECIALES';
+      case 'modern': return '✨ DESTACADOS';
+      case 'minimalist': return ''; // No badge for minimalist
+      case 'elegant': return '💎 SELECCIÓN';
+      default: return '⭐ DESTACADOS';
+    }
+  };
+
+  // Check if template is minimalist
+  const isMinimalist = template.style === 'minimalist';
+  const isElegant = template.style === 'elegant';
 
   const containerStyle = {
     width: size.width,
     height: size.height,
-    backgroundColor: colors.background,
+    background: `linear-gradient(180deg, ${colors.background} 0%, ${colors.backgroundAlt} 100%)`,
     fontFamily: 'Poppins, sans-serif',
     position: 'relative',
     overflow: 'hidden',
@@ -53,74 +68,114 @@ const PromotionalFlyerPreview = forwardRef(({
       style={containerStyle}
       className="promotional-flyer-preview neo-border shadow-2xl"
     >
+      {/* Decorative background elements */}
+      {!isMinimalist && (
+        <>
+          <div
+            style={{
+              position: 'absolute',
+              top: '-50px',
+              right: '-50px',
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              background: `${colors.primary}15`,
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '-30px',
+              left: '-30px',
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              background: `${colors.secondary}15`,
+            }}
+          />
+        </>
+      )}
+
       {/* Header */}
       <div
         style={{
           height: template.headerHeight,
-          background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
-          borderBottom: `3px solid ${colors.text}`,
-          padding: '12px 16px',
+          background: isMinimalist 
+            ? colors.background
+            : isElegant
+            ? `linear-gradient(135deg, ${colors.text} 0%, ${colors.primary} 100%)`
+            : `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+          padding: isSquare ? '12px 16px' : '16px 20px',
           display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          textAlign: 'center',
+          position: 'relative',
+          borderBottom: isMinimalist ? `2px solid ${colors.text}` : 'none',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {branding.logo && (
+        {/* Logo */}
+        {branding.logo && (
+          <div
+            style={{
+              backgroundColor: isMinimalist ? 'transparent' : '#ffffff',
+              padding: isMinimalist ? '0' : '8px',
+              borderRadius: isMinimalist ? '0' : '12px',
+              boxShadow: isMinimalist ? 'none' : '0 4px 8px rgba(0,0,0,0.15)',
+              marginBottom: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <img
               src={branding.logo}
               alt="Logo"
               style={{
-                maxHeight: '50px',
-                maxWidth: '80px',
+                maxHeight: isSquare ? '45px' : isStory ? '60px' : '50px',
+                maxWidth: isSquare ? '90px' : '140px',
                 objectFit: 'contain',
+                filter: isMinimalist ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' : 'none',
               }}
               crossOrigin="anonymous"
             />
-          )}
-          <div>
-            <h1
-              style={{
-                fontSize: template.format === 'quarter-page' ? '20px' : '24px',
-                fontWeight: 'bold',
-                color: '#ffffff',
-                margin: 0,
-                textShadow: '2px 2px 0px rgba(0,0,0,0.2)',
-              }}
-            >
-              {branding.name}
-            </h1>
-            {branding.slogan && (
-              <p
-                style={{
-                  fontSize: template.format === 'quarter-page' ? '10px' : '12px',
-                  color: '#ffffff',
-                  margin: '2px 0 0 0',
-                  opacity: 0.95,
-                }}
-              >
-                {branding.slogan}
-              </p>
-            )}
           </div>
-        </div>
+        )}
+        
+        {/* Business name */}
+        <h1
+          style={{
+            fontSize: isSquare ? '18px' : isMinimalist ? '24px' : '22px',
+            fontWeight: isMinimalist ? '300' : 'bold',
+            color: isMinimalist ? colors.text : '#ffffff',
+            margin: 0,
+            textShadow: isMinimalist ? 'none' : '2px 2px 4px rgba(0,0,0,0.3)',
+            letterSpacing: isMinimalist ? '2px' : '0.5px',
+            textTransform: isMinimalist ? 'uppercase' : 'none',
+          }}
+        >
+          {branding.name}
+        </h1>
 
-        {template.format !== 'quarter-page' && (
+        {/* Badge */}
+        {getBadgeText() && (
           <div
             style={{
-              backgroundColor: colors.accent,
-              color: '#ffffff',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              border: `2px solid ${colors.text}`,
-              fontWeight: 'bold',
-              fontSize: '14px',
+              backgroundColor: isMinimalist ? 'transparent' : colors.accent,
+              color: isMinimalist ? colors.primary : '#ffffff',
+              padding: isMinimalist ? '4px 0' : '6px 16px',
+              borderRadius: isMinimalist ? '0' : '20px',
+              fontSize: isSquare ? '11px' : isMinimalist ? '12px' : '13px',
+              fontWeight: isMinimalist ? '400' : 'bold',
+              marginTop: '8px',
+              boxShadow: isMinimalist ? 'none' : '0 2px 8px rgba(0,0,0,0.2)',
+              borderTop: isMinimalist ? `1px solid ${colors.primary}` : 'none',
+              borderBottom: isMinimalist ? `1px solid ${colors.primary}` : 'none',
+              letterSpacing: isMinimalist ? '1px' : '0',
             }}
           >
-            {template.name === 'Especiales del Día' && '⭐ ESPECIALES'}
-            {template.name === 'Promoción' && '🎯 PROMOCIÓN'}
-            {template.name === 'Combo' && '🍽️ COMBO'}
-            {template.name === 'Volante' && '📢 OFERTA'}
+            {getBadgeText()}
           </div>
         )}
       </div>
@@ -128,296 +183,158 @@ const PromotionalFlyerPreview = forwardRef(({
       {/* Items Content */}
       <div
         style={{
-          padding: template.format === 'quarter-page' ? '12px' : '16px',
+          padding: isSquare ? '12px 16px' : '16px 20px',
           height: `calc(100% - ${template.headerHeight} - ${template.footerHeight})`,
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: isSquare ? '8px' : isMinimalist ? '0' : '12px',
         }}
       >
-        {template.style === 'featured' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' }}>
-            {(() => {
-              const contentH = parseInt(size.height) - parseInt(template.headerHeight) - parseInt(template.footerHeight);
-              const gaps = Math.max(items.length - 1, 0) * 12;
-              const itemH = Math.max(Math.floor((contentH - gaps) / Math.max(items.length, 1)), 110);
-              const imgWH = Math.max(Math.min(100, itemH - 40), 60);
-              return items.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  border: `3px solid ${colors.text}`,
-                  borderRadius: '12px',
-                  padding: '12px',
-                  backgroundColor: '#ffffff',
-                  display: 'flex',
-                  gap: '16px',
-                  alignItems: 'center',
-                  boxShadow: '4px 4px 0px rgba(0,0,0,0.1)',
-                  flex: `0 0 ${itemH}px`,
-                }}
-              >
-                {item.imageUri && (
-                  <img
-                    src={item.imageUri}
-                    alt={item.name}
-                    style={{
-                      width: `${imgWH}px`,
-                      height: `${imgWH}px`,
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      border: `2px solid ${colors.text}`,
-                      flexShrink: 0,
-                    }}
-                    crossOrigin="anonymous"
-                  />
-                )}
-
-                <div style={{ flex: 1 }}>
-                  <h3
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 'bold',
-                      color: colors.text,
-                      margin: '0 0 6px 0',
-                    }}
-                  >
-                    {item.name}
-                  </h3>
-
-                  {item.description && (
-                    <p
-                      style={{
-                        fontSize: '13px',
-                        color: colors.textLight,
-                        margin: '0 0 8px 0',
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {item.description}
-                    </p>
-                  )}
-
-                  <div
-                    style={{
-                      backgroundColor: colors.primary,
-                      color: '#ffffff',
-                      display: 'inline-block',
-                      padding: '6px 16px',
-                      borderRadius: '6px',
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      border: `2px solid ${colors.text}`,
-                    }}
-                  >
-                    ${item.price.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-              ));
-            })()}
-          </div>
-        )}
-
-        {template.style === 'grid' && (
+        {items.map((item, index) => (
           <div
+            key={item.id}
             style={{
-              display: 'grid',
-              gridTemplateColumns: template.itemsPerRow === 1 ? '1fr' : '1fr 1fr',
-              gap: '12px',
-              gridAutoRows: 'min-content',
-              alignContent: 'start',
+              background: isMinimalist ? 'transparent' : '#ffffff',
+              borderRadius: isMinimalist ? '0' : isElegant ? '16px' : '12px',
+              padding: isSquare ? '10px 14px' : isMinimalist ? '12px 0' : '14px 18px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              boxShadow: isMinimalist ? 'none' : isElegant ? '0 4px 12px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.08)',
+              border: isMinimalist 
+                ? 'none'
+                : isElegant
+                ? `1px solid ${colors.primary}30`
+                : `2px solid ${colors.primary}20`,
+              borderBottom: isMinimalist ? `1px solid ${colors.textLight}30` : undefined,
+              flex: 1,
+              minHeight: 0,
             }}
           >
-            {items.map((item) => (
-              <div
-                key={item.id}
+            {/* Item number badge */}
+            <div
+              style={{
+                width: isMinimalist ? '32px' : isSquare ? '26px' : '30px',
+                height: isMinimalist ? '32px' : isSquare ? '26px' : '30px',
+                borderRadius: isMinimalist ? '0' : '50%',
+                background: isMinimalist 
+                  ? 'transparent'
+                  : isElegant
+                  ? colors.text
+                  : `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+                color: isMinimalist ? colors.text : '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMinimalist ? '16px' : isSquare ? '12px' : '14px',
+                fontWeight: isMinimalist ? '300' : 'bold',
+                flexShrink: 0,
+                marginRight: isSquare ? '10px' : '14px',
+                border: isMinimalist ? `1px solid ${colors.text}` : 'none',
+              }}
+            >
+              {index + 1}
+            </div>
+
+            {/* Item details */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h3
                 style={{
-                  border: `2px solid ${colors.text}`,
-                  borderRadius: '8px',
-                  padding: '10px',
-                  backgroundColor: '#ffffff',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  boxShadow: '3px 3px 0px rgba(0,0,0,0.1)',
+                  fontSize: isSquare ? '14px' : isMinimalist ? '15px' : '16px',
+                  fontWeight: isMinimalist ? '400' : '600',
+                  color: colors.text,
+                  margin: 0,
+                  lineHeight: 1.3,
+                  letterSpacing: isMinimalist ? '0.5px' : '0',
                 }}
               >
-                {item.imageUri && (
-                  <img
-                    src={item.imageUri}
-                    alt={item.name}
-                    style={{
-                      width: '100%',
-                      height: '70px',
-                      objectFit: 'cover',
-                      borderRadius: '6px',
-                      border: `2px solid ${colors.text}`,
-                      marginBottom: '8px',
-                    }}
-                    crossOrigin="anonymous"
-                  />
-                )}
-
-                <h3
+                {item.name}
+              </h3>
+              {item.description && !isSquare && (
+                <p
                   style={{
-                    fontSize: '15px',
-                    fontWeight: 'bold',
-                    color: colors.text,
-                    margin: '0 0 4px 0',
+                    fontSize: '11px',
+                    color: colors.textLight,
+                    margin: '2px 0 0 0',
+                    lineHeight: 1.3,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontWeight: isMinimalist ? '300' : '400',
                   }}
                 >
-                  {item.name}
-                </h3>
+                  {item.description}
+                </p>
+              )}
+            </div>
 
-                {item.description && (
-                  <p
-                    style={{
-                      fontSize: '11px',
-                      color: colors.textLight,
-                      margin: '0 0 6px 0',
-                      lineHeight: 1.3,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                    }}
-                  >
-                    {item.description}
-                  </p>
-                )}
-
-                <div
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: '#ffffff',
-                    textAlign: 'center',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    border: `2px solid ${colors.text}`,
-                    marginTop: 'auto',
-                  }}
-                >
-                  ${item.price.toFixed(2)}
-                </div>
-              </div>
-            ))}
+            {/* Price */}
+            <div
+              style={{
+                background: isMinimalist 
+                  ? 'transparent'
+                  : isElegant
+                  ? colors.text
+                  : `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+                color: isMinimalist ? colors.primary : '#ffffff',
+                padding: isMinimalist ? '0' : isSquare ? '6px 12px' : '8px 16px',
+                borderRadius: isMinimalist ? '0' : '8px',
+                fontSize: isSquare ? '15px' : isMinimalist ? '18px' : '17px',
+                fontWeight: isMinimalist ? '600' : 'bold',
+                flexShrink: 0,
+                marginLeft: '10px',
+                letterSpacing: isMinimalist ? '0.5px' : '0',
+              }}
+            >
+              {showCurrency ? '$' : ''}{item.price.toFixed(2)}
+            </div>
           </div>
-        )}
-
-        {template.style === 'simple' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
-            {(() => {
-              const contentH = parseInt(size.height) - parseInt(template.headerHeight) - parseInt(template.footerHeight);
-              const gaps = Math.max(items.length - 1, 0) * 10;
-              const itemH = Math.max(Math.floor((contentH - gaps) / Math.max(items.length, 1)), 90);
-              return items.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  border: `2px solid ${colors.text}`,
-                  borderRadius: '8px',
-                  padding: template.format === 'quarter-page' ? '8px' : '10px',
-                  backgroundColor: '#ffffff',
-                  display: 'flex',
-                  gap: '12px',
-                  alignItems: 'center',
-                  flex: `0 0 ${itemH}px`,
-                }}
-              >
-                {item.imageUri && template.format !== 'quarter-page' && (
-                  <img
-                    src={item.imageUri}
-                    alt={item.name}
-                    style={{
-                      width: '60px',
-                      height: '60px',
-                      objectFit: 'cover',
-                      borderRadius: '6px',
-                      border: `2px solid ${colors.text}`,
-                      flexShrink: 0,
-                    }}
-                    crossOrigin="anonymous"
-                  />
-                )}
-
-                <div style={{ flex: 1 }}>
-                  <h3
-                    style={{
-                      fontSize: template.format === 'quarter-page' ? '13px' : '16px',
-                      fontWeight: 'bold',
-                      color: colors.text,
-                      margin: 0,
-                    }}
-                  >
-                    {item.name}
-                  </h3>
-                  {item.description && template.format !== 'quarter-page' && (
-                    <p
-                      style={{
-                        fontSize: '11px',
-                        color: colors.textLight,
-                        margin: '2px 0 0 0',
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      {item.description.substring(0, 60)}...
-                    </p>
-                  )}
-                </div>
-
-                <div
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: '#ffffff',
-                    padding: template.format === 'quarter-page' ? '4px 10px' : '6px 12px',
-                    borderRadius: '6px',
-                    fontSize: template.format === 'quarter-page' ? '13px' : '16px',
-                    fontWeight: 'bold',
-                    border: `2px solid ${colors.text}`,
-                    flexShrink: 0,
-                  }}
-                >
-                  ${item.price.toFixed(2)}
-                </div>
-              </div>
-              ));
-            })()}
-          </div>
-        )}
+        ))}
       </div>
 
       {/* Footer */}
       <div
         style={{
           height: template.footerHeight,
-          background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
-          borderTop: `3px solid ${colors.text}`,
-          padding: template.format === 'quarter-page' ? '6px 12px' : '8px 16px',
+          background: isMinimalist 
+            ? colors.background
+            : isElegant
+            ? `linear-gradient(135deg, ${colors.text} 0%, ${colors.primary} 100%)`
+            : `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+          padding: isSquare ? '8px 16px' : '12px 20px',
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           alignItems: 'center',
-          color: '#ffffff',
-          fontSize: template.format === 'quarter-page' ? '9px' : '11px',
+          gap: '16px',
+          color: isMinimalist ? colors.text : '#ffffff',
+          borderTop: isMinimalist ? `2px solid ${colors.text}` : 'none',
         }}
       >
-        <div>
-          {contactInfo.slice(0, template.format === 'quarter-page' ? 2 : 3).map((info, i) => (
-            <div key={i} style={{ marginBottom: '2px' }}>
-              {info}
-            </div>
-          ))}
-        </div>
-
-        {socialMedia.length > 0 && template.format !== 'quarter-page' && (
-          <div style={{ textAlign: 'right' }}>
-            {socialMedia.slice(0, 2).map((social, i) => (
-              <div key={i} style={{ marginBottom: '2px' }}>
-                {social.icon} {social.text}
-              </div>
+        {/* Social media */}
+        {socialMedia.length > 0 && (
+          <div style={{ display: 'flex', gap: '12px', fontSize: isSquare ? '11px' : '12px' }}>
+            {socialMedia.slice(0, 3).map((social, i) => (
+              <span key={i} style={{ opacity: isMinimalist ? 0.7 : 0.95 }}>
+                {social.icon}
+              </span>
             ))}
           </div>
         )}
+
+        {/* CTA text */}
+        <div
+          style={{
+            fontSize: isSquare ? '11px' : isMinimalist ? '12px' : '13px',
+            fontWeight: isMinimalist ? '300' : '600',
+            textAlign: 'center',
+            letterSpacing: isMinimalist ? '1px' : '0',
+          }}
+        >
+          {branding.phone && `📞 ${branding.phone}`}
+          {!branding.phone && branding.instagram && `@${branding.instagram.replace(/.*instagram\.com\//, '').replace(/\/$/, '')}`}
+          {!branding.phone && !branding.instagram && '¡Visítanos!'}
+        </div>
       </div>
     </div>
   );

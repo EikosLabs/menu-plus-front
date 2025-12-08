@@ -30,6 +30,7 @@ export default function PromotionalFlyerGenerator({
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState(savedFlyer?.id || null);
   const [selectedPalette, setSelectedPalette] = useState(savedFlyer?.colorPalette || null);
+  const [showCurrency, setShowCurrency] = useState(true);
 
   const previewRef = useRef(null);
 
@@ -249,21 +250,8 @@ export default function PromotionalFlyerGenerator({
 
             {/* Template Selection */}
             <div>
-              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Tipo de Folleto</h3>
-              <div className="flex gap-1.5 mb-1.5 sm:mb-2">
-                <button
-                  onClick={() => setSelectedTemplate('story')}
-                  className={`neo-btn neo-btn-sm text-xs ${selectedTemplate === 'story' ? 'neo-btn-primary' : 'neo-btn-white'}`}
-                >
-                  Historia IG
-                </button>
-                <button
-                  onClick={() => setSelectedTemplate('post')}
-                  className={`neo-btn neo-btn-sm text-xs ${selectedTemplate === 'post' ? 'neo-btn-primary' : 'neo-btn-white'}`}
-                >
-                  Post IG
-                </button>
-              </div>
+              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Tipo de Folleto Promocional</h3>
+              <p className="neo-text text-xs opacity-70 mb-2">Todos los formatos son compatibles con Instagram</p>
               <div className="space-y-1.5 sm:space-y-2">
                 {Object.values(FOLLETO_TEMPLATES).map((tmpl) => (
                   <button
@@ -287,13 +275,27 @@ export default function PromotionalFlyerGenerator({
                         <div className="neo-text-bold text-xs sm:text-sm">{tmpl.name}</div>
                         <div className="neo-text text-xs opacity-70 hidden sm:block">{tmpl.description}</div>
                         <div className="neo-text text-xs mt-1 text-neo-flame">
-                          Máx. {tmpl.maxItems} • {FOLLETO_FORMATS[tmpl.format].name}
+                          Máx. {tmpl.maxItems} platos • {FOLLETO_FORMATS[tmpl.format]?.name || tmpl.format}
                         </div>
                       </div>
                     </div>
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Opciones de Visualización */}
+            <div>
+              <h3 className="neo-h5 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base">Opciones</h3>
+              <label className="flex items-center gap-2 cursor-pointer p-2 neo-border rounded-lg hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  checked={showCurrency}
+                  onChange={(e) => setShowCurrency(e.target.checked)}
+                  className="w-4 h-4 text-neo-flame rounded border-gray-300 focus:ring-neo-flame"
+                />
+                <span className="neo-text text-xs sm:text-sm">Mostrar símbolo de moneda ($)</span>
+              </label>
             </div>
 
             {/* Color Palette Selection */}
@@ -369,13 +371,6 @@ export default function PromotionalFlyerGenerator({
                       <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neo-flame text-white flex items-center justify-center">
                         <span className="text-xs neo-text-bold">{index + 1}</span>
                       </div>
-                      {item.imageUri && (
-                        <img
-                          src={item.imageUri}
-                          alt={item.name}
-                          className="w-7 h-7 sm:w-8 sm:h-8 object-cover rounded flex-shrink-0"
-                        />
-                      )}
                       <div className="flex-1 min-w-0">
                         <div className="neo-text-bold text-xs sm:text-sm truncate">{item.name}</div>
                         <div className="neo-text text-xs opacity-70">${item.price.toFixed(2)}</div>
@@ -437,13 +432,6 @@ export default function PromotionalFlyerGenerator({
                           : 'bg-white hover:bg-gray-50'
                       }`}
                     >
-                      {item.imageUri && (
-                        <img
-                          src={item.imageUri}
-                          alt={item.name}
-                          className="w-7 h-7 sm:w-8 sm:h-8 object-cover rounded flex-shrink-0"
-                        />
-                      )}
                       <div className="flex-1 min-w-0">
                         <div className="neo-text-bold text-xs sm:text-sm truncate">{item.name}</div>
                         <div className={`neo-text text-xs ${isSelected ? 'opacity-90' : 'opacity-70'}`}>
@@ -473,6 +461,7 @@ export default function PromotionalFlyerGenerator({
                   items={selectedItems}
                   template={template}
                   colorPalette={selectedPalette}
+                  showCurrency={showCurrency}
                 />
               ) : (
                 <div className="bg-white neo-border rounded-lg p-6 sm:p-8 md:p-12 text-center">

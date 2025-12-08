@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import OnboardingStep from '../OnboardingStep';
 import { validateStepColors } from '../../../utils/onboardingValidation';
 import CircularColorPicker from '../../../components/ui/CircularColorPicker';
+import { getPaletteByBusinessType } from '../../../utils/themePalettes';
 
 /**
  * Paso 5: Personalización de Colores
@@ -28,15 +29,30 @@ export default function StepColors({
     updateErrors
   ]);
 
+  // Auto-aplicar tema si cambia el tipo de negocio y no hay colores definidos
+  useEffect(() => {
+    if (isActive && formData.businessType && !formData.primaryColor) {
+      const palette = getPaletteByBusinessType(formData.businessType);
+      if (palette) {
+        updateMultipleFields({
+          primaryColor: palette.primary,
+          secondaryColor: palette.secondary,
+          accentColor: palette.accent
+        });
+      }
+    }
+  }, [isActive, formData.businessType]);
+
   const handleColorChange = (name, value) => {
     updateFormData(name, value);
   };
 
   const handleUseDefaults = () => {
+    const palette = getPaletteByBusinessType(formData.businessType);
     updateMultipleFields({
-      primaryColor: '#1a1a1a',
-      secondaryColor: '#004E71',
-      accentColor: '#0A3342'
+      primaryColor: palette.primary,
+      secondaryColor: palette.secondary,
+      accentColor: palette.accent
     });
   };
 
@@ -150,7 +166,7 @@ export default function StepColors({
       </div>
 
       {/* Botón para usar colores predeterminados */}
-      <div className="mt-6">
+      <div className="mt-6 relative z-10">
         <button
           type="button"
           onClick={handleUseDefaults}
@@ -160,7 +176,7 @@ export default function StepColors({
         </button>
       </div>
 
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg relative z-10">
         <div className="flex gap-2">
           <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

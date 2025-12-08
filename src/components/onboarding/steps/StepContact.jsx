@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import OnboardingStep from '../OnboardingStep';
-import { FormField } from '../FormField';
+import FormField from '../../ui/FormField';
 import { validateStepContact } from '../../../utils/onboardingValidation';
 
 /**
@@ -37,6 +37,10 @@ export default function StepContact({
     </svg>
   );
 
+  const handleFieldChange = (name, value) => {
+    updateFormData(name, value);
+  };
+
   return (
     <OnboardingStep
       title="Información de Contacto"
@@ -48,7 +52,7 @@ export default function StepContact({
         label="Dirección"
         name="address"
         value={formData.address}
-        onChange={updateFormData}
+        onChange={handleFieldChange}
         error={errors.address}
         required={false}
         placeholder="Ej: Calle Principal 123, Ciudad"
@@ -60,7 +64,7 @@ export default function StepContact({
         name="phoneNumber"
         type="tel"
         value={formData.phoneNumber}
-        onChange={updateFormData}
+        onChange={handleFieldChange}
         error={errors.phoneNumber}
         required={false}
         placeholder="Ej: +1 234 567 8900"
@@ -72,7 +76,7 @@ export default function StepContact({
         name="email"
         type="email"
         value={formData.email}
-        onChange={updateFormData}
+        onChange={handleFieldChange}
         error={errors.email}
         required={false}
         placeholder="Ej: contacto@tunegocio.com"

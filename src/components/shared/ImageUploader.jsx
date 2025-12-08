@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Componente reutilizable para subir imágenes
+ * Componente reutilizable para subir imágenes con soporte para drag & drop
  */
 export default function ImageUploader({
 	preview,
@@ -11,17 +11,48 @@ export default function ImageUploader({
 	disabled = false,
 	error = null,
 	label = "Imagen",
-	acceptedFormats = "PNG, JPG, WebP hasta 5MB"
+	acceptedFormats = "PNG, JPG, WebP hasta 5MB",
+	required = false
 }) {
+	const [isDragging, setIsDragging] = React.useState(false);
+	// Si no se proporciona ref externo, usar uno interno
+	const internalRef = React.useRef(null);
+	const inputRef = fileInputRef || internalRef;
+
+	const handleDragOver = (e) => { e.preventDefault(); !disabled && setIsDragging(true); };
+	const handleDragLeave = (e) => { e.preventDefault(); setIsDragging(false); };
+	
+	const handleDrop = (e) => {
+		e.preventDefault();
+		setIsDragging(false);
+		if (disabled) return;
+		
+		const files = e.dataTransfer.files;
+		if (files.length > 0 && onFileChange) {
+			// Simular evento de cambio para mantener compatibilidad
+			onFileChange({ target: { files: files } });
+		}
+	};
+
 	return (
-		<div>
+		<div className="mb-4">
 			<label className="mb-1 block font-medium text-gray-700 text-sm">
-				{label}
+				{label} {required && <span className="text-neo-flame ml-1">*</span>}
 			</label>
 
 			<div
-				className="group mt-1 flex cursor-pointer justify-center rounded-lg border-2 border-gray-300 border-dashed px-6 pt-5 pb-6 transition-colors hover:bg-gray-50"
-				onClick={() => !disabled && fileInputRef.current?.click()}
+				className={`
+					group mt-1 flex cursor-pointer justify-center rounded-lg border-2 border-dashed px-6 pt-5 pb-6 transition-all
+					${isDragging 
+						? 'border-neo-flame bg-neo-lavender shadow-md' 
+						: 'border-gray-300 hover:bg-gray-50 hover:border-gray-400'}
+					${error ? 'border-red-500' : ''}
+					${disabled ? 'opacity-60 cursor-not-allowed' : ''}
+				`}
+				onClick={() => !disabled && inputRef.current?.click()}
+				onDragOver={handleDragOver}
+				onDragLeave={handleDragLeave}
+				onDrop={handleDrop}
 			>
 				<div className="space-y-1 text-center">
 					{preview ? (
@@ -29,7 +60,16 @@ export default function ImageUploader({
 							<img
 								src={preview}
 								alt="Vista previa"
-								className="mx-auto h-40 rounded-lg object-cover shadow-md transition-transform group-hover:scale-105"
+								className="mx-auto h-40 rounded-lg object-contain shadow-md transition-transform group-hover:scale-105"
+								onError={(e) => {
+									e.target.onerror = null; // Prevent infinite loop
+									// Only clear if it's not already a placeholder or valid data URL
+									if (!e.target.src.startsWith('data:')) {
+										console.error('Error loading image preview:', e.target.src);
+										// Optional: You could show a fallback icon here or hide the image
+										e.target.style.display = 'none';
+									}
+								}}
 							/>
 							<button
 								type="button"
@@ -41,25 +81,15 @@ export default function ImageUploader({
 								disabled={disabled}
 								aria-label="Eliminar imagen"
 							>
-								<svg
-									className="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M6 18L18 6M6 6l12 12"
-									/>
+								<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 								</svg>
 							</button>
 						</div>
 					) : (
 						<>
 							<svg
-								className="mx-auto h-12 w-12 text-gray-400 transition-colors group-hover:text-gray-500"
+								className={`mx-auto h-12 w-12 transition-colors ${isDragging ? 'text-neo-flame' : 'text-gray-400 group-hover:text-gray-500'}`}
 								stroke="currentColor"
 								fill="none"
 								viewBox="0 0 48 48"
@@ -86,7 +116,7 @@ export default function ImageUploader({
 				</div>
 			</div>
 			<input
-				ref={fileInputRef}
+				ref={inputRef}
 				type="file"
 				accept="image/*"
 				onChange={onFileChange}

@@ -28,6 +28,12 @@ export const PAPER_SIZES = {
     pxWidth: 1080,
     pxHeight: 1350,
   },
+  IG_SQUARE: {
+    width: 90, // mm approx for 1080x1080
+    height: 90, // mm approx for 1080px
+    pxWidth: 1080,
+    pxHeight: 1080,
+  },
 };
 
 export const TEMPLATES = {

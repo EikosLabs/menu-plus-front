@@ -1,6 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 
-const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
+const API_URL = import.meta.env.PUBLIC_API_URL || "http://localhost:5000/api";
 
 /**
  * Valida el formato y expiración de un JWT
@@ -116,13 +116,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	const currentPath = context.url.pathname;
 
 	// Rutas públicas que no requieren autenticación
+	const reserved = ["dashboard", "login", "register", "admin", "api", "404", "menu"];
+	const singleSegment = /^\/[^/]+$/.test(currentPath);
+	const segment = singleSegment ? currentPath.slice(1) : null;
+	const isRootLanding = singleSegment && segment && !reserved.includes(segment);
 	const isPublicRoute =
 		currentPath === "/login" ||
 		currentPath === "/register" ||
 		currentPath.startsWith("/login/") ||
 		currentPath.startsWith("/register/") ||
 		currentPath.startsWith("/menu/") ||
-		currentPath.startsWith("/business/");
+		currentPath.startsWith("/business/") ||
+		isRootLanding;
 
 	const token = context.cookies.get("auth_token")?.value;
 	const refreshToken = context.cookies.get("refresh_token")?.value;

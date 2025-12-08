@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import OnboardingStep from '../OnboardingStep';
-import { FormField, TextAreaField, SelectField } from '../FormField';
+import FormField, { TextAreaField, SelectField } from '../../ui/FormField';
 import { validateStepBasicInfo } from '../../../utils/onboardingValidation';
 import menuService from '../../../services/menuService';
 import { getAllCurrencies } from '../../../utils/currencies';
+import { BUSINESS_TYPES, THEME_PALETTES, getPaletteByBusinessType } from '../../../utils/themePalettes';
 
 /**
  * Paso 1: Información Básica del Negocio
@@ -69,6 +70,28 @@ export default function StepBasicInfo({
     </svg>
   );
 
+  const handleFieldChange = (name, value) => {
+    updateFormData(name, value);
+  };
+
+  // Opciones de tipos de negocio para el tema visual
+  const businessTypeOptions = [
+    { id: BUSINESS_TYPES.RESTAURANT, name: 'Restaurante / Fine Dining' },
+    { id: BUSINESS_TYPES.CAFE, name: 'Cafetería / Coffee Shop' },
+    { id: BUSINESS_TYPES.BAR, name: 'Bar / Club / Nightlife' },
+    { id: BUSINESS_TYPES.FAST_FOOD, name: 'Comida Rápida / Fast Food' },
+    { id: BUSINESS_TYPES.BAKERY, name: 'Pastelería / Panadería' },
+    { id: BUSINESS_TYPES.PIZZERIA, name: 'Pizzería / Italiano' },
+    { id: BUSINESS_TYPES.SUSHI, name: 'Sushi / Asiático' },
+    { id: BUSINESS_TYPES.BURGER, name: 'Hamburguesería / Grill' },
+    { id: BUSINESS_TYPES.VEGAN, name: 'Vegano / Saludable' },
+    { id: BUSINESS_TYPES.ICE_CREAM, name: 'Heladería / Postres' },
+  ];
+
+  const handleBusinessTypeChange = (name, value) => {
+    updateFormData(name, value);
+  };
+
   return (
     <OnboardingStep
       title="Información Básica"
@@ -80,7 +103,7 @@ export default function StepBasicInfo({
         label="Nombre del Negocio"
         name="name"
         value={formData.name}
-        onChange={updateFormData}
+        onChange={handleFieldChange}
         error={errors.name}
         required={true}
         placeholder="Ej: Restaurante El Buen Sabor"
@@ -91,7 +114,7 @@ export default function StepBasicInfo({
         label="Descripción"
         name="description"
         value={formData.description}
-        onChange={updateFormData}
+        onChange={handleFieldChange}
         error={errors.description}
         required={false}
         placeholder="Describe brevemente tu negocio (opcional)"
@@ -104,7 +127,7 @@ export default function StepBasicInfo({
         label="Slogan"
         name="slogan"
         value={formData.slogan}
-        onChange={updateFormData}
+        onChange={handleFieldChange}
         error={errors.slogan}
         required={false}
         placeholder="Ej: La mejor comida de la ciudad (opcional)"
@@ -115,8 +138,8 @@ export default function StepBasicInfo({
         label="Categoría del Negocio"
         name="businessCategoryId"
         value={formData.businessCategoryId}
-        onChange={updateFormData}
-        options={categories}
+        onChange={handleFieldChange}
+        options={categories.map(cat => ({ id: cat.id, name: cat.name }))}
         error={errors.businessCategoryId}
         required={true}
         placeholder={loadingCategories ? 'Cargando categorías...' : 'Selecciona una categoría'}
@@ -124,10 +147,20 @@ export default function StepBasicInfo({
       />
 
       <SelectField
+        label="Estilo del Negocio (Para el diseño)"
+        name="businessType"
+        value={formData.businessType || ''}
+        onChange={handleBusinessTypeChange}
+        options={businessTypeOptions}
+        required={false}
+        placeholder="Selecciona el estilo que mejor te represente"
+      />
+
+      <SelectField
         label="Moneda Predeterminada"
         name="defaultCurrency"
         value={formData.defaultCurrency ?? 0}
-        onChange={updateFormData}
+        onChange={handleFieldChange}
         options={getAllCurrencies().map(curr => ({
           id: curr.value,
           name: `${curr.symbol} ${curr.name} (${curr.code})`

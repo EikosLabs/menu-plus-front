@@ -66,14 +66,16 @@ export default function BusinessList({
 		setSelectedMenuId(null);
 	};
 
-	const handleShowEditMenuItem = (menuItem, menuId, businessCurrency = 0) => {
+	const handleShowEditMenuItem = (menuItem, menuId, businessCurrency = 0, sectionId = null) => {
 		setMenuItemToEdit({
 			...menuItem,
 			menuId: menuId,
+			sectionId: sectionId || menuItem.sectionId || null,
 		});
 		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
 		setSelectedMenuId(menuId);
 		setSelectedBusinessCurrency(businessCurrency);
+		setSelectedSection(sectionId || menuItem.sectionId || null);
 	};
 
 	const handleCancelEditMenuItem = () => {
@@ -315,10 +317,10 @@ export default function BusinessList({
 						<div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
 							<div className="lg:col-span-8">
 								<div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
-									{business.imageKey && (
+									{(business.imageUrl || business.imageKey) && (
 										<div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white rounded-lg overflow-hidden border-2 border-white/20">
 											<img
-												src={business.imageKey}
+												src={business.imageUrl || business.imageKey}
 												alt={business.name}
 												className="w-full h-full object-cover"
 												onError={(e) => {
@@ -461,6 +463,16 @@ export default function BusinessList({
 								)}
 							</div>
 							<div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+								<button
+									onClick={() => window.open(`/${business.slug}`, '_blank')}
+									className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center"
+									title="Ver Landing Page pública"
+								>
+									<svg className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+									</svg>
+									Ver Web
+								</button>
 								<button
 									onClick={() => onEditBusinessClick(business)}
 									className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center"
@@ -755,6 +767,7 @@ export default function BusinessList({
 																								item,
 																								menu.id,
 																								business.defaultCurrency,
+																								section.id,
 																							)
 																						}
 																						className="text-blue-600 hover:text-blue-800 p-1"
@@ -922,6 +935,10 @@ export default function BusinessList({
 				const business = businesses.find(b => b.id === showMenuCard.businessId);
 				const menu = business?.menus?.find(m => m.id === showMenuCard.menuId);
 				const menuItems = menu?.sections?.flatMap(section => section.menuItems || []) || [];
+
+				if (!business || !menu) {
+					return null;
+				}
 
 				return (
 					<MenuCardGenerator

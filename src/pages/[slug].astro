@@ -1,17 +1,29 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BusinessMap from '../../components/BusinessMap.jsx';
-import BusinessSchedule from '../../components/BusinessSchedule.jsx';
+import Layout from '../layouts/Layout.astro';
+import BusinessMap from '../components/BusinessMap.jsx';
+import BusinessSchedule from '../components/BusinessSchedule.jsx';
+
+// Obtener todas las rutas estáticas válidas para build
+export async function getStaticPaths() {
+  // En modo SSR (output: 'server'), esta función no se usa para rutas dinámicas
+  return [];
+}
 
 const { slug } = Astro.params;
+
+// Validar que el slug no colisione con rutas reservadas
+const reservedRoutes = ['dashboard', 'login', 'register', 'admin', 'api', '404', 'menu'];
+if (reservedRoutes.includes(slug)) {
+  return Astro.redirect('/404');
+}
 
 // Fetch business data server-side
 let business = null;
 let error = null;
 
 try {
-  const API_URL = import.meta.env.PUBLIC_API_URL || 'https://menusesqr.online/api';
-  const response = await fetch(`${API_URL}/api/business-landing/${slug}`);
+  const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api';
+  const response = await fetch(`${API_URL}/business-landing/${slug}`);
 
   if (!response.ok) {
     error = 'Business not found';

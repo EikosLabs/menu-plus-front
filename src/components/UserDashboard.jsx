@@ -147,43 +147,44 @@ export default function UserDashboard() {
 					{activeSection === "templates" && (
 						<TemplateSection businesses={businesses} onTemplateUpdated={fetchBusinesses} />
 					)}
-					{activeSection === "estadisticas" && <StatsSection />}
+					{activeSection === "estadisticas" && <StatsSection businesses={businesses} />}
 					{activeSection === "perfil" && <ProfileSection />}
 				</Suspense>
 
-				{/* Menu Scanner Modal */}
-				{showMenuScanner && (
-					<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-						<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto">
-							<MenuScanner
-								onAnalysisComplete={handleAnalysisComplete}
-								onCancel={handleScannerCancel}
-								menuId={selectedMenuId}
-								foodBusinessId={selectedFoodBusinessId}
-							/>
-						</div>
-					</div>
-				)}
-
-				{/* Analysis Review Modal */}
-				{showAnalysisReview && analysisData && (
-					<div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-						<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto">
-							<MenuAnalysisReview
-								analysisData={analysisData}
-								onBack={handleAnalysisBack}
-								onComplete={handleAnalysisSaveComplete}
-								menuId={selectedMenuId}
-								foodBusinessId={selectedFoodBusinessId}
-							/>
-						</div>
-					</div>
-				)}
 			</main>
 
 			<Footer />
 
-			<style jsx={true}>{`
+			{/* Menu Scanner Modal - Outside main to be above everything */}
+			{showMenuScanner && (
+				<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+					<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
+						<MenuScanner
+							onAnalysisComplete={handleAnalysisComplete}
+							onCancel={handleScannerCancel}
+							menuId={selectedMenuId}
+							foodBusinessId={selectedFoodBusinessId}
+						/>
+					</div>
+				</div>
+			)}
+
+			{/* Analysis Review Modal - Outside main to be above everything */}
+			{showAnalysisReview && analysisData && (
+				<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md" onClick={handleAnalysisBack}>
+					<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
+						<MenuAnalysisReview
+							analysisData={analysisData}
+							onBack={handleAnalysisBack}
+							onComplete={handleAnalysisSaveComplete}
+							menuId={selectedMenuId}
+							foodBusinessId={selectedFoodBusinessId}
+						/>
+					</div>
+				</div>
+			)}
+
+			<style jsx="true">{`
 				@keyframes slideDown {
 					from { transform: translateY(-20px); opacity: 0; }
 					to { transform: translateY(0); opacity: 1; }

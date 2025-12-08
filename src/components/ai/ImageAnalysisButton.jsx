@@ -461,6 +461,9 @@ const ImageAnalysisButton = ({
 		setUploadProgress(0);
 		setAnalysisProgress(0);
 
+		// Declarar imageDimensions fuera del try para que esté accesible en catch
+		let imageDimensions = null;
+
 		try {
 			// Log inicio del proceso de análisis
 			errorLogger.info("Starting image analysis", {
@@ -471,31 +474,16 @@ const ImageAnalysisButton = ({
 				source: fileToAnalyze ? 'shared' : 'current'
 			});
 
-			// Fase 1: Subida de imagen (30% del progreso)
-			setUploadProgress(10);
-			const imageKey = await menuService.uploadImage(file);
-			setUploadProgress(30);
+			// Validación previa para dimensiones/tipo/tamaño
+			setIsValidating(true);
+			await validateImageFile(file).then(res => {
+				imageDimensions = res?.dimensions || null;
+			}).finally(() => setIsValidating(false));
 
-			if (!imageKey) {
-				throw new AppError(
-					ERROR_TYPES.UPLOAD_FAILED,
-					"No se pudo subir la imagen al servidor",
-					{
-						fileName: file.name,
-						suggestions: [
-							"Verifica tu conexión a internet",
-							"Intenta con otra imagen",
-						],
-					},
-				);
-			}
-
-			// Fase 2: Análisis con IA (70% restante)
 			setAnalysisProgress(40);
-			const imageIdentifier = `minio://${imageKey}`;
-
+			const base64 = await fileToBase64(file);
 			const response = await aiService.analyzeImage(
-				imageIdentifier,
+				base64,
 				entityType,
 			);
 			setAnalysisProgress(80);
@@ -537,7 +525,7 @@ const ImageAnalysisButton = ({
 				operation: "imageAnalysis",
 				fileName: file.name,
 				entityType,
-				dimensions,
+				dimensions: imageDimensions,
 			});
 
 			// Convertir errores a AppError si no lo son ya
@@ -548,11 +536,11 @@ const ImageAnalysisButton = ({
 					normalizedError = await AppError.fromResponse(err.response);
 				} else {
 					// Error genérico
-					normalizedError = AppError.fromError(err, {
-						fileName: file.name,
-						entityType,
-						dimensions,
-					});
+						normalizedError = AppError.fromError(err, {
+							fileName: file.name,
+							entityType,
+							dimensions: imageDimensions,
+						});
 				}
 			}
 

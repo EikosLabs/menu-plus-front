@@ -74,19 +74,16 @@ export default function LoginSuccessNotification({ visible, onComplete }) {
 			)}
 
 			{/* Main Card */}
-			<div className={`relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 max-w-md w-full transform transition-all duration-500 border border-violet-100 ${
+			<div className={`relative bg-white border-4 border-neo-black p-8 max-w-md w-full transform transition-all duration-500 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${
 				animationPhase === 'pop-in' ? 'scale-0' :
 				animationPhase === 'checkmark' ? 'scale-105' :
 				animationPhase === 'complete' ? 'scale-95 opacity-0' :
 				'scale-100'
 			}`}>
-				{/* Gradient Background */}
-				<div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl"></div>
-
 				{/* Content */}
 				<div className="relative z-10 text-center">
 					{/* Success Icon Container */}
-					<div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full mb-6 shadow-lg transform transition-all duration-500">
+					<div className="inline-flex items-center justify-center w-20 h-20 bg-neo-flame rounded-full mb-6 border-4 border-neo-black transform transition-all duration-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
 						<svg
 							className={`w-10 h-10 text-white transform transition-all duration-500 ${
 								animationPhase === 'pop-in' ? 'scale-0' :
@@ -107,35 +104,33 @@ export default function LoginSuccessNotification({ visible, onComplete }) {
 					</div>
 
 					{/* Success Message */}
-					<h2 className="text-2xl font-bold text-gray-800 mb-2">
-						¡Bienvenido de nuevo! 🎉
+					<h2 className="text-2xl font-black text-neo-black mb-2 uppercase tracking-tight">
+						¡Bienvenido de nuevo!
 					</h2>
-					<p className="text-gray-600 mb-6">
+					<p className="text-neo-black font-medium mb-6">
 						Inicio de sesión exitoso. Redirigiendo al dashboard...
 					</p>
 
 					{/* Progress Bar */}
-					<div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden mb-4">
+					<div className="w-full bg-gray-200 h-4 border-2 border-neo-black mb-4 relative overflow-hidden">
 						<div
-							className="h-full bg-gradient-to-r from-violet-500 to-purple-600 rounded-full transition-all duration-300 ease-out"
+							className="h-full bg-neo-green transition-all duration-300 ease-out"
 							style={{ width: `${progress}%` }}
-						>
-							<div className="h-full bg-white/30 animate-pulse"></div>
-						</div>
+						></div>
 					</div>
 
 					{/* Progress Text */}
-					<p className="text-sm text-gray-500">
+					<p className="text-sm font-bold text-neo-black uppercase">
 						{animationPhase === 'complete' ? '¡Listo!' : `${progress}% completado`}
 					</p>
 
 					{/* Loading Dots */}
 					{animationPhase !== 'complete' && (
-						<div className="flex justify-center gap-1 mt-4">
+						<div className="flex justify-center gap-2 mt-4">
 							{[0, 1, 2].map((i) => (
 								<div
 									key={i}
-									className="w-2 h-2 bg-violet-500 rounded-full animate-bounce"
+									className="w-3 h-3 bg-neo-black rounded-full animate-bounce"
 									style={{ animationDelay: `${i * 0.15}s` }}
 								></div>
 							))}
@@ -144,8 +139,8 @@ export default function LoginSuccessNotification({ visible, onComplete }) {
 				</div>
 
 				 {/* Decorative Elements */}
-				<div className="absolute -top-4 -right-4 w-24 h-24 bg-violet-200/30 rounded-full blur-xl"></div>
-				<div className="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-200/30 rounded-full blur-xl"></div>
+				<div className="absolute -top-3 -right-3 w-0 h-0 border-t-[20px] border-r-[20px] border-t-transparent border-r-neo-flame transform rotate-45"></div>
+				<div className="absolute -bottom-3 -left-3 w-0 h-0 border-b-[20px] border-l-[20px] border-b-transparent border-l-neo-green transform rotate-45"></div>
 			</div>
 		</div>
 	);

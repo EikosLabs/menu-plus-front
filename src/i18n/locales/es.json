@@ -14,6 +14,7 @@
     "close": "Cerrar",
     "confirm": "Confirmar",
     "open": "Abrir",
+    "saveChanges": "Guardar Cambios",
     "language": "Idioma",
     "spanish": "Español",
     "english": "Inglés"
@@ -88,9 +89,15 @@
 		"invalidImageFormat": "Por favor selecciona un archivo de imagen válido (JPEG, PNG, GIF, WebP)",
 		"imageSizeError": "El archivo de imagen debe ser menor a 5MB",
 		"categoryLoadError": "Error al cargar categorías",
-		"noCategoriesAvailable": "No hay categorías de negocio disponibles. Por favor, contacte al administrador para agregarlas.",
-		"loadingCategories": "Cargando categorías..."
-	},
+    "noCategoriesAvailable": "No hay categorías de negocio disponibles. Por favor, contacte al administrador para agregarlas.",
+    "loadingCategories": "Cargando categorías...",
+    "phone": "Teléfono",
+    "socialMedia": "Redes Sociales",
+    "colors": "Colores",
+    "primaryColor": "Color Primario",
+    "secondaryColor": "Color Secundario",
+    "accentColor": "Color de Acento"
+  },
 	"menu": {
 		"title": "Menú",
 		"myMenus": "Mis Menús",

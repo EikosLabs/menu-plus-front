@@ -80,7 +80,7 @@ export function renderMenu(menu, business, itemsBySection) {
   // Business Information
   html += renderBusinessInfo(business);
 
-  // Category Nav
+  // Category Nav + Search
   if (menu.sections && menu.sections.length > 0) {
     console.log('Renderizando carrusel de secciones - Total:', menu.sections.length);
     console.log('Secciones a renderizar:', menu.sections.map(s => ({
@@ -89,7 +89,15 @@ export function renderMenu(menu, business, itemsBySection) {
       itemsCount: s.menuItems?.length || 0
     })));
 
-    html += '<nav class="category-nav"><div class="category-nav-track">';
+    html += '<nav class="category-nav">'
+      + '<div class="category-nav-search">'
+      + '  <div class="search-input-wrapper">'
+      + '    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>'
+      + '    <input id="menu-search-input" type="search" placeholder="Buscar platos..." aria-label="Buscar platos" autocomplete="off" />'
+      + '    <div id="menu-search-count" class="menu-search-count" aria-live="polite"></div>'
+      + '  </div>'
+      + '</div>'
+      + '<div class="category-nav-track">';
     menu.sections.forEach((section, index) => {
       const emoji = getEmojiForSection(section.name, index);
       console.log(`Renderizando sección ${index + 1}:`, { id: section.id, name: section.name });

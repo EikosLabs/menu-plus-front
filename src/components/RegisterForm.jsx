@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import authService from "../services/authService";
 import { useErrorHandler } from "../hooks/useErrorHandler";
-import ErrorAlert, { SuccessAlert, FieldError } from "./shared/ErrorAlert";
+import ErrorAlert, { SuccessAlert } from "./shared/ErrorAlert";
 import PasswordInput from "./shared/PasswordInput";
+import FormField from "./ui/FormField";
 import { validateEmail, validateRequired, validatePassword } from "../utils/validation";
 import { useTranslation } from "../i18n/utils";
 
@@ -145,77 +146,48 @@ export default function RegisterForm() {
       )}
 
             {/* Full Name Field */}
-            <div>
-                <label
-                    htmlFor="fullName"
-                    className="neo-text-bold block mb-2"
-                >
-                    {t("auth.fullName")}
-                </label>
-                <input
-                  type="text"
-                  name="fullName"
-                  id="fullName"
-                  className={`neo-input ${(getFieldError('fullName')) ? 'border-red-500' : ''}`}
-                  placeholder={t("business.namePlaceholder")}
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  onBlur={() => handleBlur('fullName')}
-                />
-                <FieldError error={getFieldError('fullName')} />
-            </div>
+            <FormField
+                label={t("auth.fullName")}
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                onBlur={() => handleBlur('fullName')}
+                error={getFieldError('fullName')}
+                placeholder={t("business.namePlaceholder")}
+            />
 
             {/* Email Field */}
-            <div>
-                <label
-                    htmlFor="email"
-                    className="neo-text-bold block mb-2"
-                >
-                    {t("auth.email")}
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  className={`neo-input ${(getFieldError('email')) ? 'border-red-500' : ''}`}
-                  placeholder={t("auth.emailPlaceholder")}
-                  value={formData.email}
-                  onChange={handleChange}
-                  onBlur={() => handleBlur('email')}
-                />
-                <FieldError error={getFieldError('email')} />
-            </div>
+            <FormField
+                label={t("auth.email")}
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={() => handleBlur('email')}
+                error={getFieldError('email')}
+                placeholder={t("auth.emailPlaceholder")}
+            />
 
             {/* Username Field (Optional) */}
-            <div>
-                <label
-                    htmlFor="userName"
-                    className="neo-text-bold block mb-2"
-                >
-                    {t("auth.userName")} <span className="neo-text text-neo-gray text-sm">(opcional)</span>
-                </label>
-                <input
-                    type="text"
-                    name="userName"
-                    id="userName"
-                    className="neo-input"
-                    placeholder={t("auth.userName")}
-                    value={formData.userName}
-                    onChange={handleChange}
-                />
-            </div>
+            <FormField
+                label={t("auth.userName") + " (opcional)"}
+                name="userName"
+                value={formData.userName}
+                onChange={handleChange}
+                placeholder={t("auth.userNamePlaceholder")}
+            />
 
             {/* Password Field */}
             <PasswordInput
-              label={t("auth.password")}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              onBlur={() => handleBlur('password')}
-              placeholder={t("auth.passwordHint")}
-              error={getFieldError('password')}
-              showStrength={true}
-              strength={passwordStrength}
+                label={t("auth.password")}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                onBlur={() => handleBlur('password')}
+                error={getFieldError('password')}
+                placeholder={t("auth.passwordPlaceholder")}
+                showStrength={true}
+                strength={passwordStrength}
             />
 
             {/* Submit Button */}

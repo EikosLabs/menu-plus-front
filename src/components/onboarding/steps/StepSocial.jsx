@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import OnboardingStep from '../OnboardingStep';
-import { FormField } from '../FormField';
+import FormField from '../../ui/FormField';
 import { validateStepSocial } from '../../../utils/onboardingValidation';
 
 /**
@@ -44,6 +44,10 @@ export default function StepSocial({
     </svg>
   );
 
+  const handleFieldChange = (name, value) => {
+    updateFormData(name, value);
+  };
+
   return (
     <OnboardingStep
       title="Redes Sociales"
@@ -64,7 +68,7 @@ export default function StepSocial({
               label="Facebook"
               name="facebookUrl"
               value={formData.facebookUrl}
-              onChange={updateFormData}
+              onChange={handleFieldChange}
               error={errors.facebookUrl}
               required={false}
               placeholder="https://facebook.com/tunegocio"
@@ -84,7 +88,7 @@ export default function StepSocial({
               label="Instagram"
               name="instagramUrl"
               value={formData.instagramUrl}
-              onChange={updateFormData}
+              onChange={handleFieldChange}
               error={errors.instagramUrl}
               required={false}
               placeholder="https://instagram.com/tunegocio"
@@ -104,7 +108,7 @@ export default function StepSocial({
               label="Twitter / X"
               name="twitterUrl"
               value={formData.twitterUrl}
-              onChange={updateFormData}
+              onChange={handleFieldChange}
               error={errors.twitterUrl}
               required={false}
               placeholder="https://twitter.com/tunegocio"
@@ -125,7 +129,7 @@ export default function StepSocial({
               name="whatsAppNumber"
               type="tel"
               value={formData.whatsAppNumber}
-              onChange={updateFormData}
+              onChange={handleFieldChange}
               error={errors.whatsAppNumber}
               required={false}
               placeholder="+1 234 567 8900"

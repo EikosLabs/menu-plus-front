@@ -3,7 +3,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { exportToImage } from './utils/pdfExport';
-import { FLYER_TEMPLATES } from './utils/flyerTemplates';
+import { FOLLETO_TEMPLATES } from './utils/flyerTemplates';
 import FlyerPreview from './FlyerPreview';
 
 /**
@@ -16,7 +16,7 @@ export default function SimpleFlyerGenerator({
   menuItems = [],
   onClose
 }) {
-  const [selectedTemplate, setSelectedTemplate] = useState('modern');
+  const [selectedTemplate, setSelectedTemplate] = useState('promocion');
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [orderedItems, setOrderedItems] = useState([...menuItems]);
   const [isExporting, setIsExporting] = useState(false);
@@ -67,7 +67,7 @@ export default function SimpleFlyerGenerator({
     }
   };
 
-  const template = FLYER_TEMPLATES[selectedTemplate];
+  const template = FOLLETO_TEMPLATES[selectedTemplate];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
@@ -97,7 +97,7 @@ export default function SimpleFlyerGenerator({
             <div>
               <h3 className="neo-h5 mb-3">Diseño del Folleto</h3>
               <div className="space-y-2">
-                {Object.values(FLYER_TEMPLATES).map((tmpl) => (
+                {Object.values(FOLLETO_TEMPLATES).map((tmpl) => (
                   <button
                     key={tmpl.id}
                     onClick={() => setSelectedTemplate(tmpl.id)}

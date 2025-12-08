@@ -27,13 +27,12 @@ export default defineConfig({
             ],
             proxy: {
                 '/api': {
-                    target: 'http://172.19.0.4:8080',
+                    target: 'http://localhost:5000',
                     changeOrigin: true,
                     rewrite: (path) => path,
                     bodyLimit: 50 * 1024 * 1024, // 50MB
                     configure: (proxy, options) => {
                         proxy.on('proxyReq', (proxyReq, req, res) => {
-                            // Handle large file uploads
                             if (req.headers['content-length'] && parseInt(req.headers['content-length']) > 50 * 1024 * 1024) {
                                 proxyReq.setHeader('content-length', req.headers['content-length']);
                             }

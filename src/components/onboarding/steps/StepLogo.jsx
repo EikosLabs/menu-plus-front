@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import OnboardingStep from '../OnboardingStep';
-import { FileUploadField } from '../FormField';
+import ImageUploader from '../../shared/ImageUploader';
 import { validateStepLogo } from '../../../utils/onboardingValidation';
 import menuService from '../../../services/menuService';
 
@@ -40,8 +40,11 @@ export default function StepLogo({
     }
   }, [formData.logoFile]);
 
-  const handleFileChange = async (name, file) => {
+  const handleFileChange = async (event) => {
     setUploadError(null);
+    const file = event.target.files[0];
+    
+    if (!file) return;
     
     // Validar el archivo
     const validation = validateStepLogo({ logoFile: file });
@@ -107,15 +110,14 @@ export default function StepLogo({
       icon={icon}
       isActive={isActive}
     >
-      <FileUploadField
+      <ImageUploader
         label="Logo"
-        name="logoFile"
-        onChange={handleFileChange}
+        onFileChange={handleFileChange}
         error={errors.logoFile || uploadError}
         required={false}
-        accept="image/jpeg,image/png,image/gif,image/webp"
         preview={preview}
-        onRemove={handleRemove}
+        onClearImage={handleRemove}
+        acceptedFormats="JPEG, PNG, GIF, WebP hasta 1MB"
       />
 
       {uploading && (

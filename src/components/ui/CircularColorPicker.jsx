@@ -1,16 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 /**
- * Circular Color Picker con teoría del color
- * Permite seleccionar colores de forma visual y genera paletas armónicas
+ * Color Picker Mejorado
+ * Combina un selector nativo robusto con paletas predefinidas
  */
 export default function CircularColorPicker({ color, onChange, label }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [hue, setHue] = useState(0);
-  const [saturation, setSaturation] = useState(100);
-  const [lightness, setLightness] = useState(50);
-  const [colorScheme, setColorScheme] = useState('complementary');
   const pickerRef = useRef(null);
+  const inputRef = useRef(null);
 
   // Cerrar cuando se hace click fuera
   useEffect(() => {
@@ -26,133 +23,29 @@ export default function CircularColorPicker({ color, onChange, label }) {
     }
   }, [isOpen]);
 
-  // Convertir hex a HSL al cargar o cuando cambia
-  useEffect(() => {
-    if (color) {
-      const hsl = hexToHSL(color);
-      setHue(hsl.h);
-      setSaturation(hsl.s);
-      setLightness(hsl.l);
-    }
-  }, [color]);
-
-  // Convertir HSL a Hex
-  const hslToHex = (h, s, l) => {
-    l /= 100;
-    const a = (s * Math.min(l, 1 - l)) / 100;
-    const f = (n) => {
-      const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color)
-        .toString(16)
-        .padStart(2, '0');
-    };
-    return `#${f(0)}${f(8)}${f(4)}`;
-  };
-
-  // Convertir Hex a HSL
-  const hexToHSL = (hex) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    if (!result) return { h: 0, s: 100, l: 50 };
-
-    let r = parseInt(result[1], 16) / 255;
-    let g = parseInt(result[2], 16) / 255;
-    let b = parseInt(result[3], 16) / 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h, s, l = (max + min) / 2;
-
-    if (max === min) {
-      h = s = 0;
-    } else {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / d + 2) / 6; break;
-        case b: h = ((r - g) / d + 4) / 6; break;
-      }
-    }
-
-    return {
-      h: Math.round(h * 360),
-      s: Math.round(s * 100),
-      l: Math.round(l * 100)
-    };
-  };
-
-  // Generar paleta de colores según esquema
-  const generateColorScheme = () => {
-    const schemes = {
-      complementary: [hue, (hue + 180) % 360],
-      analogous: [hue, (hue + 30) % 360, (hue + 60) % 360],
-      triadic: [hue, (hue + 120) % 360, (hue + 240) % 360],
-      tetradic: [hue, (hue + 90) % 360, (hue + 180) % 360, (hue + 270) % 360],
-      monochromatic: [hue, hue, hue],
-    };
-
-    const hues = schemes[colorScheme] || schemes.complementary;
-
-    return hues.map((h, index) => {
-      let s = saturation;
-      let l = lightness;
-
-      // Variaciones en monocromático
-      if (colorScheme === 'monochromatic') {
-        if (index === 1) l = Math.max(20, lightness - 20);
-        if (index === 2) l = Math.min(80, lightness + 20);
-      }
-
-      return hslToHex(h, s, l);
-    });
-  };
-
-  const handleColorChange = (newHue, newSat, newLight) => {
-    const newColor = hslToHex(newHue, newSat, newLight);
-    onChange(newColor);
-  };
-
-  const handleHueChange = (e) => {
-    const newHue = parseInt(e.target.value);
-    setHue(newHue);
-    handleColorChange(newHue, saturation, lightness);
-  };
-
-  const handleSaturationChange = (e) => {
-    const newSat = parseInt(e.target.value);
-    setSaturation(newSat);
-    handleColorChange(hue, newSat, lightness);
-  };
-
-  const handleLightnessChange = (e) => {
-    const newLight = parseInt(e.target.value);
-    setLightness(newLight);
-    handleColorChange(hue, saturation, newLight);
-  };
-
   const handleHexChange = (e) => {
-    const hex = e.target.value || '#000000';
+    const hex = e.target.value;
+    // Allow typing but validate before calling onChange if valid hex
     if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-      const hsl = hexToHSL(hex);
-      setHue(hsl.h);
-      setSaturation(hsl.s);
-      setLightness(hsl.l);
       onChange(hex);
-    } else if (hex && hex.startsWith('#')) {
-      onChange(hex);
+    } else if (hex.startsWith('#') && hex.length <= 7) {
+        // Just update local state if we were managing it, but here we rely on parent
+        // So we might need to let the parent handle partial inputs or just wait for valid hex
+        // For now, we only trigger onChange on valid hex to avoid errors
     }
   };
 
-  const selectSchemeColor = (selectedColor) => {
-    const hsl = hexToHSL(selectedColor);
-    setHue(hsl.h);
-    setSaturation(hsl.s);
-    setLightness(hsl.l);
-    onChange(selectedColor);
-  };
-
-  const colorSchemes = generateColorScheme();
+  // Popular palettes based on business types
+  const presetColors = [
+    '#1a1a1a', '#ffffff', '#000000', '#666666', // Grayscale
+    '#DC2626', '#EF4444', '#F87171', // Reds
+    '#D97706', '#F59E0B', '#FBBF24', // Oranges
+    '#166534', '#22C55E', '#86EFAC', // Greens
+    '#1E40AF', '#3B82F6', '#93C5FD', // Blues
+    '#6B21A8', '#A855F7', '#D8B4FE', // Purples
+    '#9D174D', '#EC4899', '#F9A8D4', // Pinks
+    '#92400E', '#B45309', '#D97706', // Browns
+  ];
 
   return (
     <div ref={pickerRef} className="relative">
@@ -167,12 +60,14 @@ export default function CircularColorPicker({ color, onChange, label }) {
         className="w-full flex items-center gap-3 p-3 rounded-lg border-2 border-slate-300 bg-white hover:border-neo-flame transition-all neo-shadow-sm"
       >
         <div
-          className="w-12 h-12 rounded-lg border-2 border-slate-200 flex-shrink-0 neo-shadow-md"
+          className="w-12 h-12 rounded-lg border-2 border-slate-200 flex-shrink-0 neo-shadow-md relative overflow-hidden"
           style={{ backgroundColor: color || '#000000' }}
-        />
+        >
+             {/* Invisible native input to cover the box for fallback/quick access if needed */}
+        </div>
         <div className="flex-1 text-left">
           <div className="font-medium text-slate-900">{(color || '#000000').toUpperCase()}</div>
-          <div className="text-slate-500 text-xs">HSL({hue}°, {saturation}%, {lightness}%)</div>
+          <div className="text-slate-500 text-xs">Click para editar</div>
         </div>
         <svg
           className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -186,204 +81,55 @@ export default function CircularColorPicker({ color, onChange, label }) {
 
       {/* Picker Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-full sm:w-96 p-6 bg-white rounded-xl neo-shadow-lg border-2 border-slate-200">
-          {/* Rueda de Color Circular */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
-              🎨 Tono (Hue)
+        <div className="absolute z-[60] bottom-full left-0 mb-2 w-full sm:w-80 p-4 bg-white rounded-xl neo-shadow-lg border-2 border-slate-200 animate-fadeIn">
+          
+          {/* Native Picker Trigger */}
+          <div className="mb-4">
+             <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Selector de Color
             </label>
-            <div className="relative">
-              <div
-                className="h-12 rounded-lg mb-2 neo-shadow-inner"
-                style={{
-                  background: `linear-gradient(to right,
-                    hsl(0, ${saturation}%, ${lightness}%),
-                    hsl(60, ${saturation}%, ${lightness}%),
-                    hsl(120, ${saturation}%, ${lightness}%),
-                    hsl(180, ${saturation}%, ${lightness}%),
-                    hsl(240, ${saturation}%, ${lightness}%),
-                    hsl(300, ${saturation}%, ${lightness}%),
-                    hsl(360, ${saturation}%, ${lightness}%))`
-                }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="360"
-                value={hue}
-                onChange={handleHueChange}
-                className="w-full h-3 rounded-lg appearance-none cursor-pointer slider-thumb"
-                style={{
-                  background: 'transparent',
-                  marginTop: '-0.75rem'
-                }}
-              />
-            </div>
-            <div className="text-center text-sm text-slate-600 font-medium">{hue}°</div>
-          </div>
-
-          {/* Saturación */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
-              💧 Saturación
-            </label>
-            <div className="relative">
-              <div
-                className="h-12 rounded-lg mb-2 neo-shadow-inner"
-                style={{
-                  background: `linear-gradient(to right,
-                    hsl(${hue}, 0%, ${lightness}%),
-                    hsl(${hue}, 100%, ${lightness}%))`
-                }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={saturation}
-                onChange={handleSaturationChange}
-                className="w-full h-3 rounded-lg appearance-none cursor-pointer"
-                style={{
-                  background: 'transparent',
-                  marginTop: '-0.75rem'
-                }}
-              />
-            </div>
-            <div className="text-center text-sm text-slate-600 font-medium">{saturation}%</div>
-          </div>
-
-          {/* Luminosidad */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
-              ☀️ Luminosidad
-            </label>
-            <div className="relative">
-              <div
-                className="h-12 rounded-lg mb-2 neo-shadow-inner"
-                style={{
-                  background: `linear-gradient(to right,
-                    hsl(${hue}, ${saturation}%, 0%),
-                    hsl(${hue}, ${saturation}%, 50%),
-                    hsl(${hue}, ${saturation}%, 100%))`
-                }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={lightness}
-                onChange={handleLightnessChange}
-                className="w-full h-3 rounded-lg appearance-none cursor-pointer"
-                style={{
-                  background: 'transparent',
-                  marginTop: '-0.75rem'
-                }}
-              />
-            </div>
-            <div className="text-center text-sm text-slate-600 font-medium">{lightness}%</div>
-          </div>
-
-          {/* Valor Hex Manual */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              🔢 Código HEX
-            </label>
-            <input
-              type="text"
-              value={color || '#000000'}
-              onChange={handleHexChange}
-              className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg font-mono text-sm focus:border-neo-flame focus:outline-none"
-              placeholder="#000000"
-            />
-          </div>
-
-          {/* Esquemas de Color */}
-          <div className="border-t-2 border-slate-200 pt-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
-              🎯 Teoría del Color
-            </label>
-            <select
-              value={colorScheme}
-              onChange={(e) => setColorScheme(e.target.value)}
-              className="w-full mb-4 px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:border-neo-flame focus:outline-none"
-            >
-              <option value="complementary">🔴🟢 Complementarios</option>
-              <option value="analogous">🌈 Análogos</option>
-              <option value="triadic">🔺 Triádicos</option>
-              <option value="tetradic">🟦 Tetrádicos</option>
-              <option value="monochromatic">🎨 Monocromáticos</option>
-            </select>
-
-            <div className="grid grid-cols-4 gap-2">
-              {colorSchemes.map((color, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => selectSchemeColor(color)}
-                  className="aspect-square rounded-lg border-2 border-slate-300 hover:border-neo-flame transition-all neo-shadow-md hover:scale-110 transform"
-                  style={{ backgroundColor: color }}
-                  title={color}
+            <div className="flex gap-2">
+                <div className="relative flex-1 h-10">
+                    <input
+                        type="color"
+                        value={color || '#000000'}
+                        onChange={(e) => onChange(e.target.value)}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <button type="button" className="w-full h-full bg-neo-lavender hover:bg-neo-gray border-2 border-slate-300 rounded-lg flex items-center justify-center text-sm font-medium text-slate-700 transition-colors">
+                        🎨 Abrir Selector del Sistema
+                    </button>
+                </div>
+                <input
+                    type="text"
+                    value={color || '#000000'}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-28 px-3 py-2 border-2 border-slate-300 rounded-lg font-mono text-sm focus:border-neo-flame focus:outline-none uppercase"
+                    maxLength={7}
                 />
-              ))}
             </div>
           </div>
 
-          {/* Paleta de Colores Predefinidos */}
-          <div className="border-t-2 border-slate-200 pt-6 mt-6">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
-              ⭐ Colores Populares
+          {/* Presets */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Colores Sugeridos
             </label>
             <div className="grid grid-cols-8 gap-2">
-              {['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
-                '#1a1a1a', '#2C3E50', '#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'].map((color) => (
+              {presetColors.map((presetColor) => (
                 <button
-                  key={color}
+                  key={presetColor}
                   type="button"
-                  onClick={() => selectSchemeColor(color)}
-                  className="aspect-square rounded-lg border-2 border-slate-300 hover:border-neo-flame transition-all neo-shadow-sm hover:scale-110 transform"
-                  style={{ backgroundColor: color }}
-                  title={color}
+                  onClick={() => onChange(presetColor)}
+                  className={`aspect-square rounded-lg border-2 transition-all hover:scale-110 transform ${color === presetColor ? 'border-neo-flame ring-2 ring-neo-flame ring-offset-1' : 'border-slate-200'}`}
+                  style={{ backgroundColor: presetColor }}
+                  title={presetColor}
                 />
               ))}
             </div>
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        input[type="range"]::-webkit-slider-thumb {
-          appearance: none;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: white;
-          border: 3px solid #1a1a1a;
-          cursor: pointer;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-          transition: all 0.2s ease;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: white;
-          border: 3px solid #1a1a1a;
-          cursor: pointer;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-          transition: all 0.2s ease;
-        }
-
-        input[type="range"]::-moz-range-thumb:hover {
-          transform: scale(1.2);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-        }
-      `}</style>
     </div>
   );
 }

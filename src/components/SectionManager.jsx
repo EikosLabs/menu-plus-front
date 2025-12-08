@@ -122,6 +122,26 @@ export default function SectionManager({
 		}
 	};
 
+	const handleDeleteSection = async (sectionId) => {
+		if (!window.confirm("¿Estás seguro de eliminar esta sección? Esto también eliminará todos los platos asociados.")) {
+			return;
+		}
+
+		try {
+			setIsLoading(true);
+			setError(null);
+			await menuService.deleteSection(menuId, sectionId);
+			setSections((prev) => prev.filter(s => s.id !== sectionId));
+			
+			// Recargar para asegurar sincronización
+			await loadSections();
+		} catch (error) {
+			setError(`Error al eliminar la sección: ${error.message}`);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	const handleModalClick = (e) => {
 		e.stopPropagation();
 	};
@@ -377,6 +397,26 @@ export default function SectionManager({
 															strokeLinejoin="round"
 															strokeWidth={2}
 															d="M19 9l-7 7-7-7"
+														/>
+													</svg>
+												</button>
+												<button
+													onClick={() => handleDeleteSection(section.id)}
+													disabled={isLoading}
+													className="neo-btn neo-btn-sm p-1.5 sm:p-2 bg-red-100 hover:bg-red-200 text-red-600 border-red-200"
+													title="Eliminar sección"
+												>
+													<svg
+														className="h-4 w-4 sm:h-5 sm:w-5"
+														fill="none"
+														viewBox="0 0 24 24"
+														stroke="currentColor"
+													>
+														<path
+															strokeLinecap="round"
+															strokeLinejoin="round"
+															strokeWidth={2}
+															d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
 														/>
 													</svg>
 												</button>

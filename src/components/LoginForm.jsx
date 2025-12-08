@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import authService from "../services/authService";
 import { useErrorHandler } from "../hooks/useErrorHandler";
-import ErrorAlert, { FieldError } from "./shared/ErrorAlert";
+import ErrorAlert from "./shared/ErrorAlert";
 import PasswordInput from "./shared/PasswordInput";
+import FormField from "./ui/FormField";
 import { validateEmail, validateRequired } from "../utils/validation";
 import { useTranslation } from "../i18n/utils";
 import { ERROR_TYPES } from "../utils/errorTypes";
@@ -89,28 +90,19 @@ export default function LoginForm() {
       )}
 
             {/* Email Field */}
-            <div>
-                <label
-                    htmlFor="email"
-                    className="neo-text-bold block mb-2"
-                >
-                    {t("auth.email")}
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  className={`neo-input ${(getFieldError('email') || fieldErrors?.email) ? 'border-red-500' : ''}`}
-                  placeholder={t("auth.emailPlaceholder")}
-                  value={email}
-                  onChange={(e) => {
+            <FormField
+                label={t("auth.email")}
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => {
                     setEmail(e.target.value);
                     if (touched.email) clearFieldError('email');
-                  }}
-                  onBlur={() => handleBlur('email')}
-                />
-                <FieldError error={getFieldError('email') || fieldErrors?.email || (error?.type === ERROR_TYPES.UNAUTHORIZED ? t('auth.invalidCredentials') || 'Email o contraseña incorrectos.' : null)} />
-            </div>
+                }}
+                onBlur={() => handleBlur('email')}
+                error={getFieldError('email') || fieldErrors?.email || (error?.type === ERROR_TYPES.UNAUTHORIZED ? t('auth.invalidCredentials') || 'Email o contraseña incorrectos.' : null)}
+                placeholder={t("auth.emailPlaceholder")}
+            />
 
             {/* Password Field */}
             <PasswordInput

@@ -33,7 +33,6 @@ export default function MenuCardGenerator({
   };
   const defaultFontKey = (business?.fontFamily || 'poppins').toLowerCase();
   const [selectedFontKey, setSelectedFontKey] = useState(FONT_MAP[defaultFontKey] ? defaultFontKey : 'poppins');
-  const [includePhotos, setIncludePhotos] = useState(savedFlyer?.includePhotos ?? CARTA_TEMPLATES[selectedTemplate].showImages);
   const [orderedItems, setOrderedItems] = useState(() => {
     if (savedFlyer?.itemsOrder && savedFlyer.itemsOrder.length > 0) {
       // Reorder items based on saved order
@@ -44,13 +43,17 @@ export default function MenuCardGenerator({
     return [...menuItems];
   });
   const [isExporting, setIsExporting] = useState(false);
-  const [paperSize, setPaperSize] = useState(savedFlyer?.paperSize || 'A4');
   const [cartaName, setCartaName] = useState(savedFlyer?.name || `Carta ${business?.name || 'Menu'} - ${new Date().toLocaleDateString()}`);
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState(savedFlyer?.id || null);
   const [autoSplit, setAutoSplit] = useState(true);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [selectedPalette, setSelectedPalette] = useState(savedFlyer?.colorPalette || null);
+  const [showCurrency, setShowCurrency] = useState(true);
+
+  // Obtener el formato del template actual (siempre A4 para cartas)
+  const template = CARTA_TEMPLATES[selectedTemplate] || CARTA_TEMPLATES.elegante;
+  const paperSize = 'A4';
 
   const previewRef = useRef(null);
   const pageRefs = useRef([]);
@@ -96,7 +99,7 @@ export default function MenuCardGenerator({
         itemsOrder: JSON.stringify(orderedItems.map(item => item.id)),
         paperSize: paperSize,
         fontFamily: selectedFontKey,
-        includePhotos: includePhotos,
+        includePhotos: false, // Never include photos in carta
         colorPalette: selectedPalette,
       };
 
@@ -118,16 +121,17 @@ export default function MenuCardGenerator({
   };
 
   /**
-   * Export to PDF
+   * Export to PDF (A4 format)
    */
   const handleExport = async () => {
     if (!previewRef.current) return;
 
     setIsExporting(true);
     try {
+      // Siempre exportar como PDF para formato A4
       await exportToPDF(previewRef.current, {
         fileName: `${cartaName || business?.name || 'menu'}-carta.pdf`,
-        paperSize,
+        paperSize: 'A4',
         orientation: 'portrait',
         quality: 2,
       });
@@ -138,9 +142,11 @@ export default function MenuCardGenerator({
     }
   };
 
-  const template = CARTA_TEMPLATES[selectedTemplate];
-
   const getItemsPerPage = () => {
+    // Si autoSplit está desactivado, mostramos todos los ítems en una página (para que el usuario lo vea todo junto)
+    if (!autoSplit) return 9999;
+    
+    // Si está activado, paginamos según la capacidad del diseño
     const map = { elegante: 12, compacto: 36, moderno: 24, minimalista: 32 };
     return map[selectedTemplate] || 24;
   };
@@ -211,11 +217,12 @@ export default function MenuCardGenerator({
             {/* Template Selection */}
             <div>
               <h3 className="neo-h5 mb-2 text-sm sm:text-base">Diseño de la Carta</h3>
+              <p className="neo-text text-xs opacity-70 mb-2">Elige el formato y estilo</p>
               <div className="space-y-2">
                 {Object.values(CARTA_TEMPLATES).map((tmpl) => (
                   <button
                     key={tmpl.id}
-                    onClick={() => { setSelectedTemplate(tmpl.id); setIncludePhotos(tmpl.showImages); }}
+                    onClick={() => { setSelectedTemplate(tmpl.id); }}
                     className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
                       selectedTemplate === tmpl.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
@@ -228,7 +235,7 @@ export default function MenuCardGenerator({
                         <div className="neo-text-bold text-xs sm:text-sm">{tmpl.name}</div>
                         <div className="neo-text text-xs opacity-70 hidden sm:block">{tmpl.description}</div>
                         <div className="neo-text text-xs mt-1 text-neo-flame">
-                          {tmpl.showImages ? '📷' : '📝'} •
+                          📄 A4 •
                           {tmpl.itemsPerRow === 1 ? ' 1 col' : ' 2 col'}
                         </div>
                       </div>
@@ -250,6 +257,20 @@ export default function MenuCardGenerator({
                   <option key={key} value={key}>{key}</option>
                 ))}
               </select>
+            </div>
+
+            {/* Opciones de Visualización */}
+            <div>
+              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Opciones</h3>
+              <label className="flex items-center gap-2 cursor-pointer p-2 neo-border rounded-lg hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  checked={showCurrency}
+                  onChange={(e) => setShowCurrency(e.target.checked)}
+                  className="w-4 h-4 text-neo-flame rounded border-gray-300 focus:ring-neo-flame"
+                />
+                <span className="neo-text text-sm">Mostrar símbolo de moneda ($)</span>
+              </label>
             </div>
 
             {/* Color Palette Selection */}
@@ -306,43 +327,6 @@ export default function MenuCardGenerator({
               </div>
             </div>
 
-            {/* Incluir fotos */}
-            <div>
-              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Fotos de platos</h3>
-              <label className="flex items-center gap-2 neo-text text-xs sm:text-sm">
-                <input
-                  type="checkbox"
-                  checked={includePhotos}
-                  onChange={(e) => setIncludePhotos(e.target.checked)}
-                />
-                Incluir fotos
-              </label>
-              <p className="neo-text text-xs opacity-70 mt-1">Si desactivas, se mostrará solo nombre y precio.</p>
-            </div>
-
-            {/* Paper size */}
-            <div>
-              <h3 className="neo-h5 mb-2 text-sm sm:text-base">Tamaño de Papel</h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPaperSize('A4')}
-                  className={`neo-btn neo-btn-sm flex-1 text-xs ${
-                    paperSize === 'A4' ? 'neo-btn-primary' : ''
-                  }`}
-                >
-                  A4
-                </button>
-                <button
-                  onClick={() => setPaperSize('LETTER')}
-                  className={`neo-btn neo-btn-sm flex-1 text-xs ${
-                    paperSize === 'LETTER' ? 'neo-btn-primary' : ''
-                  }`}
-                >
-                  Letter
-                </button>
-              </div>
-            </div>
-
             {/* Item Ordering */}
             <div>
               <h3 className="neo-h5 mb-2 text-sm sm:text-base">Orden de Platos ({orderedItems.length})</h3>
@@ -381,10 +365,11 @@ export default function MenuCardGenerator({
                 business={business}
                 menu={menu}
                 items={currentItems}
-                template={{ ...template, showImages: includePhotos }}
+                template={template}
                 paperSize={paperSize}
                 fontFamily={FONT_MAP[selectedFontKey]}
                 colorPalette={selectedPalette}
+                showCurrency={showCurrency}
               />
               <div style={{ position: 'absolute', left: '-10000px', top: '-10000px' }}>
                 {pages.map((items, idx) => (
@@ -394,10 +379,11 @@ export default function MenuCardGenerator({
                     business={business}
                     menu={menu}
                     items={items}
-                    template={{ ...template, showImages: includePhotos }}
+                    template={template}
                     paperSize={paperSize}
                     fontFamily={FONT_MAP[selectedFontKey]}
                     colorPalette={selectedPalette}
+                    showCurrency={showCurrency}
                   />
                 ))}
               </div>
@@ -479,6 +465,11 @@ export default function MenuCardGenerator({
       </div>
     </div>
   );
+
+  // Retornar el modal usando createPortal
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : null;
 }
 
 /**
@@ -529,8 +520,4 @@ function SortableItem({ item, index }) {
       </div>
     </div>
   );
-
-  return typeof document !== 'undefined'
-    ? createPortal(modalContent, document.body)
-    : null;
 }

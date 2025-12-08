@@ -1,5 +1,5 @@
 import { sanitizeHtml, sanitizeUrl } from './security.js';
-import { getCurrencySymbol } from './currencies.js';
+import { getCurrencySymbol, getCurrencyCode } from './currencies.js';
 import { getEmojiForSection } from './emojiDetector.js';
 
 // Re-export for backwards compatibility
@@ -10,14 +10,18 @@ function getImageUrl(item) {
 }
 
 function getCurrencyType(item, business) {
-  // Prioridad: item.currencyType > business?.defaultCurrency > 0 (USD)
-  if (item.currencyType !== undefined && item.currencyType !== null) {
+  // Si el item tiene una moneda específica distinta de USD (0), la respetamos
+  if (item.currencyType !== undefined && item.currencyType !== null && item.currencyType !== 0) {
     return item.currencyType;
   }
+  
+  // Si el item es USD (0) o no tiene moneda, usamos la del negocio
   if (business && business.defaultCurrency !== undefined && business.defaultCurrency !== null) {
     return business.defaultCurrency;
   }
-  return 0; // USD por defecto
+  
+  // Si no hay moneda de negocio, usamos la del item (que será 0/USD) o 0 por defecto
+  return item.currencyType || 0;
 }
 
 export function renderSection(section, items, index, business) {
@@ -26,6 +30,7 @@ export function renderSection(section, items, index, business) {
     const imageUrl = getImageUrl(item);
     const currencyType = getCurrencyType(item, business);
     const currencySymbol = getCurrencySymbol(currencyType);
+    const currencyCode = getCurrencyCode(currencyType);
 
     const itemData = {
       id: item.id,
@@ -42,11 +47,14 @@ export function renderSection(section, items, index, business) {
         <div class="item-image-wrapper"${!imageUrl ? ' style="display:none"' : ''}>
           <img src="${sanitizeUrl(imageUrl)}" alt="${sanitizeHtml(item.name)}" class="item-image" loading="${idx < 6 ? 'eager' : 'lazy'}" decoding="async" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex';">
         </div>
-        <div class="item-image-placeholder"${imageUrl ? ' style="display:none"' : ''}><span class="placeholder-emoji">🍴</span></div>
+        <div class="item-image-placeholder"${imageUrl ? ' style="display:none"' : ''}><span class="placeholder-emoji">🥘</span></div>
         <div class="item-content">
           <div class="item-header">
             <h3 class="item-name">${sanitizeHtml(item.name)}</h3>
-            <div class="item-price-wrapper"><span class="item-price">${currencySymbol}${item.price.toFixed(2)}</span></div>
+            <div class="item-price-wrapper">
+              <span class="item-price">${currencySymbol}${item.price.toFixed(2)}</span>
+              <span class="item-currency-code">${currencyCode}</span>
+            </div>
           </div>
           ${item.description ? `<p class="item-description">${sanitizeHtml(item.description)}</p>` : ''}
           ${item.allergens?.length ? `<div class="item-allergens">${item.allergens.map(a => `<span class="allergen-badge">${sanitizeHtml(a)}</span>`).join('')}</div>` : ''}
@@ -63,6 +71,6 @@ export function renderSection(section, items, index, business) {
           ${section.description ? `<p class="section-description">${sanitizeHtml(section.description)}</p>` : ''}
         </div>
       </div>
-      <div class="menu-grid">${itemsHtml}</div>
+      <div class="menu-items-grid">${itemsHtml}</div>
     </section>`;
 }

@@ -83,19 +83,39 @@ export async function exportToImage(element, options = {}) {
 
   try {
     const paper = PAPER_SIZES[paperSize];
+    
+    // Get the actual element dimensions
+    const elementWidth = element.offsetWidth;
+    const elementHeight = element.offsetHeight;
+    
+    // Calculate the scale factor to reach target dimensions
+    // For IG formats, we want to export at full resolution (1080px width)
+    const targetWidth = paper.pxWidth;
+    const targetHeight = paper.pxHeight;
+    const scaleX = targetWidth / elementWidth;
+    const scaleY = targetHeight / elementHeight;
+    const scaleFactor = Math.max(scaleX, scaleY);
 
     const canvas = await html2canvas(element, {
-      scale: quality,
+      scale: scaleFactor * quality,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
       logging: false,
-      width: paper.pxWidth,
-      height: paper.pxHeight,
     });
 
+    // If the canvas is larger than needed, we might need to resize it
+    // Create a new canvas with exact target dimensions
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = targetWidth;
+    finalCanvas.height = targetHeight;
+    const ctx = finalCanvas.getContext('2d');
+    
+    // Draw the scaled canvas onto the final canvas
+    ctx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+
     // Convert to blob and download
-    canvas.toBlob(
+    finalCanvas.toBlob(
       (blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');

@@ -6,7 +6,9 @@ import { validateEmail, validateRequired } from '../utils/validation';
 import { cookieManager } from '../utils/cookieManager.js';
 import { jwtHelper } from '../utils/jwtHelper.js';
 
-const API_URL = import.meta.env.PUBLIC_API_URL || "/api";
+// En desarrollo local, forzar localhost si no está definido
+const isDev = import.meta.env.DEV;
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const authService = {
 	async login(email, password) {
@@ -101,6 +103,10 @@ export const authService = {
 
 			// Error de red
 			errorLogger.error(error, { endpoint: '/auth/login', email });
+			// Forzar mensaje de error de conexión si es un error de red
+			if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
+				throw new AppError(ERROR_TYPES.NO_INTERNET, 'No se pudo conectar al servidor. Verifica que el backend esté corriendo en http://localhost:5000');
+			}
 			throw AppError.fromNetworkError(error, { endpoint: '/auth/login' });
 		}
 	},

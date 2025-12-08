@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import menuService from "../services/menuService";
+import ErrorAlert from "./shared/ErrorAlert";
+import FormField, { TextAreaField } from "./ui/FormField";
 
 export default function AddMenuForm({ onMenuAdded, onCancel }) {
 	const [formData, setFormData] = useState({
@@ -45,6 +47,18 @@ export default function AddMenuForm({ onMenuAdded, onCancel }) {
 	}, []);
 
 	const handleChange = (e) => {
+		const { name, value } = e.target;
+		setFormData((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+		if (error) {
+			setError(null);
+		}
+	};
+
+	// Adaptador para FormField
+	const handleFieldChange = (e) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({
 			...prev,
@@ -114,27 +128,10 @@ export default function AddMenuForm({ onMenuAdded, onCancel }) {
 			onSubmit={handleSubmit}
 			className="menu-form animate-fadeIn neo-space-lg px-2 sm:px-0"
 		>
-			{error && (
-				<div className="neo-alert neo-alert-error flex items-center text-xs sm:text-sm">
-					<svg
-						className="mr-2 h-5 w-5 flex-shrink-0"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-						/>
-					</svg>
-					<span>{error}</span>
-				</div>
-			)}
+			{error && <ErrorAlert error={error} onClose={() => setError(null)} />}
 
 			{status && !error && (
-				<div className="neo-alert neo-alert-info flex items-center text-xs sm:text-sm">
+				<div className="neo-alert neo-alert-info flex items-center text-xs sm:text-sm mb-4">
 					<svg
 						className="mr-2 h-5 w-5 flex-shrink-0"
 						fill="none"
@@ -175,68 +172,23 @@ export default function AddMenuForm({ onMenuAdded, onCancel }) {
 				</div>
 
 				<div className="neo-space-md space-y-3 sm:space-y-4">
-					<div>
-						<label
-							htmlFor="name"
-							className="neo-text neo-text-bold mb-1.5 sm:mb-2 block flex items-center text-xs sm:text-sm"
-						>
-							<svg
-								className="mr-1 h-3.5 w-3.5 sm:h-4 sm:w-4 text-neo-black"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-								/>
-							</svg>
-							Nombre del Menú *
-						</label>
-						<input
-							type="text"
-							id="name"
-							name="name"
-							required={true}
-							value={formData.name}
-							onChange={handleChange}
-							className="neo-input w-full text-sm sm:text-base"
-							placeholder="Ej. Menú de Desayunos, Carta Principal, etc."
-						/>
-					</div>
+					<FormField
+						label="Nombre del Menú"
+						name="name"
+						value={formData.name}
+						onChange={handleFieldChange}
+						required={true}
+						placeholder="Ej. Menú de Desayunos, Carta Principal, etc."
+					/>
 
-					<div>
-						<label
-							htmlFor="description"
-							className="neo-text neo-text-bold mb-1.5 sm:mb-2 block flex items-center text-xs sm:text-sm"
-						>
-							<svg
-								className="mr-1 h-3.5 w-3.5 sm:h-4 sm:w-4 text-neo-black"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M4 6h16M4 12h16M4 18h7"
-								/>
-							</svg>
-							Descripción
-						</label>
-						<textarea
-							id="description"
-							name="description"
-							value={formData.description}
-							onChange={handleChange}
-							rows="3"
-							className="neo-textarea w-full text-sm sm:text-base"
-							placeholder="Describe brevemente este menú"
-						/>
-					</div>
+					<TextAreaField
+						label="Descripción"
+						name="description"
+						value={formData.description}
+						onChange={handleFieldChange}
+						rows={3}
+						placeholder="Describe brevemente este menú"
+					/>
 				</div>
 
 				<div className="mt-4 sm:mt-6 md:mt-8 neo-border-top pt-3 sm:pt-4 md:pt-6">

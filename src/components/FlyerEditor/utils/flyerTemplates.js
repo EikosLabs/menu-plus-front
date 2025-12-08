@@ -1,6 +1,6 @@
 /**
  * Templates for Menu Cards (Cartas) - Full menu printing
- * Auto-generated with business branding
+ * Auto-generated with business branding - NO IMAGES, only text
  */
 
 export const CARTA_TEMPLATES = {
@@ -9,11 +9,12 @@ export const CARTA_TEMPLATES = {
     name: 'Elegante',
     description: 'Diseño clásico y profesional',
     icon: '📋',
+    format: 'A4',
     itemsPerRow: 1,
-    showImages: true,
-    imageSize: 'medium', // small, medium, large
-    headerHeight: '180px',
-    footerHeight: '80px',
+    showImages: false,
+    imageSize: null,
+    headerHeight: '140px',
+    footerHeight: '60px',
     itemSpacing: 'relaxed',
   },
 
@@ -22,24 +23,26 @@ export const CARTA_TEMPLATES = {
     name: 'Compacto',
     description: 'Maximiza items por página',
     icon: '📄',
+    format: 'A4',
     itemsPerRow: 2,
     showImages: false,
     imageSize: null,
-    headerHeight: '120px',
-    footerHeight: '60px',
+    headerHeight: '100px',
+    footerHeight: '50px',
     itemSpacing: 'compact',
   },
 
   moderno: {
     id: 'moderno',
     name: 'Moderno',
-    description: 'Con imágenes y diseño actual',
+    description: 'Diseño contemporáneo y limpio',
     icon: '🎨',
+    format: 'A4',
     itemsPerRow: 2,
-    showImages: true,
-    imageSize: 'small',
-    headerHeight: '160px',
-    footerHeight: '70px',
+    showImages: false,
+    imageSize: null,
+    headerHeight: '120px',
+    footerHeight: '55px',
     itemSpacing: 'normal',
   },
 
@@ -48,129 +51,210 @@ export const CARTA_TEMPLATES = {
     name: 'Minimalista',
     description: 'Limpio y espacioso',
     icon: '⚪',
+    format: 'A4',
     itemsPerRow: 2,
     showImages: false,
     imageSize: null,
-    headerHeight: '120px',
-    footerHeight: '50px',
+    headerHeight: '100px',
+    footerHeight: '45px',
     itemSpacing: 'compact',
+  },
+
+  premium: {
+    id: 'premium',
+    name: 'Premium Dark',
+    description: 'Sofisticado y elegante (Fondo oscuro)',
+    icon: '💎',
+    format: 'A4',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    headerHeight: '160px',
+    footerHeight: '70px',
+    itemSpacing: 'relaxed',
+    style: 'dark',
+  },
+
+  bistro: {
+    id: 'bistro',
+    name: 'Bistro Clásico',
+    description: 'Estilo restaurante clásico centrado',
+    icon: '🍷',
+    format: 'A4',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    headerHeight: '180px',
+    footerHeight: '60px',
+    itemSpacing: 'normal',
+    style: 'centered',
+  },
+
+  botanico: {
+    id: 'botanico',
+    name: 'Botánico Fresh',
+    description: 'Fresco y natural',
+    icon: '🌿',
+    format: 'A4',
+    itemsPerRow: 2,
+    showImages: false,
+    imageSize: null,
+    headerHeight: '130px',
+    footerHeight: '50px',
+    itemSpacing: 'normal',
+    style: 'fresh',
   },
 };
 
 /**
- * Templates for Promotional Flyers (Folletos) - Small promotional prints
- * Smaller format, for selected items only
+ * Templates for Promotional Flyers (Folletos) - Promotional prints
+ * NO IMAGES - Text-based promotional content with varied aesthetics
  */
 export const FOLLETO_TEMPLATES = {
+  moderno: {
+    id: 'moderno',
+    name: 'Moderno Gradiente',
+    description: 'Diseño moderno con gradientes vibrantes',
+    icon: '🎨',
+    format: 'instagram-portrait',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    maxItems: 5,
+    headerHeight: '110px',
+    footerHeight: '80px',
+    style: 'modern',
+  },
+
+  minimalista: {
+    id: 'minimalista',
+    name: 'Minimalista',
+    description: 'Diseño limpio y elegante',
+    icon: '⚪',
+    format: 'instagram-portrait',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    maxItems: 6,
+    headerHeight: '100px',
+    footerHeight: '70px',
+    style: 'minimalist',
+  },
+
+  elegante: {
+    id: 'elegante',
+    name: 'Elegante',
+    description: 'Sofisticado con bordes decorativos',
+    icon: '✨',
+    format: 'instagram-portrait',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    maxItems: 5,
+    headerHeight: '120px',
+    footerHeight: '85px',
+    style: 'elegant',
+  },
+
+  promocion: {
+    id: 'promocion',
+    name: 'Promoción Bold',
+    description: 'Llamativo para ofertas y descuentos',
+    icon: '🎯',
+    format: 'instagram-portrait',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    maxItems: 5,
+    headerHeight: '110px',
+    footerHeight: '85px',
+    style: 'promo',
+  },
+
   especiales: {
     id: 'especiales',
     name: 'Especiales del Día',
     description: 'Destaca tus platos especiales',
     icon: '⭐',
-    format: 'half-page', // half-page, third-page, quarter-page
-    itemsPerRow: 1,
-    showImages: true,
-    imageSize: 'large',
-    maxItems: 4,
-    headerHeight: '100px',
-    footerHeight: '50px',
-    style: 'featured', // featured, simple, grid
-  },
-
-  promocion: {
-    id: 'promocion',
-    name: 'Promoción',
-    description: 'Ofertas y descuentos',
-    icon: '🎯',
-    format: 'half-page',
-    itemsPerRow: 2,
-    showImages: true,
-    imageSize: 'medium',
-    maxItems: 6,
-    headerHeight: '80px',
-    footerHeight: '50px',
-    style: 'grid',
-  },
-
-  combo: {
-    id: 'combo',
-    name: 'Combo',
-    description: 'Menú del día o combo',
-    icon: '🍽️',
-    format: 'third-page',
-    itemsPerRow: 1,
-    showImages: true,
-    imageSize: 'medium',
-    maxItems: 3,
-    headerHeight: '90px',
-    footerHeight: '60px',
-    style: 'simple',
-  },
-
-  volante: {
-    id: 'volante',
-    name: 'Volante',
-    description: 'Formato pequeño para repartir',
-    icon: '🎫',
-    format: 'quarter-page',
+    format: 'instagram-portrait',
     itemsPerRow: 1,
     showImages: false,
     imageSize: null,
-    maxItems: 6,
-    headerHeight: '60px',
-    footerHeight: '40px',
-    style: 'simple',
+    maxItems: 4,
+    headerHeight: '115px',
+    footerHeight: '90px',
+    style: 'featured',
   },
 
   story: {
     id: 'story',
     name: 'Historia IG',
-    description: 'Formato vertical 9:16 para redes',
+    description: 'Formato vertical 9:16 para stories',
     icon: '📱',
     format: 'story-vertical',
     itemsPerRow: 1,
-    showImages: true,
-    imageSize: 'large',
-    maxItems: 5,
-    headerHeight: '100px',
-    footerHeight: '50px',
-    style: 'featured',
+    showImages: false,
+    imageSize: null,
+    maxItems: 6,
+    headerHeight: '130px',
+    footerHeight: '100px',
+    style: 'modern',
   },
+
+  storyMinimal: {
+    id: 'storyMinimal',
+    name: 'Story Minimalista',
+    description: 'Historia IG limpia y elegante',
+    icon: '📲',
+    format: 'story-vertical',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    maxItems: 6,
+    headerHeight: '120px',
+    footerHeight: '95px',
+    style: 'minimalist',
+  },
+
   post: {
     id: 'post',
-    name: 'Post IG',
-    description: 'Formato vertical 4:5 para feed',
-    icon: '🖼️',
-    format: 'instagram-portrait',
+    name: 'Post IG Cuadrado',
+    description: 'Formato 1:1 para feed',
+    icon: '⬜',
+    format: 'instagram-square',
     itemsPerRow: 1,
-    showImages: true,
-    imageSize: 'large',
+    showImages: false,
+    imageSize: null,
     maxItems: 4,
-    headerHeight: '90px',
-    footerHeight: '45px',
-    style: 'featured',
+    headerHeight: '85px',
+    footerHeight: '65px',
+    style: 'modern',
+  },
+
+  postMinimal: {
+    id: 'postMinimal',
+    name: 'Post Cuadrado Minimal',
+    description: 'Cuadrado minimalista',
+    icon: '◻️',
+    format: 'instagram-square',
+    itemsPerRow: 1,
+    showImages: false,
+    imageSize: null,
+    maxItems: 4,
+    headerHeight: '80px',
+    footerHeight: '60px',
+    style: 'minimalist',
   },
 };
 
 /**
- * Format dimensions for folletos
+ * Format dimensions for all formats (carta + folleto)
  */
 export const FOLLETO_FORMATS = {
-  'half-page': {
-    name: 'Media Página',
-    width: 'A5', // 148 x 210 mm
-    description: 'Ideal para menú del día',
-  },
-  'third-page': {
-    name: 'Tercio de Página',
-    width: 'custom',
-    dimensions: { width: 99, height: 210 }, // mm
-    description: 'Perfecto para combos',
-  },
-  'quarter-page': {
-    name: 'Cuarto de Página',
-    width: 'A6', // 105 x 148 mm
-    description: 'Volante para repartir',
+  'A4': {
+    name: 'A4',
+    width: 'A4',
+    description: 'Formato A4 estándar (210x297mm)',
   },
   'story-vertical': {
     name: 'Historia IG',
@@ -178,9 +262,14 @@ export const FOLLETO_FORMATS = {
     description: 'Formato vertical 9:16 (1080x1920)',
   },
   'instagram-portrait': {
-    name: 'Post IG',
+    name: 'Post IG Vertical',
     width: 'IG_PORTRAIT',
     description: 'Formato vertical 4:5 (1080x1350)',
+  },
+  'instagram-square': {
+    name: 'Post IG Cuadrado',
+    width: 'IG_SQUARE',
+    description: 'Formato cuadrado 1:1 (1080x1080)',
   },
 };
 
@@ -316,7 +405,7 @@ export function getColorScheme(business, customPalette = null) {
 export function getBusinessBranding(business) {
   return {
     name: business?.name || 'Mi Negocio',
-    logo: business?.logoUri || (business?.logoKey ? `${import.meta.env.PUBLIC_API_URL}/images/${business.logoKey}` : null),
+    logo: business?.logoUri || business?.imageUrl || (business?.logoKey ? `${import.meta.env.PUBLIC_API_URL}/images/${business.logoKey}` : null),
     slogan: business?.slogan || '',
     phone: business?.contactInfo?.phone || business?.phoneNumber || '',
     email: business?.contactInfo?.email || business?.email || '',
