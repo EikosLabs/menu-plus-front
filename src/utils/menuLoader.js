@@ -223,7 +223,6 @@ export async function loadMenu(qrCodeId) {
     const itemsBySection = {};
 
     console.log('Secciones originales recibidas:', menu.sections.length);
-    console.log('IDs de secciones recibidas:', menu.sections.map(s => ({ id: s.id, name: s.name })));
 
     menu.sections.forEach((section) => {
       const sectionId = String(section.id).toLowerCase();
