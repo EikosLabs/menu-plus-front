@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = "http://localhost:5000/api"; // HARDCODED FOR DEBUG
 
 /**
  * Service for fetching business landing page data

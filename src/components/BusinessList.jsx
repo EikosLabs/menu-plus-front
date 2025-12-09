@@ -462,11 +462,18 @@ export default function BusinessList({
 									</div>
 								)}
 							</div>
-							<div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+							<div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto mt-4 lg:mt-0">
 								<button
-									onClick={() => window.open(`/${business.slug}`, '_blank')}
-									className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center"
-									title="Ver Landing Page pública"
+									onClick={() => {
+                                        if (business.slug) {
+                                            window.open(`/${business.slug}`, '_blank');
+                                        } else {
+                                            alert('Este negocio no tiene una URL pública configurada correctamente.');
+                                        }
+                                    }}
+									className={`neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial min-w-[100px] ${!business.slug ? 'opacity-50 cursor-not-allowed' : ''}`}
+									title={business.slug ? "Ver Landing Page pública" : "URL no disponible"}
+                                    disabled={!business.slug}
 								>
 									<svg className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -475,7 +482,7 @@ export default function BusinessList({
 								</button>
 								<button
 									onClick={() => onEditBusinessClick(business)}
-									className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center"
+									className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial min-w-[100px]"
 								>
 									<svg
 										className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0"
@@ -494,7 +501,7 @@ export default function BusinessList({
 								</button>
 								<button
 									onClick={() => setShowQr(business.id)}
-									className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center"
+									className="neo-btn neo-btn-white text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial min-w-[100px]"
 								>
 									<svg
 										className="h-4 w-4 mr-1 sm:mr-1.5 flex-shrink-0"

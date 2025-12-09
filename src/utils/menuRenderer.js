@@ -211,16 +211,23 @@ export function renderMenu(menu, business, itemsBySection) {
             ` : ''}
           </div>
         ` : ''}
-        <div class="footer-divider"></div>
-        <div class="footer-branding">
-          <div class="footer-logo">Menu<span>Plus</span></div>
-          <p class="footer-text">
-            Powered by <a href="https://menusesqr.com" target="_blank" rel="noopener noreferrer" class="footer-link">MenuPlus</a>
-          </p>
-          <p class="footer-tagline">Digital menus made beautiful ✨</p>
+          <div class="footer-divider"></div>
+          
+          <div style="margin-top: 3rem; padding-top: 2rem; border-top: 4px solid #000; background-color: #eee5e9; padding: 2rem; border: 4px solid #000; box-shadow: 8px 8px 0 0 #000; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+              <span style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #7c7c7c;">Platform</span>
+              <img src="/powered-by.svg" alt="Powered by MenuPlus" style="height: 6rem; width: auto;" />
+              
+              <div style="width: 100%; height: 2px; background-color: rgba(0,0,0,0.1); margin: 1rem 0;"></div>
+              
+              <a href="mailto:hello@eikoslabs.com" style="font-size: 0.875rem; font-weight: 700; color: #4a4a4a; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.color='#000'; this.style.textDecoration='underline'" onmouseout="this.style.color='#4a4a4a'; this.style.textDecoration='none'">
+                hello@eikoslabs.com
+              </a>
+            </div>
+          </div>
+
         </div>
-      </div>
-    </footer>
+      </footer>
   `;
 
   menuContent.innerHTML = html;

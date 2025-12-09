@@ -26,12 +26,12 @@ try {
   const response = await fetch(`${API_URL}/business-landing/${slug}`);
 
   if (!response.ok) {
-    error = 'Business not found';
+    error = `Business not found (Status: ${response.status})`;
   } else {
     business = await response.json();
   }
 } catch (e) {
-  error = 'Failed to load business information';
+  error = `Failed to load business information. Error: ${e.message}. URL: ${import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api'}/business-landing/${slug}`;
   console.error('Error fetching business:', e);
 }
 ---
@@ -244,22 +244,24 @@ try {
         )}
 
         <!-- CTA Button -->
-        <div class="mt-12 text-center">
-          <a
-            href={`/menu/${business.slug}`}
-            class="inline-flex items-center gap-3 px-8 py-4 text-xl font-black rounded-lg hover:translate-y-[-2px] transition-all border-4 border-black shadow-xl"
-            style={{
-              background: business.accentColor || business.primaryColor || '#fbbf24',
-              color: 'white',
-              textShadow: '2px 2px 0px rgba(0,0,0,0.2)'
-            }}
-          >
-            Ver Menú Completo
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-            </svg>
-          </a>
-        </div>
+        {business.menuQrCodeId && (
+          <div class="mt-12 text-center">
+            <a
+              href={`/menu/${business.menuQrCodeId}`}
+              class="inline-flex items-center gap-3 px-8 py-4 text-xl font-black rounded-lg hover:translate-y-[-2px] transition-all border-4 border-black shadow-xl"
+              style={{
+                background: business.accentColor || business.primaryColor || '#fbbf24',
+                color: 'white',
+                textShadow: '2px 2px 0px rgba(0,0,0,0.2)'
+              }}
+            >
+              Ver Menú Completo
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </a>
+          </div>
+        )}
       </div>
     </div>
   )}

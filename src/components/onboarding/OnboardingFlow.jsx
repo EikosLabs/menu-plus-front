@@ -96,19 +96,23 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
         name: formData.name,
         description: formData.description || '',
         slogan: formData.slogan || '',
-        businessCategoryId: formData.businessCategoryId,
+        businessCategoryId: parseInt(formData.businessCategoryId) || 0,
         imageKey: formData.imageKey || null,
         address: formData.address || '',
+        latitude: formData.latitude || 0,
+        longitude: formData.longitude || 0,
         phoneNumber: formData.phoneNumber || '',
         email: formData.email || '',
         facebookUrl: formData.facebookUrl || '',
         instagramUrl: formData.instagramUrl || '',
         twitterUrl: formData.twitterUrl || '',
         whatsAppNumber: formData.whatsAppNumber || '',
-        primaryColor: formData.primaryColor,
-        secondaryColor: formData.secondaryColor,
-        accentColor: formData.accentColor,
-        defaultCurrency: formData.defaultCurrency ?? 0
+        primaryColor: formData.primaryColor || '#000000',
+        secondaryColor: formData.secondaryColor || '#FFFFFF',
+        accentColor: formData.accentColor || '#FF5733',
+        defaultCurrency: parseInt(formData.defaultCurrency) ?? 0,
+        template: 0, // Modern template by default
+        fontFamily: 'poppins'
       };
 
       // Crear el negocio

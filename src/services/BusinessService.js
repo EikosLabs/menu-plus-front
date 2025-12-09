@@ -26,6 +26,8 @@ export class BusinessService {
 			Description: businessData.description || '',
 			Slogan: businessData.slogan || '',
 			Address: businessData.address || '',
+			Latitude: businessData.latitude ?? 0,
+			Longitude: businessData.longitude ?? 0,
 			PhoneNumber: businessData.phoneNumber || '',
 			Email: businessData.email || '',
 			BusinessCategoryId: businessData.businessCategoryId || 1,
@@ -73,6 +75,8 @@ export class BusinessService {
 			Description: businessData.description,
 			Slogan: businessData.slogan,
 			Address: businessData.address,
+			Latitude: businessData.latitude ?? 0,
+			Longitude: businessData.longitude ?? 0,
 			PhoneNumber: businessData.phoneNumber,
 			Email: businessData.email,
 			BusinessCategoryId: businessData.businessCategoryId ? Number.parseInt(businessData.businessCategoryId, 10) : undefined,
@@ -163,25 +167,24 @@ export class BusinessService {
 
 			const business = response.data;
 
-			// Cargar menús del negocio
-			try {
-				const menuResponse = await this.apiClient.get(`/menus/food-business`);
-				if (!menuResponse.isEmpty && menuResponse.data) {
-					business.menus = Array.isArray(menuResponse.data) ? menuResponse.data : [menuResponse.data];
-				} else {
-					business.menus = [];
-				}
-			} catch (error) {
-				if (error instanceof AppError && error.type !== ERROR_TYPES.NOT_FOUND) {
-					errorLogger.warn('Failed to load menus for business', {
-						businessId: business.id,
-						error: error.message,
-					});
-				}
+		// Cargar menús del negocio
+		try {
+			const menuResponse = await this.apiClient.get(`/menus/food-business`);
+			if (!menuResponse.isEmpty && menuResponse.data) {
+				business.menus = Array.isArray(menuResponse.data) ? menuResponse.data : [menuResponse.data];
+			} else {
 				business.menus = [];
 			}
-
-			return [business];
+		} catch (error) {
+			// Silenciar 404 - es normal que un negocio nuevo no tenga menú
+			if (!(error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND)) {
+				errorLogger.warn('Failed to load menus for business', {
+					businessId: business.id,
+					error: error.message,
+				});
+			}
+			business.menus = [];
+		}			return [business];
 		} catch (error) {
 			// Si es un error de autenticación o validación, propagarlo
 			if (error instanceof AppError &&
@@ -224,7 +227,13 @@ export class BusinessService {
 			const menuResponse = await retryOperation(
 				() => this.apiClient.get(`/menus/food-business`),
 				{ maxRetries: 2 }
-			);
+			).catch(error => {
+				// Si es un 404, significa que no hay menú aún
+				if (error instanceof AppError && error.type === ERROR_TYPES.NOT_FOUND) {
+					return { isEmpty: true };
+				}
+				throw error;
+			});
 
 			if (menuResponse.isEmpty || !menuResponse.data || !menuResponse.data.id) {
 				throw new AppError(

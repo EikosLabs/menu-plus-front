@@ -21,6 +21,17 @@ export function FormField({
 }) {
 	const baseClassName = `neo-input ${error ? 'border-red-500' : ''} ${className}`;
 
+	const handleChange = (e) => {
+		// Check if onChange expects (name, value) or (event)
+		if (onChange.length === 2) {
+			// New format: (name, value)
+			onChange(name, e.target.value);
+		} else {
+			// Old format: (event)
+			onChange(e);
+		}
+	};
+
 	return (
 		<div className="mb-4">
 			<label
@@ -33,8 +44,8 @@ export function FormField({
 				type={type}
 				id={name}
 				name={name}
-				value={value}
-				onChange={onChange}
+				value={value || ''}
+				onChange={handleChange}
 				onBlur={onBlur}
 				className={baseClassName}
 				placeholder={placeholder}
@@ -73,6 +84,17 @@ export function TextAreaField({
 }) {
 	const baseClassName = `neo-input neo-textarea ${error ? 'border-red-500' : ''} ${className}`;
 
+	const handleChange = (e) => {
+		// Check if onChange expects (name, value) or (event)
+		if (onChange.length === 2) {
+			// New format: (name, value)
+			onChange(name, e.target.value);
+		} else {
+			// Old format: (event)
+			onChange(e);
+		}
+	};
+
 	return (
 		<div className="mb-4">
 			<label
@@ -84,8 +106,8 @@ export function TextAreaField({
 			<textarea
 				id={name}
 				name={name}
-				value={value}
-				onChange={onChange}
+				value={value || ''}
+				onChange={handleChange}
 				onBlur={onBlur}
 				rows={rows}
 				className={baseClassName}
@@ -124,6 +146,17 @@ export function SelectField({
 }) {
 	const baseClassName = `neo-input neo-select ${error ? 'border-red-500' : ''} ${className}`;
 
+	const handleChange = (e) => {
+		// Check if onChange expects (name, value) or (event)
+		if (onChange.length === 2) {
+			// New format: (name, value)
+			onChange(name, e.target.value);
+		} else {
+			// Old format: (event)
+			onChange(e);
+		}
+	};
+
 	return (
 		<div className="mb-4">
 			<label
@@ -135,20 +168,30 @@ export function SelectField({
 			<select
 				id={name}
 				name={name}
-				value={value}
-				onChange={onChange}
+				value={value || ''}
+				onChange={handleChange}
 				onBlur={onBlur}
 				className={baseClassName}
 				disabled={disabled}
 				required={required}
 				{...props}
 			>
-				{placeholder && <option value="">{placeholder}</option>}
-				{children ? children : options.map((option) => (
-					<option key={option.value} value={option.value}>
-						{option.label}
-					</option>
-				))}
+				{placeholder && <option value="" key="placeholder">{placeholder}</option>}
+				{children ? (
+					// Si hay children, asegurarnos de que tengan keys
+					React.Children.map(children, (child, index) => {
+						if (!child) return null;
+						return React.isValidElement(child) && !child.key
+							? React.cloneElement(child, { key: child.props.value || `child-${index}` })
+							: child;
+					})
+				) : (
+					options.map((option, index) => (
+						<option key={option.value || option.id || `option-${index}`} value={option.value || option.id}>
+							{option.label || option.name}
+						</option>
+					))
+				)}
 			</select>
 			{error && (
 				<p className="mt-1 text-red-600 text-sm">{error}</p>

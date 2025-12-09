@@ -83,9 +83,9 @@ function createCanvas(width, height) {
   if (typeof document !== 'undefined') {
     return document.createElement('canvas');
   }
-  // For server-side or Web Worker context
-  const { createCanvas } = require('canvas');
-  return createCanvas(width, height);
+  // For server-side or Web Worker context - return null if not available
+  // Client-side compression only needs browser canvas
+  return null;
 }
 
 /**

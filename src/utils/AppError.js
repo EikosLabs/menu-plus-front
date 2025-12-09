@@ -43,20 +43,20 @@ export class AppError extends Error {
 	/**
 	 * Crea un AppError desde una respuesta HTTP
 	 */
-	static async fromResponse(response, customMessage = null) {
+	static async fromResponse(response, parsedData = null, extraDetails = {}) {
 		const errorType = mapHttpStatusToErrorType(response.status);
 		let details = {
 			status: response.status,
 			statusText: response.statusText,
 			url: response.url,
+			...extraDetails
 		};
 
 		// Manejo especial para HTTP 413 (Payload Too Large)
 		if (response.status === 413) {
 			return new AppError(
 				ERROR_TYPES.FILE_TOO_LARGE,
-				customMessage ||
-					"Archivo demasiado grande. Máximo 5MB permitido para análisis.",
+				"Archivo demasiado grande. Máximo 5MB permitido para análisis.",
 				{
 					...details,
 					suggestion: "Comprime la imagen o usa una más pequeña.",
@@ -65,30 +65,48 @@ export class AppError extends Error {
 			);
 		}
 
+		// Si ya tenemos datos parseados, usarlos
+		if (parsedData) {
+			if (typeof parsedData === 'object') {
+				details.serverData = parsedData;
+				const serverMessage = parsedData.message || parsedData.error || parsedData.title;
+				if (serverMessage) {
+					return new AppError(errorType, serverMessage, details);
+				}
+			} else if (typeof parsedData === 'string') {
+				details.serverMessage = parsedData;
+				return new AppError(errorType, parsedData, details);
+			}
+		}
+
+		// Si no hay datos parseados, intentar leerlos
 		try {
 			const contentType = response.headers.get("content-type");
 			if (contentType?.includes("application/json")) {
 				const data = await response.json();
-				details = { ...details, serverData: data };
+				details.serverData = data;
 
 				// Intentar extraer mensaje específico del servidor
 				const serverMessage = data.message || data.error || data.title;
 				if (serverMessage) {
 					return new AppError(
 						errorType,
-						customMessage || serverMessage,
+						serverMessage,
 						details,
 					);
 				}
 			} else {
 				const text = await response.text();
 				details.serverMessage = text;
+				if (text) {
+					return new AppError(errorType, text, details);
+				}
 			}
 		} catch (parseError) {
 			details.parseError = parseError.message;
 		}
 
-		return new AppError(errorType, customMessage, details);
+		return new AppError(errorType, `Error ${response.status}: ${response.statusText}`, details);
 	}
 
 	/**

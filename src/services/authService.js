@@ -8,7 +8,7 @@ import { jwtHelper } from '../utils/jwtHelper.js';
 
 // En desarrollo local, forzar localhost si no está definido
 const isDev = import.meta.env.DEV;
-const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5000/api'; // HARDCODED FOR DEBUG
 
 export const authService = {
 	async login(email, password) {

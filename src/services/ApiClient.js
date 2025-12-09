@@ -63,17 +63,7 @@ export class ApiClient {
 					try {
 						data = JSON.parse(responseText);
 					} catch (_error) {
-						if (!response.ok) {
-							errorLogger.error(new AppError(
-								ERROR_TYPES.SERVER_ERROR,
-								'El servidor devolvió una respuesta inválida'
-							), { endpoint, method, responseText });
-
-							throw new AppError(
-								ERROR_TYPES.SERVER_ERROR,
-								'El servidor devolvió una respuesta inválida'
-							);
-						}
+						// Si no es JSON válido, usar el texto tal cual
 						data = responseText;
 					}
 				} else if (response.ok) {
@@ -83,7 +73,7 @@ export class ApiClient {
 
 				if (!response.ok) {
 					// Crear error con status para que el interceptor lo detecte
-					const error = await AppError.fromResponse(response, null, { endpoint, method });
+					const error = await AppError.fromResponse(response, data, { endpoint, method, responseText });
 					error.status = response.status;
 					throw error;
 				}
@@ -96,9 +86,15 @@ export class ApiClient {
 			} catch (error) {
 				clearTimeout(timeoutId);
 
-				// Si ya es AppError, re-lanzar con logging
+				// Si ya es AppError, re-lanzar con logging (excepto 404 que son esperados)
 				if (error instanceof AppError) {
-					errorLogger.error(error, { endpoint, method });
+					// No logear 404 en endpoints de menú - es normal que no existan
+					const isExpected404 = error.type === ERROR_TYPES.NOT_FOUND && 
+						(endpoint.includes('/menus/food-business') || endpoint.includes('/menus/'));
+					
+					if (!isExpected404) {
+						errorLogger.error(error, { endpoint, method });
+					}
 					throw error;
 				}
 

@@ -76,16 +76,16 @@ export default function StepBasicInfo({
 
   // Opciones de tipos de negocio para el tema visual
   const businessTypeOptions = [
-    { id: BUSINESS_TYPES.RESTAURANT, name: 'Restaurante / Fine Dining' },
-    { id: BUSINESS_TYPES.CAFE, name: 'Cafetería / Coffee Shop' },
-    { id: BUSINESS_TYPES.BAR, name: 'Bar / Club / Nightlife' },
-    { id: BUSINESS_TYPES.FAST_FOOD, name: 'Comida Rápida / Fast Food' },
-    { id: BUSINESS_TYPES.BAKERY, name: 'Pastelería / Panadería' },
-    { id: BUSINESS_TYPES.PIZZERIA, name: 'Pizzería / Italiano' },
-    { id: BUSINESS_TYPES.SUSHI, name: 'Sushi / Asiático' },
-    { id: BUSINESS_TYPES.BURGER, name: 'Hamburguesería / Grill' },
-    { id: BUSINESS_TYPES.VEGAN, name: 'Vegano / Saludable' },
-    { id: BUSINESS_TYPES.ICE_CREAM, name: 'Heladería / Postres' },
+    { value: BUSINESS_TYPES.RESTAURANT, label: 'Restaurante / Fine Dining' },
+    { value: BUSINESS_TYPES.CAFE, label: 'Cafetería / Coffee Shop' },
+    { value: BUSINESS_TYPES.BAR, label: 'Bar / Club / Nightlife' },
+    { value: BUSINESS_TYPES.FAST_FOOD, label: 'Comida Rápida / Fast Food' },
+    { value: BUSINESS_TYPES.BAKERY, label: 'Pastelería / Panadería' },
+    { value: BUSINESS_TYPES.PIZZERIA, label: 'Pizzería / Italiano' },
+    { value: BUSINESS_TYPES.SUSHI, label: 'Sushi / Asiático' },
+    { value: BUSINESS_TYPES.BURGER, label: 'Hamburguesería / Grill' },
+    { value: BUSINESS_TYPES.VEGAN, label: 'Vegano / Saludable' },
+    { value: BUSINESS_TYPES.ICE_CREAM, label: 'Heladería / Postres' },
   ];
 
   const handleBusinessTypeChange = (name, value) => {
@@ -139,7 +139,7 @@ export default function StepBasicInfo({
         name="businessCategoryId"
         value={formData.businessCategoryId}
         onChange={handleFieldChange}
-        options={categories.map(cat => ({ id: cat.id, name: cat.name }))}
+        options={categories.map(cat => ({ value: cat.id, label: cat.name }))}
         error={errors.businessCategoryId}
         required={true}
         placeholder={loadingCategories ? 'Cargando categorías...' : 'Selecciona una categoría'}
@@ -162,8 +162,8 @@ export default function StepBasicInfo({
         value={formData.defaultCurrency ?? 0}
         onChange={handleFieldChange}
         options={getAllCurrencies().map(curr => ({
-          id: curr.value,
-          name: `${curr.symbol} ${curr.name} (${curr.code})`
+          value: curr.value,
+          label: `${curr.symbol} ${curr.name} (${curr.code})`
         }))}
         error={errors.defaultCurrency}
         required={false}

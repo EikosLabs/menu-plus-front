@@ -32,8 +32,8 @@ export default function PasswordInput({
           id={name}
           className={`neo-input pr-10 ${error ? 'border-red-500' : ''}`}
           placeholder={placeholder}
-          value={value}
-          onChange={onChange}
+          value={value || ''}
+          onChange={(e) => onChange(e)}
           onBlur={onBlur}
         />
         <button

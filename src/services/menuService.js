@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = "http://localhost:5000/api"; // HARDCODED FOR DEBUG
 
 import authService from "./authService";
 import { TokenInterceptor } from "./tokenInterceptor.js";

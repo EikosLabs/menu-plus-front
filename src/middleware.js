@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import { proxyApiRequest } from './api-proxy.js';
 
 const API_URL = import.meta.env.PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -113,6 +114,12 @@ async function tryRefreshToken(refreshToken, context) {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+	// Proxy API requests to backend
+	const proxyResponse = await proxyApiRequest(context.request);
+	if (proxyResponse) {
+		return proxyResponse;
+	}
+
 	const currentPath = context.url.pathname;
 
 	// Rutas públicas que no requieren autenticación

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import OnboardingStep from '../OnboardingStep';
 import FormField from '../../ui/FormField';
+import LocationPicker from '../../shared/LocationPicker';
 import { validateStepContact } from '../../../utils/onboardingValidation';
 
 /**
@@ -81,6 +82,18 @@ export default function StepContact({
         required={false}
         placeholder="Ej: contacto@tunegocio.com"
         maxLength={100}
+      />
+
+      <LocationPicker
+        address={formData.address}
+        latitude={formData.latitude}
+        longitude={formData.longitude}
+        onLocationChange={({address, latitude, longitude}) => {
+          updateFormData('address', address);
+          updateFormData('latitude', latitude);
+          updateFormData('longitude', longitude);
+        }}
+        error={errors.location}
       />
 
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
