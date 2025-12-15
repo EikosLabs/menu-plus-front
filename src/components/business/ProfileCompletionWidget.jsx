@@ -44,7 +44,7 @@ const ProfileCompletionWidget = ({ businessData, onSectionClick, onDismiss }) =>
       { key: 'phone', completed: businessData.phoneNumber && businessData.phoneNumber.trim().length > 0, weight: 15 },
       { key: 'address', completed: businessData.address && businessData.address.trim().length > 0, weight: 15 },
       { key: 'logo', completed: businessData.imageKey || businessData.imageUrl, weight: 20 },
-      { key: 'colors', completed: businessData.primaryColor && businessData.secondaryColor, weight: 15 }
+      { key: 'colors', completed: businessData.primaryColor, weight: 15 }
     ];
 
     const completedScore = checks.reduce((sum, check) => sum + (check.completed ? check.weight : 0), 0);

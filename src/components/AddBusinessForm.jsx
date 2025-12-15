@@ -13,6 +13,7 @@ import { validateRequired, validateEmail, validateUrl, validatePhone } from "../
 import { getAllCurrencies } from "../utils/currencies";
 import CircularColorPicker from "./ui/CircularColorPicker";
 import { THEME_PALETTES } from "../utils/themePalettes";
+import { generateColorVariants } from "../utils/colorUtils";
 
 export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBusiness = null, isEditing = false }) {
 	const { t } = useTranslation();
@@ -143,7 +144,18 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 	};
 
 	const handleColorChange = (name, color) => {
-		handleChange(name, color);
+		if (name === 'primaryColor') {
+			// Auto-generate secondary and accent colors from primary
+			const variants = generateColorVariants(color);
+			setFormData(prev => ({
+				...prev,
+				primaryColor: color,
+				secondaryColor: variants.secondary,
+				accentColor: variants.accent
+			}));
+		} else {
+			handleChange(name, color);
+		}
 	};
 
 	const handleBlur = (e) => {
@@ -186,7 +198,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 
 		clearError();
 		setLogoFile(file);
-		
+
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			setLogoPreview(e.target.result);
@@ -235,59 +247,61 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 			return;
 		}
 
-	setLoading(true);
+		setLoading(true);
 
-	try {
-		let imageKey = existingBusiness?.imageKey || null;
+		try {
+			let imageKey = existingBusiness?.imageKey || null;
 
-		if (logoFile) {
-			setUploadingLogo(true);
-			try {
-				imageKey = await menuService.uploadImage(logoFile);
-				errorLogger.info('Logo uploaded successfully', { imageKey });
-			} catch (imageError) {
-				const uploadError = imageError instanceof AppError
-					? imageError
-					: new AppError(ERROR_TYPES.UPLOAD_ERROR, t("business.logoUploadError"));
-				handleError(uploadError);
-				setLoading(false);
-				setUploadingLogo(false);
-				return;
-			} finally {
-				setUploadingLogo(false);
+			if (logoFile) {
+				setUploadingLogo(true);
+				try {
+					imageKey = await menuService.uploadImage(logoFile);
+					errorLogger.info('Logo uploaded successfully', { imageKey });
+				} catch (imageError) {
+					const uploadError = imageError instanceof AppError
+						? imageError
+						: new AppError(ERROR_TYPES.UPLOAD_ERROR, t("business.logoUploadError"));
+					handleError(uploadError);
+					setLoading(false);
+					setUploadingLogo(false);
+					return;
+				} finally {
+					setUploadingLogo(false);
+				}
 			}
+
+			const businessData = {
+				...formData,
+				businessCategoryId: Number.parseInt(formData.businessCategoryId),
+				latitude: formData.latitude || 0,
+				longitude: formData.longitude || 0,
+				imageKey: imageKey,
+			};
+
+			let result;
+			if (isEditing && existingBusiness) {
+				result = await menuService.updateFoodBusiness(existingBusiness.id, businessData);
+			} else {
+				result = await menuService.createFoodBusiness(businessData);
+			}
+
+			onBusinessAdded(result);
+		} catch (err) {
+			const appError = err instanceof AppError
+				? err
+				: new AppError(ERROR_TYPES.SERVER_ERROR, `${t("errors.general")} ${err.message}`);
+			handleError(appError);
+		} finally {
+			setLoading(false);
 		}
-
-		const businessData = {
-			...formData,
-			businessCategoryId: Number.parseInt(formData.businessCategoryId),
-			latitude: formData.latitude || 0,
-			longitude: formData.longitude || 0,
-			imageKey: imageKey,
-		};
-
-		let result;
-		if (isEditing && existingBusiness) {
-			result = await menuService.updateFoodBusiness(existingBusiness.id, businessData);
-		} else {
-			result = await menuService.createFoodBusiness(businessData);
-		}
-
-		onBusinessAdded(result);
-	} catch (err) {
-		const appError = err instanceof AppError
-			? err
-			: new AppError(ERROR_TYPES.SERVER_ERROR, `${t("errors.general")} ${err.message}`);
-		handleError(appError);
-	} finally {
-		setLoading(false);
-	}
-};	const handlePresetClick = (palette) => {
+	}; const handlePresetClick = (palette) => {
+		// Use palette primary and auto-generate variants
+		const variants = generateColorVariants(palette.primary);
 		setFormData(prev => ({
 			...prev,
 			primaryColor: palette.primary,
-			secondaryColor: palette.secondary,
-			accentColor: palette.accent
+			secondaryColor: variants.secondary,
+			accentColor: variants.accent
 		}));
 	};
 
@@ -369,7 +383,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 					</svg>
 					{t("business.logo")}
 				</h3>
-				
+
 				<ImageUploader
 					label="Logo del Negocio"
 					preview={logoPreview}
@@ -383,61 +397,61 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 			{/* Contact Info */}
 			<div className="neo-surface neo-border neo-shadow-md p-4 sm:p-5 md:p-6">
 				<h3 className="mb-4 sm:mb-5 flex items-center neo-heading neo-h4 text-base sm:text-lg">
-				<svg className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 text-neo-flame flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-				</svg>
-				{t("business.contactInfo")}
-			</h3>
+					<svg className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 text-neo-flame flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+					</svg>
+					{t("business.contactInfo")}
+				</h3>
 
-			<div className="space-y-3 sm:space-y-4">
-				<FormField
-					label={t("business.address")}
-					name="address"
-					value={formData.address}
-					onChange={handleFieldChange}
-					onBlur={handleBlur}
-					placeholder={t("business.addressPlaceholder")}
-				/>
-
-				<LocationPicker
-					address={formData.address}
-					latitude={formData.latitude}
-					longitude={formData.longitude}
-					onLocationChange={({address, latitude, longitude}) => {
-						setFormData(prev => ({
-							...prev,
-							address: address,
-							latitude: latitude,
-							longitude: longitude
-						}));
-					}}
-					error={getFieldError('location')}
-				/>
-
-				<div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+				<div className="space-y-3 sm:space-y-4">
 					<FormField
-						label={t("business.phone")}
-						name="phoneNumber"
-						type="tel"
-						value={formData.phoneNumber}
+						label={t("business.address")}
+						name="address"
+						value={formData.address}
 						onChange={handleFieldChange}
 						onBlur={handleBlur}
-						error={getFieldError('phoneNumber')}
-						placeholder="+1 234 567 8900"
+						placeholder={t("business.addressPlaceholder")}
 					/>
 
-					<FormField
-						label={t("business.email")}
-						name="email"
-						type="email"
-						value={formData.email}
-						onChange={handleFieldChange}
-						onBlur={handleBlur}
-						error={getFieldError('email')}
-						placeholder="contacto@ejemplo.com"
+					<LocationPicker
+						address={formData.address}
+						latitude={formData.latitude}
+						longitude={formData.longitude}
+						onLocationChange={({ address, latitude, longitude }) => {
+							setFormData(prev => ({
+								...prev,
+								address: address,
+								latitude: latitude,
+								longitude: longitude
+							}));
+						}}
+						error={getFieldError('location')}
 					/>
-				</div>					<div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+
+					<div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+						<FormField
+							label={t("business.phone")}
+							name="phoneNumber"
+							type="tel"
+							value={formData.phoneNumber}
+							onChange={handleFieldChange}
+							onBlur={handleBlur}
+							error={getFieldError('phoneNumber')}
+							placeholder="+1 234 567 8900"
+						/>
+
+						<FormField
+							label={t("business.email")}
+							name="email"
+							type="email"
+							value={formData.email}
+							onChange={handleFieldChange}
+							onBlur={handleBlur}
+							error={getFieldError('email')}
+							placeholder="contacto@ejemplo.com"
+						/>
+					</div>					<div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
 						<FormField
 							label="WhatsApp"
 							name="whatsAppNumber"
@@ -526,22 +540,34 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+				<div className="flex flex-col items-center gap-4">
 					<CircularColorPicker
 						color={formData.primaryColor}
 						onChange={(c) => handleColorChange("primaryColor", c)}
-						label={t("business.primaryColor")}
+						label="Color Principal"
 					/>
-					<CircularColorPicker
-						color={formData.secondaryColor}
-						onChange={(c) => handleColorChange("secondaryColor", c)}
-						label={t("business.secondaryColor")}
-					/>
-					<CircularColorPicker
-						color={formData.accentColor}
-						onChange={(c) => handleColorChange("accentColor", c)}
-						label={t("business.accentColor")}
-					/>
+
+					{/* Preview of auto-generated colors */}
+					<div className="flex items-center gap-2 mt-2">
+						<div className="flex items-center gap-1.5">
+							<div
+								className="w-6 h-6 rounded-full border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+								style={{ backgroundColor: formData.primaryColor }}
+								title="Principal"
+							/>
+							<div
+								className="w-5 h-5 rounded-full border border-gray-400"
+								style={{ backgroundColor: formData.secondaryColor }}
+								title="Secundario (auto)"
+							/>
+							<div
+								className="w-5 h-5 rounded-full border border-gray-400"
+								style={{ backgroundColor: formData.accentColor }}
+								title="Acento (auto)"
+							/>
+						</div>
+						<span className="text-xs text-gray-500">+ variantes automáticas</span>
+					</div>
 				</div>
 			</div>
 

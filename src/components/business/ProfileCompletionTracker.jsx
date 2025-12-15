@@ -114,7 +114,7 @@ const ProfileCompletionTracker = ({ businessData, onSectionClick }) => {
             fieldCompleted = businessData.imageKey || businessData.imageUrl;
             break;
           case 'colors':
-            fieldCompleted = businessData.primaryColor && businessData.secondaryColor;
+            fieldCompleted = businessData.primaryColor && businessData.primaryColor.trim().length > 0;
             break;
           case 'template':
             fieldCompleted = businessData.template && businessData.template !== 'default';
@@ -291,11 +291,10 @@ const ProfileCompletionTracker = ({ businessData, onSectionClick }) => {
           <div
             key={section.id}
             onClick={() => onSectionClick && onSectionClick(section.id)}
-            className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${
-              section.completed
+            className={`relative p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${section.completed
                 ? 'bg-green-50 border-green-500 shadow-[2px_2px_0px_0px_rgba(34,197,94,0.5)]'
                 : 'bg-gray-50 border-gray-300 hover:border-neo-flame hover:shadow-[4px_4px_0px_0px_rgba(239,68,68,0.3)]'
-            }`}
+              }`}
           >
             {/* Section Header */}
             <div className="flex items-center justify-between mb-3">
@@ -313,9 +312,8 @@ const ProfileCompletionTracker = ({ businessData, onSectionClick }) => {
             {/* Progress Bar */}
             <div className="w-full bg-gray-200 rounded-full h-2 border border-gray-300">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  section.completed ? 'bg-green-500' : 'bg-neo-flame'
-                }`}
+                className={`h-full rounded-full transition-all duration-500 ${section.completed ? 'bg-green-500' : 'bg-neo-flame'
+                  }`}
                 style={{ width: `${section.completionPercentage}%` }}
               ></div>
             </div>
