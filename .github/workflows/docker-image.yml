@@ -3,7 +3,7 @@ name: Deploy Frontend to Production
 on:
   push:
     branches:
-      - prod
+      - main
   workflow_dispatch:
 
 jobs:
@@ -25,8 +25,8 @@ jobs:
           script: |
             cd /home/ubuntu/menu-plus/menu-plus-front
             git fetch --all
-            git checkout prod
-            git pull origin prod
+            git checkout main
+            git pull origin main
             sudo docker stop menusesqr-front || true
             sudo docker rm menusesqr-front || true
             sudo docker rmi menu-plus-front:latest || true
