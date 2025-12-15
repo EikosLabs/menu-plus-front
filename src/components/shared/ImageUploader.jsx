@@ -11,7 +11,7 @@ export default function ImageUploader({
 	disabled = false,
 	error = null,
 	label = "Imagen",
-	acceptedFormats = "PNG, JPG, WebP hasta 5MB",
+	acceptedFormats = "PNG, JPG, WebP hasta 10MB",
 	required = false
 }) {
 	const [isDragging, setIsDragging] = React.useState(false);

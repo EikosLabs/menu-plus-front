@@ -89,8 +89,8 @@ const StatsSection = ({ businesses }) => {
 							<div className="bg-gray-50 p-4 border-b-neo-thick border-black flex justify-between items-center">
 								<div className="flex items-center gap-3">
 									{business.imageKey ? (
-										<img 
-											src={`/api/images/${business.imageKey}`} 
+										<img
+											src={`api/images/${business.imageKey}`}
 											alt={business.name}
 											className="w-10 h-10 rounded-full object-cover border-2 border-black"
 										/>

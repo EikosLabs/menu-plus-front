@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SimpleSuperAdminDashboard from '../../components/superadmin/SimpleSuperAdminDashboard.jsx';
+---
+
+<BaseLayout>
+  <div class="min-h-screen bg-neo-lavender p-8">
+    <h1 class="text-4xl font-bold mb-8">SuperAdmin Dashboard</h1>
+    <SimpleSuperAdminDashboard client:load />
+  </div>
+</BaseLayout>

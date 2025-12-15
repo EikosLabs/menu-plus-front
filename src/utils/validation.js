@@ -199,7 +199,7 @@ export const validateFileType = (file, allowedTypes = ['image/jpeg', 'image/png'
 /**
  * Valida tamaño de archivo con feedback mejorado
  */
-export const validateFileSize = (file, maxSizeMB = 5) => {
+export const validateFileSize = (file, maxSizeMB = 10) => {
   if (!file) return null;
 
   const maxSizeBytes = maxSizeMB * 1024 * 1024;
@@ -256,7 +256,7 @@ export const validateField = (value, rules = []) => {
  */
 export const validateImageFile = (file, options = {}) => {
   const {
-    maxSizeMB = 5,
+    maxSizeMB = 10,
     allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
     minWidth = 1,
     minHeight = 1,

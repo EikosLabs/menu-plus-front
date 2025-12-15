@@ -3,7 +3,7 @@
  * Forwards /api requests to backend server
  */
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.API_BACKEND_URL || 'http://menusesqr-back:8080';
 
 export async function proxyApiRequest(request) {
   const url = new URL(request.url);
@@ -16,21 +16,28 @@ export async function proxyApiRequest(request) {
   // Build backend URL
   const backendUrl = `${BACKEND_URL}${url.pathname}${url.search}`;
 
-  // Copy headers
+  // Copy headers and handle body properly
   const headers = {};
+  let body = null;
+
   request.headers.forEach((value, key) => {
-    // Skip host header
-    if (key.toLowerCase() !== 'host') {
+    // Skip host header and content-length (will be set automatically)
+    if (key.toLowerCase() !== 'host' && key.toLowerCase() !== 'content-length') {
       headers[key] = value;
     }
   });
+
+  // Only read body for POST, PUT, PATCH requests
+  if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
+    body = await request.text();
+  }
 
   // Forward request to backend
   try {
     const backendResponse = await fetch(backendUrl, {
       method: request.method,
       headers,
-      body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined,
+      body,
     });
 
     // Copy response headers

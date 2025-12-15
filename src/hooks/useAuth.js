@@ -33,16 +33,32 @@ export const useAuth = () => {
 		}
 
 		try {
-			// El backend obtiene el userId del token
-			const userBusinesses = await menuService.getUserBusinesses();
-			const businessName = userBusinesses.length > 0 ? userBusinesses[0].name : "Mi Negocio";
+			// Obtener información del rol del token
+			const currentRole = authService.getRoleFromToken();
+			const isSuperAdmin = authService.isSuperAdmin();
 
-			setUserData({
-				id: currentUserId,
-				name: businessName,
-				email: `user_${currentUserId}@example.com`,
-				role: "Owner",
-			});
+			if (isSuperAdmin) {
+				// Para SuperAdmin, no necesita información de negocio
+				setUserData({
+					id: currentUserId,
+					name: "Super Administrator",
+					email: `superadmin@menusesqr.online`,
+					role: currentRole || "Super Admin",
+					isSuperAdmin: true,
+				});
+			} else {
+				// Para usuarios normales, obtener información del negocio
+				const userBusinesses = await menuService.getUserBusinesses();
+				const businessName = userBusinesses.length > 0 ? userBusinesses[0].name : "Mi Negocio";
+
+				setUserData({
+					id: currentUserId,
+					name: businessName,
+					email: `user_${currentUserId}@example.com`,
+					role: currentRole || "Owner",
+					isSuperAdmin: false,
+				});
+			}
 		} catch (error) {
 			// Si es error de autenticación, redirigir a login
 			if (error instanceof AppError && error.type === ERROR_TYPES.UNAUTHORIZED) {

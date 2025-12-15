@@ -1,0 +1,60 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { setCookie } from '../../utils/cookieManager.js';
+
+export const prerender = false;
+
+// Handle OAuth callback
+const url = Astro.url;
+const searchParams = url.searchParams;
+
+// Extract tokens from URL
+const token = searchParams.get('token');
+const refreshToken = searchParams.get('refreshToken');
+const userId = searchParams.get('userId');
+const userName = searchParams.get('userName');
+const fullName = searchParams.get('fullName');
+const email = searchParams.get('email');
+const role = searchParams.get('role');
+
+// Handle authentication
+if (token && refreshToken) {
+  // Save authentication data using cookies
+  setCookie('auth_token', token, { maxAge: 7200 }); // 2 hours
+  setCookie('refresh_token', refreshToken, { maxAge: 604800 }); // 7 days
+
+  // Save user data in a separate cookie for client-side access
+  const userData = JSON.stringify({
+    userId: parseInt(userId),
+    userName: userName || '',
+    fullName: fullName || '',
+    email: email || '',
+    role: role || ''
+  });
+
+  setCookie('user_data', userData, { maxAge: 7200 });
+
+  // Redirect to dashboard
+  return Astro.redirect('/dashboard');
+} else {
+  // Handle error
+  const error = searchParams.get('error');
+  if (error) {
+    return Astro.redirect(`/login?error=${error}`);
+  } else {
+    return Astro.redirect('/login?error=auth-failed');
+  }
+}
+---
+
+<Layout title="Authentication Callback">
+  <div class="min-h-screen flex items-center justify-center bg-neo-lavender">
+    <div class="neo-card bg-white border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+      <div class="text-center">
+        <div class="animate-spin w-12 h-12 border-4 border-neo-flame border-t-transparent rounded-full mx-auto mb-4"></div>
+        <h2 class="text-2xl font-black mb-2">Procesando autenticación...</h2>
+        <p class="text-gray-600">Por favor espera mientras verificamos tus credenciales</p>
+      </div>
+    </div>
+  </div>
+</Layout>

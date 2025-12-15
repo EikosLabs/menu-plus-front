@@ -176,6 +176,11 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 	};
 
 	const handleLogoChange = (e) => {
+		// Validate that e.target.files exists and has at least one file
+		if (!e.target?.files || e.target.files.length === 0) {
+			return;
+		}
+
 		const file = e.target.files[0];
 		if (!file) return;
 
@@ -370,7 +375,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 					preview={logoPreview}
 					onFileChange={handleLogoChange}
 					onClearImage={removeLogo}
-					acceptedFormats="JPEG, PNG, GIF, WebP hasta 1MB"
+					acceptedFormats="JPEG, PNG, GIF, WebP hasta 10MB"
 					error={getFieldError('logoFile')}
 				/>
 			</div>

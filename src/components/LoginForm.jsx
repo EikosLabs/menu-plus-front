@@ -8,6 +8,7 @@ import { validateEmail, validateRequired } from "../utils/validation";
 import { useTranslation } from "../i18n/utils";
 import { ERROR_TYPES } from "../utils/errorTypes";
 import LoginSuccessNotification from "./ui/LoginSuccessNotification";
+import GoogleLoginButton from "./auth/GoogleLoginButton";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -142,6 +143,34 @@ export default function LoginForm() {
                     </>
                   ) : t("auth.loginButton")}
                 </button>
+            </div>
+
+            {/* Divider */}
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t-2 border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                    <div className="px-4 bg-white font-bold text-gray-500 neo-text">
+                        O
+                    </div>
+                </div>
+            </div>
+
+            {/* Google Login Button */}
+            <div className="mt-4">
+                <GoogleLoginButton
+                    onLoginStart={() => console.log('Google login started')}
+                    onLoginSuccess={(data) => console.log('Google login success:', data)}
+                    onLoginError={(error) => {
+                        console.error('Google login error:', error);
+                        handleError({
+                            message: 'Error al iniciar sesión con Google',
+                            type: ERROR_TYPES.NETWORK_ERROR
+                        });
+                    }}
+                    disabled={loading}
+                />
             </div>
         </form>
     );

@@ -57,8 +57,8 @@ export const useBusinessForm = (onBusinessAdded, onCancel) => {
 	const handleLogoChange = (e) => {
 		const file = e.target.files[0];
 		if (file) {
-			if (file.size > 5 * 1024 * 1024) {
-				setError("El archivo es demasiado grande. El tamaño máximo es 5MB.");
+			if (file.size > 10 * 1024 * 1024) {
+				setError("El archivo es demasiado grande. El tamaño máximo es 10MB.");
 				return;
 			}
 

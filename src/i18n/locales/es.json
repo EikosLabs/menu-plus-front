@@ -80,7 +80,7 @@
 		"nameRequired": "El nombre del negocio es requerido",
 		"categoryRequired": "Debe seleccionar una categoría de negocio",
 		"uploadLogo": "Subir Logo (Opcional)",
-		"logoFormats": "Formatos soportados: JPEG, PNG, GIF, WebP. Tamaño máximo: 5MB",
+		"logoFormats": "Formatos soportados: JPEG, PNG, GIF, WebP. Tamaño máximo: 10MB",
 		"dragDropImage": "Hacer clic para seleccionar imagen",
 		"dragDropText": "o arrastrar y soltar aquí",
 		"uploadingLogo": "Subiendo logo...",

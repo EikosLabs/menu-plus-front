@@ -9,6 +9,7 @@ import DashboardHeader from "./ui/DashboardHeader";
 import Footer from "./ui/Footer";
 import MenuScanner from "./MenuScanner";
 import MenuAnalysisReview from "./MenuAnalysisReview";
+import ProfileCompletionWidget from "./business/ProfileCompletionWidget";
 
 const BusinessSection = lazy(() => import("./sections/BusinessSection"));
 const StatsSection = lazy(() => import("./sections/StatsSection"));
@@ -124,6 +125,19 @@ export default function UserDashboard() {
 				<DashboardHeader activeSection={activeSection} />
 				<ErrorAlert error={error} onClose={() => setError(null)} />
 
+				{/* Profile Completion Widget - Show when user has businesses */}
+				{businesses && businesses.length > 0 && activeSection === "negocios" && (
+					<div className="mb-6 max-w-md">
+						<ProfileCompletionWidget
+							businessData={businesses[0]}
+							onSectionClick={(sectionId) => {
+								// Handle section clicks for navigation
+								console.log('Profile section clicked:', sectionId);
+								// You can add navigation logic here
+							}}
+						/>
+					</div>
+				)}
 
 				<Suspense fallback={<LoadingSpinner />}>
 					{activeSection === "negocios" && (

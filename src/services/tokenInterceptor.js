@@ -2,7 +2,7 @@ import { AppError } from '../utils/AppError.js';
 import { ERROR_TYPES } from '../utils/errorTypes.js';
 import { errorLogger } from '../utils/errorLogger.js';
 
-const API_URL = "http://localhost:5000/api"; // HARDCODED FOR DEBUG
+const API_URL = "import.meta.env.PUBLIC_API_URL || '/api'"; // HARDCODED FOR DEBUG
 
 export class TokenInterceptor {
 	constructor(authService) {

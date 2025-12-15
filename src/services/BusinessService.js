@@ -203,7 +203,7 @@ export class BusinessService {
 
 	async getCategories() {
 		try {
-			const response = await this.apiClient.get("/business-categories");
+			const response = await this.apiClient.get("/business-categories", { requiresAuth: false });
 			return response.isEmpty ? [] : response.data;
 		} catch (error) {
 			errorLogger.error(error, { endpoint: '/business-categories' });

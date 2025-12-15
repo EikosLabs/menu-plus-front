@@ -42,8 +42,8 @@ const DEFAULT_OPTIONS = {
   progressive: true,
 };
 
-// Maximum file size before compression (5MB)
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+// Maximum file size before compression (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 // Target compressed file size (2.5MB)
 const TARGET_COMPRESSED_SIZE = 2.5 * 1024 * 1024;
@@ -69,7 +69,7 @@ export function validateImageFile(file) {
   if (file.size > MAX_FILE_SIZE) {
     return {
       isValid: false,
-      error: `File too large: ${(file.size / (1024 * 1024)).toFixed(1)}MB. Maximum: 5MB`
+      error: `File too large: ${(file.size / (1024 * 1024)).toFixed(1)}MB. Maximum: 10MB`
     };
   }
 
@@ -513,7 +513,7 @@ export function getOptimalCompressionSettings(fileSize) {
       outputFormat: 'jpeg',
       progressive: true,
     };
-  } else if (fileSize > 5 * 1024 * 1024) { // > 5MB
+  } else if (fileSize > 5 * 1024 * 1024) { // > 5MB (adjusted threshold for 10MB limit)
     return {
       maxWidth: 1536,
       maxHeight: 1536,

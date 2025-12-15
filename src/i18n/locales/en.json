@@ -80,7 +80,7 @@
 		"nameRequired": "Business name is required",
 		"categoryRequired": "You must select a business category",
 		"uploadLogo": "Upload Logo (Optional)",
-		"logoFormats": "Supported formats: JPEG, PNG, GIF, WebP. Maximum size: 5MB",
+		"logoFormats": "Supported formats: JPEG, PNG, GIF, WebP. Maximum size: 10MB",
 		"dragDropImage": "Click to select image",
 		"dragDropText": "or drag and drop here",
 		"uploadingLogo": "Uploading logo...",

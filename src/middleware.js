@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { proxyApiRequest } from './api-proxy.js';
 
-const API_URL = import.meta.env.PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.PUBLIC_API_URL || "import.meta.env.PUBLIC_API_URL || '/api'";
 
 /**
  * Valida el formato y expiración de un JWT
@@ -122,8 +122,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 	const currentPath = context.url.pathname;
 
+	// Skip middleware for static assets (CSS, JS, images, fonts)
+	if (currentPath.startsWith('/_astro/') ||
+		currentPath.startsWith('/_imaginary/') ||
+		currentPath.startsWith('/_src/') ||
+		currentPath.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2)$/)) {
+		return next();
+	}
+
 	// Rutas públicas que no requieren autenticación
-	const reserved = ["dashboard", "login", "register", "admin", "api", "404", "menu"];
+	const reserved = ["dashboard", "login", "register", "admin", "api", "404", "menu", "admin-super"];
 	const singleSegment = /^\/[^/]+$/.test(currentPath);
 	const segment = singleSegment ? currentPath.slice(1) : null;
 	const isRootLanding = singleSegment && segment && !reserved.includes(segment);
@@ -136,8 +144,50 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		currentPath.startsWith("/business/") ||
 		isRootLanding;
 
+	// /admin-super requiere autenticación de SuperAdmin específica
+	const isSuperAdminRoute = currentPath === "/admin-super";
+
 	const token = context.cookies.get("auth_token")?.value;
 	const refreshToken = context.cookies.get("refresh_token")?.value;
+
+	// Manejar rutas de SuperAdmin
+	if (isSuperAdminRoute) {
+		const validation = validateJwtToken(token);
+
+		// Si no hay token o es inválido, redirigir a login
+		if (!token || !validation.valid) {
+			console.log('[Middleware] No valid token for SuperAdmin route, redirecting to login');
+			context.cookies.delete("auth_token", { path: "/" });
+			context.cookies.delete("token", { path: "/" });
+			context.cookies.delete("refresh_token", { path: "/" });
+			return context.redirect("/login");
+		}
+
+		// Si el token está expirado, intentar renovarlo
+		if (validation.expired) {
+			console.log('[Middleware] SuperAdmin token expired, attempting refresh');
+			const refreshed = await tryRefreshToken(refreshToken, context);
+
+			if (!refreshed) {
+				console.log('[Middleware] SuperAdmin refresh failed, redirecting to login');
+				context.cookies.delete("auth_token", { path: "/" });
+				context.cookies.delete("token", { path: "/" });
+				context.cookies.delete("refresh_token", { path: "/" });
+				return context.redirect("/login");
+			}
+		}
+
+		// Verificar que sea SuperAdmin
+		const finalValidation = validateJwtToken(context.cookies.get("auth_token")?.value);
+		if (!finalValidation.valid || finalValidation.payload?.role !== "Super Admin") {
+			console.log('[Middleware] Not a SuperAdmin, redirecting to login');
+			return context.redirect("/login");
+		}
+
+		// Si es SuperAdmin válido, permitir acceso
+		console.log('[Middleware] SuperAdmin access granted');
+		return next();
+	}
 
 	// Si no es ruta pública
 	if (!isPublicRoute) {
@@ -176,15 +226,31 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	if (currentPath === "/") {
 		const validation = validateJwtToken(token);
 		if (token && validation.valid) {
+			// Si es SuperAdmin, ir a SuperAdmin dashboard
+			if (validation.payload?.role === "Super Admin") {
+				return context.redirect("/admin-super");
+			}
 			return context.redirect("/dashboard");
 		}
 	}
 
 	// Si está en login/register y tiene token válido, redirigir a dashboard
-	if (currentPath === "/login" || currentPath === "/register") {
+	if ((currentPath === "/login" || currentPath === "/register") && currentPath !== "/admin-super") {
 		const validation = validateJwtToken(token);
 		if (token && validation.valid) {
+			// Si es SuperAdmin, ir a SuperAdmin dashboard
+			if (validation.payload?.role === "Super Admin") {
+				return context.redirect("/admin-super");
+			}
 			return context.redirect("/dashboard");
+		}
+	}
+
+	// Si es SuperAdmin pero está en onboarding, redirigir a SuperAdmin dashboard
+	if (currentPath === "/onboarding" || currentPath === "/dashboard") {
+		const validation = validateJwtToken(token);
+		if (token && validation.valid && validation.payload?.role === "Super Admin") {
+			return context.redirect("/admin-super");
 		}
 	}
 

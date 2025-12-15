@@ -6,9 +6,8 @@ import { validateEmail, validateRequired } from '../utils/validation';
 import { cookieManager } from '../utils/cookieManager.js';
 import { jwtHelper } from '../utils/jwtHelper.js';
 
-// En desarrollo local, forzar localhost si no está definido
-const isDev = import.meta.env.DEV;
-const API_URL = 'http://localhost:5000/api'; // HARDCODED FOR DEBUG
+// Usar la URL de la API desde las variables de entorno
+const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
 
 export const authService = {
 	async login(email, password) {
@@ -312,12 +311,31 @@ export const authService = {
 
 		// Usar jwtHelper para extraer el claim correcto: UserId
 		const userId = jwtHelper.getUserIdFromToken(token);
-		
+
 		if (!userId) {
 			errorLogger.warn('UserId not found in token');
 		}
 
 		return userId;
+	},
+
+	getRoleFromToken() {
+		const token = this.getToken();
+		if (!token) return null;
+
+		// Extraer el claim de rol
+		const role = jwtHelper.getRoleFromToken(token);
+
+		if (!role) {
+			errorLogger.warn('Role not found in token');
+		}
+
+		return role;
+	},
+
+	isSuperAdmin() {
+		const role = this.getRoleFromToken();
+		return role === 'Super Admin';
 	},
 
 	isTokenExpired() {

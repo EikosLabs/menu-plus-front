@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef } from 'react';
-import { compressImage, formatFileSize, getOptimalCompressionSettings } from '../utils/imageCompression.js';
 import { validateImageFile } from '../utils/imageCompression.js';
 
 /**
@@ -14,9 +13,9 @@ import { validateImageFile } from '../utils/imageCompression.js';
  */
 export function useImageUpload(options = {}) {
 	const {
-		maxSizeMB = 3, // Reducido para permitir margen de compresión
+		maxSizeMB = 10, // Actualizado a 10MB como solicitado
 		validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
-		enableCompression = true,
+		enableCompression = false, // Desactivada para evitar errores
 		showCompressionProgress = true,
 		onCompressionProgress,
 		onCompressionComplete
@@ -25,36 +24,23 @@ export function useImageUpload(options = {}) {
 	const [image, setImage] = useState(null);
 	const [preview, setPreview] = useState(null);
 	const [error, setError] = useState(null);
-	const [isCompressing, setIsCompressing] = useState(false);
-	const [compressionProgress, setCompressionProgress] = useState(null);
-	const [originalSize, setOriginalSize] = useState(null);
-	const [compressedSize, setCompressedSize] = useState(null);
-	const [compressionStats, setCompressionStats] = useState(null);
+	// Variables de compresión eliminadas - ya no se usan
 	const fileInputRef = useRef(null);
 
-	const handleCompressionProgress = useCallback((progress) => {
-		if (showCompressionProgress) {
-			setCompressionProgress(progress);
-		}
-		onCompressionProgress?.(progress);
-	}, [showCompressionProgress, onCompressionProgress]);
-
-	const clearCompressionState = useCallback(() => {
-		setIsCompressing(false);
-		setCompressionProgress(null);
-		setOriginalSize(null);
-		setCompressedSize(null);
-		setCompressionStats(null);
-	}, []);
+	// Funciones de compresión eliminadas - ya no se usan
 
 	const handleFileChange = useCallback(async (e) => {
+		// Validate that e.target.files exists and has at least one file
+		if (!e.target?.files || e.target.files.length === 0) {
+			return;
+		}
+
 		const file = e.target.files[0];
 
 		// Reset state
 		setImage(null);
 		setPreview(null);
 		setError(null);
-		clearCompressionState();
 
 		if (!file) return;
 
@@ -79,51 +65,12 @@ export function useImageUpload(options = {}) {
 		}
 
 		try {
-			let finalFile = file;
-			let shouldCompress = enableCompression && file.size > 1 * 1024 * 1024; // Comprimir si > 1MB
-
-			// Get optimal compression settings based on file size
-			const compressionOptions = getOptimalCompressionSettings(file.size);
-
-			if (shouldCompress) {
-				setIsCompressing(true);
-				setOriginalSize(file.size);
-
-				const compressionResult = await compressImage(file, compressionOptions, handleCompressionProgress);
-
-				if (compressionResult.success && compressionResult.compressedFile !== file) {
-					finalFile = compressionResult.compressedFile;
-					setCompressedSize(finalFile.size);
-					setCompressionStats({
-						originalSize: compressionResult.originalSize,
-						compressedSize: compressionResult.compressedSize,
-						compressionRatio: compressionResult.compressionRatio,
-						processingTime: compressionResult.processingTime
-					});
-
-					console.log(`[ImageUpload] Compression complete: ${formatFileSize(compressionResult.originalSize)} → ${formatFileSize(compressionResult.compressedSize)} (${compressionResult.compressionRatio.toFixed(1)}% reduction in ${compressionResult.processingTime.toFixed(0)}ms)`);
-
-					onCompressionComplete?.(compressionResult);
-				} else if (!compressionResult.success) {
-					// Si la compresión falla, continuar con el archivo original
-					console.warn(`[ImageUpload] Compression failed: ${compressionResult.error}`);
-					setCompressionStats({
-						originalSize: file.size,
-						compressedSize: file.size,
-						compressionRatio: 0,
-						processingTime: compressionResult.processingTime,
-						error: compressionResult.error
-					});
-				}
-			}
-
-			// Final validation of compressed file
-			if (finalFile.size > maxSizeBytes * 2) { // Permitir hasta 2x el tamaño máximo después de compresión fallida
-				setError(`La imagen es demasiado grande (${formatFileSize(finalFile.size)}). Máximo permitido: ${formatFileSize(maxSizeBytes)}`);
+			// Validación de tamaño final
+			if (file.size > maxSizeBytes) {
+				setError(`La imagen excede el tamaño máximo de ${maxSizeMB}MB. Tamaño actual: ${(file.size / (1024 * 1024)).toFixed(1)}MB.`);
 				if (fileInputRef.current) {
 					fileInputRef.current.value = null;
 				}
-				clearCompressionState();
 				return;
 			}
 
@@ -132,15 +79,10 @@ export function useImageUpload(options = {}) {
 			reader.onloadend = () => {
 				setPreview(reader.result);
 			};
-			reader.readAsDataURL(finalFile);
+			reader.readAsDataURL(file);
 
-			// Update image with potential file name preservation
-			const processedFile = new File([finalFile], file.name, {
-				type: finalFile.type,
-				lastModified: Date.now()
-			});
-
-			setImage(processedFile);
+			// Usar el archivo original sin compresión
+			setImage(file);
 
 		} catch (error) {
 			console.error('[ImageUpload] Error processing file:', error);
@@ -148,96 +90,34 @@ export function useImageUpload(options = {}) {
 			if (fileInputRef.current) {
 				fileInputRef.current.value = null;
 			}
-			clearCompressionState();
 		}
-	}, [maxSizeMB, enableCompression, showCompressionProgress, onCompressionProgress, onCompressionComplete, clearCompressionState, handleCompressionProgress]);
+	}, [maxSizeMB]);
 
 	const clearImage = useCallback(() => {
 		setImage(null);
 		setPreview(null);
 		setError(null);
-		clearCompressionState();
 		if (fileInputRef.current) {
 			fileInputRef.current.value = null;
 		}
-	}, [clearCompressionState]);
+	}, []);
 
 	const setExistingPreview = useCallback((url) => {
 		setPreview(url);
 		setImage(null);
-		clearCompressionState();
-	}, [clearCompressionState]);
+	}, []);
 
-	const retryCompression = useCallback(async (customOptions = {}) => {
-		if (!image || !enableCompression) return;
-
-		setIsCompressing(true);
-		setCompressionProgress({ stage: 'compressing', progress: 0, message: 'Reintentando compresión...' });
-
-		try {
-			const compressionOptions = { ...getOptimalCompressionSettings(image.size), ...customOptions };
-			const compressionResult = await compressImage(image, compressionOptions, handleCompressionProgress);
-
-			if (compressionResult.success && compressionResult.compressedFile !== image) {
-				const compressedFile = compressionResult.compressedFile;
-				setCompressedSize(compressedFile.size);
-				setCompressionStats({
-					originalSize: compressionResult.originalSize,
-					compressedSize: compressionResult.compressedSize,
-					compressionRatio: compressionResult.compressionRatio,
-					processingTime: compressionResult.processingTime
-				});
-
-				// Update preview
-				const reader = new FileReader();
-				reader.onloadend = () => {
-					setPreview(reader.result);
-				};
-				reader.readAsDataURL(compressedFile);
-
-				// Update image with preserved name
-				const processedFile = new File([compressedFile], image.name, {
-					type: compressedFile.type,
-					lastModified: Date.now()
-				});
-
-				setImage(processedFile);
-				onCompressionComplete?.(compressionResult);
-			}
-		} catch (error) {
-			setError(`Error en reintento de compresión: ${error.message}`);
-		} finally {
-			setIsCompressing(false);
-		}
-	}, [image, enableCompression, handleCompressionProgress, onCompressionComplete]);
-
-	// Utility functions for UI
-	const getCompressionInfo = useCallback(() => {
-		if (!compressionStats) return null;
-
-		const { originalSize, compressedSize, compressionRatio, processingTime, error } = compressionStats;
-
-		return {
-			originalSize: formatFileSize(originalSize),
-			compressedSize: formatFileSize(compressedSize),
-			compressionRatio: compressionRatio.toFixed(1),
-			processingTime: processingTime.toFixed(0),
-			spaceSaved: formatFileSize(originalSize - compressedSize),
-			wasCompressed: compressionRatio > 0,
-			error
-		};
-	}, [compressionStats]);
-
+	// Utility functions simplificadas sin compresión
 	const getFileSizeInfo = useCallback(() => {
 		if (!image) return null;
 
 		return {
-			currentSize: formatFileSize(image.size),
-			originalSize: originalSize ? formatFileSize(originalSize) : formatFileSize(image.size),
-			isCompressed: compressedSize !== null && compressedSize < originalSize,
-			compressionSaved: originalSize && compressedSize ? formatFileSize(originalSize - compressedSize) : null
+			currentSize: `${(image.size / (1024 * 1024)).toFixed(1)}MB`,
+			originalSize: `${(image.size / (1024 * 1024)).toFixed(1)}MB`,
+			isCompressed: false,
+			compressionSaved: null
 		};
-	}, [image, originalSize, compressedSize]);
+	}, [image]);
 
 	return {
 		// Core state
@@ -246,24 +126,16 @@ export function useImageUpload(options = {}) {
 		error,
 		fileInputRef,
 
-		// Compression state
-		isCompressing,
-		compressionProgress,
-		compressionStats,
-
 		// Actions
 		handleFileChange,
 		clearImage,
 		setExistingPreview,
-		retryCompression,
 
 		// Utility functions for UI
-		getCompressionInfo,
 		getFileSizeInfo,
 
 		// State helpers
 		hasImage: !!image,
-		hasCompressionStats: !!compressionStats,
 		isImageTooLarge: image && image.size > maxSizeMB * 1024 * 1024
 	};
 }

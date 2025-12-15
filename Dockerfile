@@ -40,7 +40,8 @@ FROM base AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PUBLIC_API_URL=/api
+ENV PUBLIC_API_URL=https://menusesqr.online/api
+ENV PUBLIC_FRONTEND_URL=https://menusesqr.online
 ENV HOST=0.0.0.0
 ENV PORT=4321
 

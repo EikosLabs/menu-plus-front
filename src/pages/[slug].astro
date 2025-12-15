@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 
 // Validar que el slug no colisione con rutas reservadas
-const reservedRoutes = ['dashboard', 'login', 'register', 'admin', 'api', '404', 'menu'];
+const reservedRoutes = ['dashboard', 'login', 'register', 'admin', 'admin-super', 'api', '404', 'menu'];
 if (reservedRoutes.includes(slug)) {
   return Astro.redirect('/404');
 }
@@ -22,7 +22,7 @@ let business = null;
 let error = null;
 
 try {
-  const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
   const response = await fetch(`${API_URL}/business-landing/${slug}`);
 
   if (!response.ok) {
@@ -31,7 +31,7 @@ try {
     business = await response.json();
   }
 } catch (e) {
-  error = `Failed to load business information. Error: ${e.message}. URL: ${import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api'}/business-landing/${slug}`;
+  error = `Failed to load business information. Error: ${e.message}. URL: ${import.meta.env.PUBLIC_API_URL || '/api'}/business-landing/${slug}`;
   console.error('Error fetching business:', e);
 }
 ---

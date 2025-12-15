@@ -3,7 +3,7 @@ import { renderMenu } from './menuRenderer.js';
 import { initializeInteractiveElements } from './menuInteractions.js';
 import { getPaletteByBusinessType } from './themePalettes.js';
 
-const API_URL = 'http://localhost:5000/api'; // HARDCODED FOR DEBUG
+const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
 
 function getContrastColor(hex, alphaFactor = 1) {
   try {

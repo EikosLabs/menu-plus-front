@@ -310,8 +310,16 @@ const ImageAnalysisButton = ({
 	 * Validación previa de archivos de imagen
 	 */
 	const validateImageFile = (file) => {
+		// Validar que file existe
+		if (!file) {
+			throw new AppError(
+				ERROR_TYPES.VALIDATION_ERROR,
+				"No se proporcionó ningún archivo"
+			);
+		}
+
 		const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-		const maxSize = 5 * 1024 * 1024; // 5MB para análisis (más restrictivo que upload)
+		const maxSize = 10 * 1024 * 1024; // 10MB para análisis (mismo límite que upload)
 
 		// Validar tipo
 		if (!allowedTypes.includes(file.type)) {
@@ -334,7 +342,7 @@ const ImageAnalysisButton = ({
 			const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
 			throw new AppError(
 				ERROR_TYPES.FILE_TOO_LARGE,
-				`La imagen es demasiado grande (${sizeMB}MB). Máximo 5MB permitido para análisis.`,
+				`La imagen es demasiado grande (${sizeMB}MB). Máximo 10MB permitido para análisis.`,
 				{
 					suggestions: [
 						"Comprime la imagen antes de subirla",

@@ -188,14 +188,14 @@ export function getSentryDashboardURL(dsn) {
       : process.env?.SENTRY_DSN || process.env?.PUBLIC_SENTRY_DSN);
 
   if (!targetDSN) {
-    return 'http://localhost:5000/sentry';
+    return import.meta.env?.PUBLIC_FRONTEND_URL || 'https://menusesqr.online';
   }
 
   try {
     const parsed = new URL(targetDSN);
     return `${parsed.protocol}//${parsed.host}`;
   } catch {
-    return 'http://localhost:5000/sentry';
+    return import.meta.env?.PUBLIC_FRONTEND_URL || 'https://menusesqr.online';
   }
 }
 

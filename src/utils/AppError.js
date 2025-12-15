@@ -56,11 +56,11 @@ export class AppError extends Error {
 		if (response.status === 413) {
 			return new AppError(
 				ERROR_TYPES.FILE_TOO_LARGE,
-				"Archivo demasiado grande. Máximo 5MB permitido para análisis.",
+				"Archivo demasiado grande. Máximo 10MB permitido para análisis.",
 				{
 					...details,
 					suggestion: "Comprime la imagen o usa una más pequeña.",
-					maxSize: "5MB",
+					maxSize: "10MB",
 				},
 			);
 		}

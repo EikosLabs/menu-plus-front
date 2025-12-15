@@ -5,7 +5,7 @@ import authService from "./authService";
 
 class AIService {
 	constructor() {
-		const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:5000/api";
+		const apiUrl = import.meta.env.PUBLIC_API_URL || "import.meta.env.PUBLIC_API_URL || '/api'";
 		this.baseUrl = `${apiUrl}/ai`;
 
 		// Cache simple para análisis de imágenes (evita análisis duplicados)

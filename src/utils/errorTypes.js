@@ -100,7 +100,7 @@ export const ERROR_MESSAGES = {
 	[ERROR_TYPES.ITEM_NOT_FOUND]: "Artículo no encontrado.",
 	[ERROR_TYPES.CATEGORY_NOT_FOUND]: "Categoría no encontrada.",
 
-	[ERROR_TYPES.FILE_TOO_LARGE]: "El archivo es demasiado grande. Máximo 5MB.",
+	[ERROR_TYPES.FILE_TOO_LARGE]: "El archivo es demasiado grande. Máximo 10MB.",
 	[ERROR_TYPES.PAYLOAD_TOO_LARGE]:
 		"La imagen es demasiado grande para el servidor. Intenta con una imagen más pequeña o comprímela antes de subirla.",
 	[ERROR_TYPES.INVALID_FILE_TYPE]:
