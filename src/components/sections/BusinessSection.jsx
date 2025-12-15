@@ -84,33 +84,6 @@ const BusinessSection = ({
 				)}
 			</div>
 
-			{/* Info Message */}
-			{businesses.length > 0 && (
-				<div className="mb-6 sm:mb-8 neo-card-3d-sunset p-4 sm:p-5 lg:p-6">
-					<div className="flex items-start gap-3 sm:gap-4">
-						<svg
-							className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 flex-shrink-0 text-neo-flame mt-0.5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2.5}
-								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-						<div className="min-w-0 flex-1">
-							<p className="neo-text-bold mb-2 text-sm sm:text-base lg:text-lg">ℹ️ Información Importante</p>
-							<p className="neo-text text-xs sm:text-sm lg:text-base leading-relaxed">
-								Cada usuario solo puede tener un negocio registrado en la plataforma y cada negocio solo puede tener un menú principal.
-							</p>
-						</div>
-					</div>
-				</div>
-			)}
-
 			{/* Forms */}
 			{showAddBusiness && (
 				<div className="mb-6 sm:mb-8 animate-fadeInUp">

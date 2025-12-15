@@ -39,24 +39,28 @@ const ProfileCompletionWidget = ({ businessData, onSectionClick, onDismiss }) =>
   const calculateCompletion = () => {
     // Simplified calculation with key fields only
     const checks = [
-      { key: 'name', completed: businessData.name && businessData.name.trim().length > 0, weight: 20 },
-      { key: 'description', completed: businessData.description && businessData.description.trim().length > 10, weight: 15 },
-      { key: 'phone', completed: businessData.phoneNumber && businessData.phoneNumber.trim().length > 0, weight: 15 },
-      { key: 'address', completed: businessData.address && businessData.address.trim().length > 0, weight: 15 },
-      { key: 'logo', completed: businessData.imageKey || businessData.imageUrl, weight: 20 },
-      { key: 'colors', completed: businessData.primaryColor, weight: 15 }
+      { key: 'name', label: 'Nombre', completed: businessData.name && businessData.name.trim().length > 0, weight: 20 },
+      { key: 'description', label: 'Descripción', completed: businessData.description && businessData.description.trim().length > 10, weight: 15 },
+      { key: 'phone', label: 'Teléfono', completed: businessData.phoneNumber && businessData.phoneNumber.trim().length > 0, weight: 15 },
+      { key: 'address', label: 'Dirección', completed: businessData.address && businessData.address.trim().length > 0, weight: 15 },
+      { key: 'logo', label: 'Logo', completed: businessData.imageKey || businessData.imageUrl, weight: 20 },
+      { key: 'colors', label: 'Color', completed: businessData.primaryColor, weight: 15 }
     ];
 
     const completedScore = checks.reduce((sum, check) => sum + (check.completed ? check.weight : 0), 0);
     const maxScore = checks.reduce((sum, check) => sum + check.weight, 0);
     const percentage = Math.round((completedScore / maxScore) * 100);
 
+    // Get missing fields (first 2 for subtle hint)
+    const missingFields = checks.filter(c => !c.completed).map(c => c.label).slice(0, 2);
+
     setCompletionData({
       percentage,
       completed: checks.filter(c => c.completed).length,
       total: checks.length,
       level: getLevel(percentage),
-      nextGoal: getNextGoal(percentage)
+      nextGoal: getNextGoal(percentage),
+      missingFields
     });
   };
 
@@ -87,90 +91,56 @@ const ProfileCompletionWidget = ({ businessData, onSectionClick, onDismiss }) =>
     );
   }
 
-  const { percentage, completed, total, level, nextGoal } = completionData;
-  const isHighCompletion = percentage >= 70;
+  const { percentage, completed, total, level, nextGoal, missingFields } = completionData;
+  const isComplete = percentage === 100;
 
+  // Super minimal single-line widget
   return (
     <div
-      className={`neo-surface neo-border rounded-lg p-4 transition-all duration-300 cursor-pointer ${isHighCompletion
-        ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300'
-        : 'bg-white hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg border transition-all cursor-pointer ${isComplete
+          ? 'bg-green-50 border-green-200'
+          : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
         }`}
       onClick={() => onSectionClick && onSectionClick('complete-profile')}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className={`text-lg ${level.color}`}>{level.emoji}</span>
-          <span className="font-bold text-sm text-gray-800">Perfil</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="font-black text-lg text-gray-800">{percentage}%</div>
-          <button
-            onClick={handleDismiss}
-            className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors"
-            aria-label="Cerrar"
-            title="Cerrar"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+      {/* Emoji + percentage */}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <span className="text-sm">{level.emoji}</span>
+        <span className={`text-xs font-bold ${isComplete ? 'text-green-600' : 'text-gray-700'}`}>
+          {percentage}%
+        </span>
       </div>
 
-      {/* Progress Bar */}
-      <div className="relative">
-        <div className="w-full bg-gray-200 rounded-full h-2 border border-gray-300">
+      {/* Mini progress bar */}
+      <div className="flex-1 min-w-0">
+        <div className="w-full bg-gray-200 rounded-full h-1.5">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${isHighCompletion ? 'bg-green-500' : 'bg-neo-flame'
+            className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : 'bg-neo-flame'
               }`}
-            style={{
-              width: animateProgress ? `${percentage}%` : '0%',
-              transition: 'width 0.8s ease-out'
-            }}
-          ></div>
+            style={{ width: animateProgress ? `${percentage}%` : '0%' }}
+          />
         </div>
-
-        {/* Small indicator dot */}
-        {percentage < 100 && (
-          <div
-            className="absolute -top-1 w-4 h-4 bg-neo-yellow border-2 border-black rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-500"
-            style={{
-              left: animateProgress ? `${Math.min(percentage, 95)}%` : '0%',
-              transform: 'translateX(-50%)'
-            }}
-          ></div>
-        )}
       </div>
 
-      {/* Subtle motivational text */}
-      <div className="flex items-center justify-between mt-3">
-        <p className="text-xs text-gray-600">
-          {completed}/{total} completado
-        </p>
-        {percentage < 100 && (
-          <p className="text-xs font-medium text-neo-flame">
-            +{nextGoal.target - percentage}%
-          </p>
-        )}
-      </div>
+      {/* Missing fields hint OR complete badge */}
+      {isComplete ? (
+        <span className="text-xs text-green-600 font-medium flex-shrink-0">✓</span>
+      ) : missingFields && missingFields.length > 0 ? (
+        <span className="text-xs text-gray-400 truncate max-w-[120px] flex-shrink-0" title={`Falta: ${missingFields.join(', ')}`}>
+          {missingFields[0]}
+        </span>
+      ) : null}
 
-      {/* Completion celebration badge (only when high completion) */}
-      {isHighCompletion && (
-        <div className="mt-3 flex items-center justify-center">
-          <div className="bg-green-100 border-2 border-green-500 px-3 py-1 rounded-full">
-            <span className="text-xs font-bold text-green-700">
-              {percentage === 100 ? '🎉 ¡Perfecto!' : nextGoal.text}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Completion pulse animation for low completion */}
-      {percentage < 50 && (
-        <div className="absolute top-2 right-2 w-2 h-2 bg-neo-flame rounded-full animate-pulse"></div>
-      )}
+      {/* Close button */}
+      <button
+        onClick={handleDismiss}
+        className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+        aria-label="Cerrar"
+      >
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   );
 };
