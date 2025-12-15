@@ -17,6 +17,12 @@ function getCurrentLangSSR() {
 	if (lang) return lang;
 
 	const pathname = Astro.url.pathname;
+
+	// Excluir rutas de SuperAdmin de la lógica de idioma
+	if (pathname.startsWith("/admin-super")) {
+		return "es"; // Siempre español para SuperAdmin
+	}
+
 	const langFromPath = pathname.split("/")[1];
 
 	// Verificar si es un idioma válido
@@ -32,6 +38,9 @@ const currentLang = getCurrentLangSSR();
 // Textos localizados para el layout
 const layoutTitle = title || t("navigation.home", currentLang);
 const layoutDescription = description || t("dashboard.welcome", currentLang);
+
+// Determinar si mostrar el LanguageSwitcher
+const showLanguageSwitcher = !Astro.url.pathname.startsWith("/admin-super");
 ---
 
 <!DOCTYPE html>
@@ -71,9 +80,14 @@ const layoutDescription = description || t("dashboard.welcome", currentLang);
       (function() {
         const savedLang = localStorage.getItem('preferred-language');
         const htmlLang = currentLang;
+        const currentPath = window.location.pathname;
+
+        // Excluir rutas de SuperAdmin de la lógica de idioma
+        if (currentPath.startsWith('/admin-super')) {
+          return; // No aplicar lógica de idioma en rutas de SuperAdmin
+        }
 
         if (savedLang && savedLang !== htmlLang) {
-          const currentPath = window.location.pathname;
           const pathSegments = currentPath.split('/').filter(segment => segment);
 
           // Remover idioma actual si existe
@@ -119,9 +133,11 @@ const layoutDescription = description || t("dashboard.welcome", currentLang);
           </div>
 
           <!-- Selector de idioma -->
-          <div class="flex items-center space-x-4">
-            <LanguageSwitcher client:load />
-          </div>
+          {showLanguageSwitcher && (
+            <div class="flex items-center space-x-4">
+              <LanguageSwitcher client:load />
+            </div>
+          )}
         </div>
       </div>
     </header>
@@ -140,8 +156,8 @@ const layoutDescription = description || t("dashboard.welcome", currentLang);
           </div>
 
           <div class="flex items-center space-x-6">
-            <a href="mailto:hello@eikoslabs.com" class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
-              hello@eikoslabs.com
+            <a href="https://eikoslabs.com" target="_blank" rel="noopener noreferrer" class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
+              eikoslabs.com
             </a>
             <a href={localizeUrl('/help', currentLang)} class="neo-text text-white/80 hover:text-neo-sunset transition-colors neo-text-bold">
               {t('navigation.help', currentLang)}

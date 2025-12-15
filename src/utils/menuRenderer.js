@@ -220,8 +220,8 @@ export function renderMenu(menu, business, itemsBySection) {
               
               <div style="width: 100%; height: 2px; background-color: rgba(0,0,0,0.1); margin: 1rem 0;"></div>
               
-              <a href="mailto:hello@eikoslabs.com" style="font-size: 0.875rem; font-weight: 700; color: #4a4a4a; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.color='#000'; this.style.textDecoration='underline'" onmouseout="this.style.color='#4a4a4a'; this.style.textDecoration='none'">
-                hello@eikoslabs.com
+              <a href="https://eikoslabs.com" target="_blank" rel="noopener noreferrer" style="font-size: 0.875rem; font-weight: 700; color: #4a4a4a; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.color='#000'; this.style.textDecoration='underline'" onmouseout="this.style.color='#4a4a4a'; this.style.textDecoration='none'">
+                eikoslabs.com
               </a>
             </div>
           </div>
