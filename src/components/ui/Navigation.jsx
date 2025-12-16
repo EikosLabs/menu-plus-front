@@ -2,57 +2,45 @@ import React from "react";
 import { useTranslation } from "../../i18n/utils";
 
 const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection, setActiveSection, onLogout }) => {
-    const { t } = useTranslation();
-    const navItems = [
-        {
-            id: "negocios",
-            label: t("navigation.businesses"),
-            icon: (
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-            )
-        },
-        {
-            id: "templates",
-            label: t("navigation.templates"),
-            icon: (
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 4 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                />
-            )
-        },
-        {
-            id: "estadisticas",
-            label: t("navigation.dashboard"),
-            icon: (
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-            )
-        },
-        {
-            id: "perfil",
-            label: t("navigation.profile"),
-            icon: (
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-            )
-        }
-    ];
+	const { t } = useTranslation();
+	const navItems = [
+		{
+			id: "negocios",
+			label: t("navigation.businesses"),
+			icon: (
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+				/>
+			)
+		},
+		{
+			id: "templates",
+			label: t("navigation.templates"),
+			icon: (
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 4 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+				/>
+			)
+		},
+		{
+			id: "estadisticas",
+			label: t("navigation.dashboard"),
+			icon: (
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+				/>
+			)
+		}
+	];
 
 	return (
 		<nav className="sticky top-0 z-50 bg-white border-b-neo-extra border-neo-black shadow-lg">
@@ -72,11 +60,10 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 							<button
 								key={item.id}
 								onClick={() => setActiveSection(item.id)}
-								className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base ${
-									activeSection === item.id
+								className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base ${activeSection === item.id
 										? "bg-neo-flame text-white neo-shadow"
 										: "text-neo-black hover:bg-neo-lavender"
-								}`}
+									}`}
 							>
 								<svg className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									{item.icon}
@@ -132,11 +119,10 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 							<button
 								key={item.id}
 								onClick={() => setActiveSection(item.id)}
-								className={`flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${
-									activeSection === item.id
+								className={`flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${activeSection === item.id
 										? "bg-neo-flame text-white neo-shadow"
 										: "text-neo-black hover:bg-neo-lavender"
-								}`}
+									}`}
 							>
 								<svg className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									{item.icon}
