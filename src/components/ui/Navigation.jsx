@@ -28,18 +28,6 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 				/>
 			)
 		},
-		{
-			id: "estadisticas",
-			label: t("navigation.dashboard"),
-			icon: (
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={2}
-					d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-				/>
-			)
-		}
 	];
 
 	return (
@@ -61,8 +49,8 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 								key={item.id}
 								onClick={() => setActiveSection(item.id)}
 								className={`flex items-center px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base ${activeSection === item.id
-										? "bg-neo-flame text-white neo-shadow"
-										: "text-neo-black hover:bg-neo-lavender"
+									? "bg-neo-flame text-white neo-shadow"
+									: "text-neo-black hover:bg-neo-lavender"
 									}`}
 							>
 								<svg className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,8 +108,8 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 								key={item.id}
 								onClick={() => setActiveSection(item.id)}
 								className={`flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${activeSection === item.id
-										? "bg-neo-flame text-white neo-shadow"
-										: "text-neo-black hover:bg-neo-lavender"
+									? "bg-neo-flame text-white neo-shadow"
+									: "text-neo-black hover:bg-neo-lavender"
 									}`}
 							>
 								<svg className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -12,14 +12,13 @@ import MenuAnalysisReview from "./MenuAnalysisReview";
 import ProfileCompletionWidget from "./business/ProfileCompletionWidget";
 
 const BusinessSection = lazy(() => import("./sections/BusinessSection"));
-const StatsSection = lazy(() => import("./sections/StatsSection"));
 const ProfileSection = lazy(() => import("./sections/ProfileSection"));
 const TemplateSection = lazy(() => import("./sections/TemplateSection"));
 
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
 	const { businesses, setBusinesses, loading: businessLoading, error, setError, addBusiness, addMenu, fetchBusinesses, refreshBusinesses } = useBusinesses();
-	
+
 	const [showAddBusiness, setShowAddBusiness] = useState(false);
 	const [showAddMenu, setShowAddMenu] = useState(false);
 	const [selectedBusinessId, setSelectedBusinessId] = useState(null);
@@ -34,17 +33,17 @@ export default function UserDashboard() {
 	// Verificar si el usuario necesita completar el onboarding
 	useEffect(() => {
 		if (businessLoading) return; // Esperar a que carguen los negocios
-		
+
 		const needsOnboarding = localStorage.getItem('needs_onboarding');
 		const hasBusinesses = businesses && businesses.length > 0;
-		
+
 		// 1. Si no tiene negocios, redirigir a onboarding del negocio
 		if (needsOnboarding === 'true' && !hasBusinesses) {
 			window.location.href = '/onboarding';
 			return;
 		}
-		
-			}, [businesses, businessLoading]);
+
+	}, [businesses, businessLoading]);
 
 	const handleBusinessAdded = async (newBusiness) => {
 		try {
@@ -161,7 +160,6 @@ export default function UserDashboard() {
 					{activeSection === "templates" && (
 						<TemplateSection businesses={businesses} onTemplateUpdated={fetchBusinesses} />
 					)}
-					{activeSection === "estadisticas" && <StatsSection businesses={businesses} />}
 					{activeSection === "perfil" && <ProfileSection />}
 				</Suspense>
 

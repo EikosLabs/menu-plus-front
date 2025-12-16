@@ -62,6 +62,26 @@ const BusinessSection = ({
 					<p className="neo-text text-neo-gray text-sm sm:text-base lg:text-lg max-w-2xl">
 						Gestiona tu negocio y menús digitales desde aquí
 					</p>
+
+					{/* Stats Summary */}
+					<div className="mt-4 inline-flex items-center bg-white border-2 border-neo-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-lg px-4 py-2">
+						<div className="mr-3 bg-neo-yellow p-1.5 rounded border border-black">
+							<svg className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+							</svg>
+						</div>
+						<div>
+							<p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Vistas Totales</p>
+							<p className="text-xl font-black text-neo-black leading-none">
+								{(businesses?.reduce((acc, business) => {
+									return acc + (business.menus?.reduce((menuAcc, menu) => {
+										return menuAcc + (menu.scanCount || menu.ScanCount || 0);
+									}, 0) || 0);
+								}, 0) || 0).toLocaleString()}
+							</p>
+						</div>
+					</div>
 				</div>
 
 				{businesses.length === 0 && (
@@ -85,44 +105,50 @@ const BusinessSection = ({
 			</div>
 
 			{/* Forms */}
-			{showAddBusiness && (
-				<div className="mb-6 sm:mb-8 animate-fadeInUp">
-					<AddBusinessForm
-						onBusinessAdded={onBusinessAdded}
-						onCancel={() => {
-							setShowAddBusiness(false);
-							setEditingBusiness(null);
-						}}
-						existingBusiness={editingBusiness}
-						isEditing={!!editingBusiness}
-					/>
-				</div>
-			)}
+			{
+				showAddBusiness && (
+					<div className="mb-6 sm:mb-8 animate-fadeInUp">
+						<AddBusinessForm
+							onBusinessAdded={onBusinessAdded}
+							onCancel={() => {
+								setShowAddBusiness(false);
+								setEditingBusiness(null);
+							}}
+							existingBusiness={editingBusiness}
+							isEditing={!!editingBusiness}
+						/>
+					</div>
+				)
+			}
 
 			{/* Business List */}
-			{businesses.length > 0 && !showAddBusiness && !showAddMenu && (
-				<div className="animate-fadeIn">
-					<BusinessList
-						businesses={businesses}
-						onAddMenuClick={handleAddMenuClick}
-						onEditBusinessClick={handleEditBusinessClick}
-						setBusinesses={setBusinesses}
-						onMenuScanner={onMenuScanner}
-						onRefresh={onRefresh}
-					/>
-				</div>
-			)}
+			{
+				businesses.length > 0 && !showAddBusiness && !showAddMenu && (
+					<div className="animate-fadeIn">
+						<BusinessList
+							businesses={businesses}
+							onAddMenuClick={handleAddMenuClick}
+							onEditBusinessClick={handleEditBusinessClick}
+							setBusinesses={setBusinesses}
+							onMenuScanner={onMenuScanner}
+							onRefresh={onRefresh}
+						/>
+					</div>
+				)
+			}
 
 			{/* Add Menu Form */}
-			{showAddMenu && (
-				<div className="mb-6 sm:mb-8 animate-fadeInUp">
-					<AddMenuForm
-						onMenuAdded={onMenuAdded}
-						onCancel={() => setShowAddMenu(false)}
-					/>
-				</div>
-			)}
-		</section>
+			{
+				showAddMenu && (
+					<div className="mb-6 sm:mb-8 animate-fadeInUp">
+						<AddMenuForm
+							onMenuAdded={onMenuAdded}
+							onCancel={() => setShowAddMenu(false)}
+						/>
+					</div>
+				)
+			}
+		</section >
 	);
 };
 

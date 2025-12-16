@@ -27,18 +27,6 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 					d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
 				/>
 			)
-		},
-		{
-			id: "estadisticas",
-			label: t("navigation.dashboard"),
-			icon: (
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={2}
-					d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-				/>
-			)
 		}
 	];
 
@@ -68,8 +56,8 @@ const MobileMenu = ({ userData, activeSection, setActiveSection, setShowMobileMe
 								setShowMobileMenu(false);
 							}}
 							className={`flex items-center rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 transition-all duration-200 ${activeSection === item.id
-									? "neo-card-3d-sunset bg-neo-flame text-white"
-									: "neo-card-3d text-neo-black hover:bg-neo-lavender"
+								? "neo-card-3d-sunset bg-neo-flame text-white"
+								: "neo-card-3d text-neo-black hover:bg-neo-lavender"
 								}`}
 						>
 							<svg className="mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
