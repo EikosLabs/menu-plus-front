@@ -348,6 +348,10 @@
   justify-content: center;
 }
 
+.hero-fallback-icon.hidden {
+  display: none !important;
+}
+
 .fallback-icon-wrapper {
   width: 120px;
   height: 120px;
@@ -838,12 +842,14 @@
 .item-price,
 .item-price-wrapper {
   font-weight: 800;
-  color: var(--brand-primary, var(--accent-gold));
-  background: rgba(0, 0, 0, 0.03);
-  padding: 0.25rem 0.75rem;
+  color: var(--brand-primary-text, #1a1a1a);
+  background: var(--surface-white, white);
+  padding: 0.35rem 0.85rem;
   border-radius: 100px;
   font-size: 0.95rem;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-light, rgba(0, 0, 0, 0.05));
 }
 
 .item-description {
