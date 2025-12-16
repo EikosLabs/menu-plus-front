@@ -471,7 +471,7 @@ export default function BusinessList({
 											alert('Este negocio no tiene una URL pública configurada correctamente.');
 										}
 									}}
-									className={`group px-4 py-2 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center flex-1 sm:flex-initial min-w-[90px] ${!business.slug ? 'opacity-50 cursor-not-allowed' : ''}`}
+									className={`group px-3 py-1.5 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center ${!business.slug ? 'opacity-50 cursor-not-allowed' : ''}`}
 									title={business.slug ? "Ver Landing Page pública" : "URL no disponible"}
 									disabled={!business.slug}
 								>
@@ -482,7 +482,7 @@ export default function BusinessList({
 								</button>
 								<button
 									onClick={() => onEditBusinessClick(business)}
-									className="group px-4 py-2 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center flex-1 sm:flex-initial min-w-[90px]"
+									className="group px-3 py-1.5 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center"
 								>
 									<svg className="h-4 w-4 mr-1.5 text-amber-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -491,7 +491,7 @@ export default function BusinessList({
 								</button>
 								<button
 									onClick={() => setShowQr(business.id)}
-									className="group px-4 py-2 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center flex-1 sm:flex-initial min-w-[90px]"
+									className="group px-3 py-1.5 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center"
 								>
 									<svg className="h-4 w-4 mr-1.5 text-purple-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
@@ -738,8 +738,8 @@ export default function BusinessList({
 																			<div className="mt-2 flex justify-between items-center">
 																				<span
 																					className={`text-xs px-2 py-0.5 rounded-full ${item.isAvailable
-																							? "bg-green-100 text-green-800"
-																							: "bg-red-100 text-red-800"
+																						? "bg-green-100 text-green-800"
+																						: "bg-red-100 text-red-800"
 																						}`}
 																				>
 																					{item.isAvailable
