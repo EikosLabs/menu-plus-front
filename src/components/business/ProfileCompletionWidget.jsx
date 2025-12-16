@@ -1,30 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-const DISMISS_STORAGE_KEY = 'profile_completion_dismissed';
-
-const ProfileCompletionWidget = ({ businessData, onSectionClick, onDismiss }) => {
+const ProfileCompletionWidget = ({ businessData, onSectionClick }) => {
   const [completionData, setCompletionData] = useState(null);
-  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem(DISMISS_STORAGE_KEY);
-    if (dismissed === 'true') {
-      setIsDismissed(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (businessData && !isDismissed) {
+    if (businessData) {
       calculateCompletion();
     }
-  }, [businessData, isDismissed]);
-
-  const handleDismiss = (e) => {
-    e.stopPropagation();
-    setIsDismissed(true);
-    localStorage.setItem(DISMISS_STORAGE_KEY, 'true');
-    if (onDismiss) onDismiss();
-  };
+  }, [businessData]);
 
   const calculateCompletion = () => {
     const checks = [
@@ -48,8 +31,8 @@ const ProfileCompletionWidget = ({ businessData, onSectionClick, onDismiss }) =>
     });
   };
 
-  // Don't render if dismissed or if 100% complete
-  if (isDismissed || !completionData || completionData.percentage === 100) {
+  // Don't render if 100% complete
+  if (!completionData || completionData.percentage === 100) {
     return null;
   }
 
@@ -74,17 +57,6 @@ const ProfileCompletionWidget = ({ businessData, onSectionClick, onDismiss }) =>
           Falta: <span className="font-medium text-amber-800">{missingFields.join(', ')}</span>
         </span>
       </div>
-
-      {/* Close button */}
-      <button
-        onClick={handleDismiss}
-        className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-amber-200 text-amber-500 hover:text-amber-700 transition-colors flex-shrink-0"
-        aria-label="Cerrar"
-      >
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
     </div>
   );
 };
