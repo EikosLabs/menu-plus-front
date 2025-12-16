@@ -91,6 +91,7 @@
 		"categoryLoadError": "Error loading categories",
 		"noCategoriesAvailable": "No business categories available. Please contact the administrator to add them.",
 		"loadingCategories": "Loading categories...",
+		"selectCategory": "Select a category",
 		"phone": "Phone",
 		"socialMedia": "Social Media",
 		"colors": "Color",

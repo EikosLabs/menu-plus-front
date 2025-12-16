@@ -91,6 +91,7 @@
 		"categoryLoadError": "Error al cargar categorías",
 		"noCategoriesAvailable": "No hay categorías de negocio disponibles. Por favor, contacte al administrador para agregarlas.",
 		"loadingCategories": "Cargando categorías...",
+		"selectCategory": "Selecciona una categoría",
 		"phone": "Teléfono",
 		"socialMedia": "Redes Sociales",
 		"colors": "Color",
