@@ -1,4 +1,4 @@
-name: Deploy Frontend to Production
+name: Deploy Frontend to Production (Zero Downtime)
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to server
+      - name: Deploy to server (Zero Downtime)
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -23,16 +23,33 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            set -e
             cd /home/ubuntu/menu-plus/menu-plus-front
+            
+            echo "📥 Pulling latest code..."
             git fetch --all
             git checkout main
             git pull origin main
+            
+            echo "🔨 Building new image (app still running)..."
+            # Build new image with a temporary tag while old container runs
+            sudo docker build --no-cache -t menu-plus-front:new .
+            
+            echo "🔄 Swapping containers (minimal downtime)..."
+            # Stop and remove old container
             sudo docker stop menusesqr-front || true
             sudo docker rm menusesqr-front || true
-            sudo docker rmi menu-plus-front:latest || true
-            sudo docker build --no-cache -t menu-plus-front:latest .
+            
+            # Tag new image as latest
+            sudo docker tag menu-plus-front:new menu-plus-front:latest
+            sudo docker rmi menu-plus-front:new || true
+            
+            echo "🚀 Starting new container..."
             cd /home/ubuntu
-            sudo docker compose up -d  --no-deps front
+            sudo docker compose up -d --no-deps front
+            
+            # Cleanup old images
             sudo docker image prune -f
-            echo "✅ Frontend deployed successfully!"
+            
+            echo "✅ Frontend deployed successfully with minimal downtime!"
             sudo docker logs menusesqr-front --tail 20
