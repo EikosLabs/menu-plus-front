@@ -1,6 +1,7 @@
 import { sanitizeHtml, sanitizeUrl } from './security.js';
 import { renderBusinessInfo } from './renderBusinessInfo.js';
 import { renderSection, getEmojiForSection } from './menuHelpers.js';
+import { renderCartButton, renderCartDrawer } from './cartUI.js';
 
 export function renderMenu(menu, business, itemsBySection) {
   const menuContent = document.getElementById('menu-content');
@@ -222,6 +223,10 @@ export function renderMenu(menu, business, itemsBySection) {
     </footer>
 
   `;
+
+  // Add Cart UI
+  html += renderCartButton();
+  html += renderCartDrawer(business);
 
   menuContent.innerHTML = html;
 }

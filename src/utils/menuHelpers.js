@@ -14,12 +14,12 @@ function getCurrencyType(item, business) {
   if (item.currencyType !== undefined && item.currencyType !== null && item.currencyType !== 0) {
     return item.currencyType;
   }
-  
+
   // Si el item es USD (0) o no tiene moneda, usamos la del negocio
   if (business && business.defaultCurrency !== undefined && business.defaultCurrency !== null) {
     return business.defaultCurrency;
   }
-  
+
   // Si no hay moneda de negocio, usamos la del item (que será 0/USD) o 0 por defecto
   return item.currencyType || 0;
 }
@@ -43,7 +43,7 @@ export function renderSection(section, items, index, business) {
     };
 
     return `
-      <article class="menu-item" data-item='${JSON.stringify(itemData).replace(/'/g, "&#39;").replace(/"/g, "&quot;")}' style="animation-delay:${idx * 0.05}s">
+      <article class="menu-item" data-item='${JSON.stringify(itemData).replace(/'/g, "&#39;").replace(/"/g, "&quot;")}' data-item-id="${item.id}" data-item-name="${sanitizeHtml(item.name)}" data-item-price="${item.price}" data-item-currency="${currencyCode}" style="animation-delay:${idx * 0.05}s">
         <div class="item-image-wrapper"${!imageUrl ? ' style="display:none"' : ''}>
           <img src="${sanitizeUrl(imageUrl)}" alt="${sanitizeHtml(item.name)}" class="item-image" loading="${idx < 6 ? 'eager' : 'lazy'}" decoding="async" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex';">
         </div>
@@ -59,6 +59,7 @@ export function renderSection(section, items, index, business) {
           ${item.description ? `<p class="item-description">${sanitizeHtml(item.description)}</p>` : ''}
           ${item.allergens?.length ? `<div class="item-allergens">${item.allergens.map(a => `<span class="allergen-badge">${sanitizeHtml(a)}</span>`).join('')}</div>` : ''}
         </div>
+        <button class="item-add-btn" aria-label="Agregar al carrito" data-add-id="${item.id}">+</button>
       </article>`;
   }).join('');
 

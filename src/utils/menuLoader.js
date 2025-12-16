@@ -2,23 +2,24 @@ import { sanitizeMenuData, sanitizeColor } from './security.js';
 import { renderMenu } from './menuRenderer.js';
 import { initializeInteractiveElements } from './menuInteractions.js';
 import { getPaletteByBusinessType } from './themePalettes.js';
+import { initCartUI, addToCartFromItem } from './cartUI.js';
 
 const API_URL = import.meta.env.PUBLIC_API_URL || '/api';
 
 function getContrastColor(hex, alphaFactor = 1) {
   try {
-    const clean = hex.replace('#','');
-    const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16) / 255;
-    const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16) / 255;
-    const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16) / 255;
-    
+    const clean = hex.replace('#', '');
+    const r = parseInt(clean.length === 3 ? clean[0] + clean[0] : clean.substring(0, 2), 16) / 255;
+    const g = parseInt(clean.length === 3 ? clean[1] + clean[1] : clean.substring(2, 4), 16) / 255;
+    const b = parseInt(clean.length === 3 ? clean[2] + clean[2] : clean.substring(4, 6), 16) / 255;
+
     // Calculate relative luminance
     const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    
+
     // Use a slightly lower threshold for better readability on colored backgrounds
     // This prefers white text on more backgrounds
     const color = lum > 0.6 ? '#111111' : '#FFFFFF';
-    
+
     if (color === '#FFFFFF' && alphaFactor < 1) {
       return `rgba(255,255,255,${alphaFactor})`;
     }
@@ -31,35 +32,35 @@ function getContrastColor(hex, alphaFactor = 1) {
 
 function hexToRgba(hex, alpha = 1) {
   try {
-    const clean = hex.replace('#','');
-    const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16);
-    const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16);
-    const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16);
+    const clean = hex.replace('#', '');
+    const r = parseInt(clean.length === 3 ? clean[0] + clean[0] : clean.substring(0, 2), 16);
+    const g = parseInt(clean.length === 3 ? clean[1] + clean[1] : clean.substring(2, 4), 16);
+    const b = parseInt(clean.length === 3 ? clean[2] + clean[2] : clean.substring(4, 6), 16);
     return `rgba(${r},${g},${b},${alpha})`;
   } catch { return `rgba(0,0,0,${alpha})`; }
 }
 
 // Helper to darken/lighten color
 function adjustColorBrightness(hex, percent) {
-    try {
-        const clean = hex.replace('#', '');
-        const num = parseInt(clean, 16);
-        let amt = Math.round(2.55 * percent);
-        let R = (num >> 16) + amt;
-        let G = (num >> 8 & 0x00FF) + amt;
-        let B = (num & 0x0000FF) + amt;
-        
-        return '#' + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
-    } catch { return hex; }
+  try {
+    const clean = hex.replace('#', '');
+    const num = parseInt(clean, 16);
+    let amt = Math.round(2.55 * percent);
+    let R = (num >> 16) + amt;
+    let G = (num >> 8 & 0x00FF) + amt;
+    let B = (num & 0x0000FF) + amt;
+
+    return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+  } catch { return hex; }
 }
 
 // Foreground color for background to maximize contrast
 function getForegroundOnBackground(hex) {
   try {
-    const clean = hex.replace('#','');
-    const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16) / 255;
-    const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16) / 255;
-    const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16) / 255;
+    const clean = hex.replace('#', '');
+    const r = parseInt(clean.length === 3 ? clean[0] + clean[0] : clean.substring(0, 2), 16) / 255;
+    const g = parseInt(clean.length === 3 ? clean[1] + clean[1] : clean.substring(2, 4), 16) / 255;
+    const b = parseInt(clean.length === 3 ? clean[2] + clean[2] : clean.substring(4, 6), 16) / 255;
     const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
     return lum > 0.6 ? '#111111' : '#FFFFFF';
   } catch { return '#111111'; }
@@ -67,18 +68,18 @@ function getForegroundOnBackground(hex) {
 
 // Helper to ensure text color is readable on light background
 function getReadableTextColor(hex) {
-    try {
-        const clean = hex.replace('#', '');
-        const r = parseInt(clean.length === 3 ? clean[0]+clean[0] : clean.substring(0,2), 16) / 255;
-        const g = parseInt(clean.length === 3 ? clean[1]+clean[1] : clean.substring(2,4), 16) / 255;
-        const b = parseInt(clean.length === 3 ? clean[2]+clean[2] : clean.substring(4,6), 16) / 255;
-        
-        const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        
-        // If color is too light (lum > 0.4), return a dark gray/black
-        // Otherwise return the color itself
-        return lum > 0.4 ? '#1a1a1a' : hex;
-    } catch { return '#1a1a1a'; }
+  try {
+    const clean = hex.replace('#', '');
+    const r = parseInt(clean.length === 3 ? clean[0] + clean[0] : clean.substring(0, 2), 16) / 255;
+    const g = parseInt(clean.length === 3 ? clean[1] + clean[1] : clean.substring(2, 4), 16) / 255;
+    const b = parseInt(clean.length === 3 ? clean[2] + clean[2] : clean.substring(4, 6), 16) / 255;
+
+    const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+    // If color is too light (lum > 0.4), return a dark gray/black
+    // Otherwise return the color itself
+    return lum > 0.4 ? '#1a1a1a' : hex;
+  } catch { return '#1a1a1a'; }
 }
 
 function applyTheme(business) {
@@ -260,6 +261,26 @@ export async function loadMenu(qrCodeId) {
     }, 100);
 
     initializeInteractiveElements();
+
+    // Initialize Cart UI
+    initCartUI(business);
+
+    // Add to cart button click handlers
+    document.querySelectorAll('.item-add-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent opening item modal
+        const item = btn.closest('.menu-item');
+        if (item) {
+          const itemData = {
+            id: item.dataset.itemId,
+            name: item.dataset.itemName,
+            price: parseFloat(item.dataset.itemPrice),
+            currency: item.dataset.itemCurrency
+          };
+          addToCartFromItem(itemData);
+        }
+      });
+    });
 
   } catch (error) {
     console.error('Error loading menu:', error);
