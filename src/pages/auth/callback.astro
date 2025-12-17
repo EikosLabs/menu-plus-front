@@ -1,6 +1,5 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { setCookie } from '../../utils/cookieManager.js';
 
 export const prerender = false;
 
@@ -19,20 +18,39 @@ const role = searchParams.get('role');
 
 // Handle authentication
 if (token && refreshToken) {
-  // Save authentication data using cookies
-  setCookie('auth_token', token, { maxAge: 7200 }); // 2 hours
-  setCookie('refresh_token', refreshToken, { maxAge: 604800 }); // 7 days
+  // Save authentication data using Astro.cookies (SSR-compatible)
+  Astro.cookies.set('auth_token', token, {
+    path: '/',
+    maxAge: 7200, // 2 hours
+    httpOnly: false, // Allow JS access for client-side auth checks
+    secure: true,
+    sameSite: 'lax'
+  });
+  
+  Astro.cookies.set('refresh_token', refreshToken, {
+    path: '/',
+    maxAge: 604800, // 7 days
+    httpOnly: false,
+    secure: true,
+    sameSite: 'lax'
+  });
 
   // Save user data in a separate cookie for client-side access
   const userData = JSON.stringify({
-    userId: parseInt(userId),
+    userId: parseInt(userId || '0'),
     userName: userName || '',
     fullName: fullName || '',
     email: email || '',
     role: role || ''
   });
 
-  setCookie('user_data', userData, { maxAge: 7200 });
+  Astro.cookies.set('user_data', userData, {
+    path: '/',
+    maxAge: 7200, // 2 hours
+    httpOnly: false,
+    secure: true,
+    sameSite: 'lax'
+  });
 
   // Redirect to dashboard
   return Astro.redirect('/dashboard');

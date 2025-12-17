@@ -71,18 +71,39 @@ const SimpleSuperAdminDashboard = () => {
     return num.toString();
   };
 
+  const handleSignOut = () => {
+    // Clear all auth cookies
+    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'user_data=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // Redirect to login
+    window.location.href = '/login';
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white neo-card-3d p-6 border-4 border-neo-black">
-        <h2 className="text-2xl font-bold text-neo-flame mb-4">
-          SuperAdmin Dashboard
-          {loading && <span className="text-lg font-normal text-gray-500 ml-2">⏳ Cargando...</span>}
-          {error && <span className="text-lg font-normal text-red-500 ml-2">⚠️ Error: {error}</span>}
-          {!loading && !error && systemStats && <span className="text-lg font-normal text-green-500 ml-2">✅ Datos cargados</span>}
-        </h2>
-        <p className="text-gray-700 mb-4">
-          Panel de administración del sistema con estadísticas en tiempo real.
-        </p>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-neo-flame">
+              SuperAdmin Dashboard
+              {loading && <span className="text-lg font-normal text-gray-500 ml-2">⏳ Cargando...</span>}
+              {error && <span className="text-lg font-normal text-red-500 ml-2">⚠️ Error: {error}</span>}
+              {!loading && !error && systemStats && <span className="text-lg font-normal text-green-500 ml-2">✅ Datos cargados</span>}
+            </h2>
+            <p className="text-gray-700 mt-2">
+              Panel de administración del sistema con estadísticas en tiempo real.
+            </p>
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 neo-card-3d border-4 border-neo-black font-bold transition-colors flex items-center gap-2"
+          >
+            🚪 Cerrar Sesión
+          </button>
+        </div>
 
         {systemStats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">

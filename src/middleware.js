@@ -58,7 +58,7 @@ async function tryRefreshToken(refreshToken, context) {
 
 	try {
 		console.log('[Middleware] Attempting token refresh');
-		
+
 		const response = await fetch(`${API_URL}/auth/refreshToken`, {
 			method: 'POST',
 			headers: {
@@ -142,6 +142,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		currentPath.startsWith("/register/") ||
 		currentPath.startsWith("/menu/") ||
 		currentPath.startsWith("/business/") ||
+		currentPath.startsWith("/auth/") ||  // OAuth callback routes
 		isRootLanding;
 
 	// /admin-super requiere autenticación de SuperAdmin específica
