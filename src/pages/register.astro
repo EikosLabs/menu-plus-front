@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import RegisterForm from "../components/RegisterForm.jsx";
+import GoogleLoginButton from "../components/auth/GoogleLoginButton.jsx";
 ---
 <Layout title="Crear Cuenta - Menu Plus Platform">
   <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
@@ -31,6 +32,18 @@ import RegisterForm from "../components/RegisterForm.jsx";
         <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
           Únete y empieza a mostrar tu menú al mundo.
         </p>
+
+        <!-- Google Sign Up Button -->
+        <div class="mb-4">
+          <GoogleLoginButton client:load />
+        </div>
+
+        <!-- Divider with "or" -->
+        <div class="flex items-center my-4">
+          <div class="flex-1 h-px bg-gray-400"></div>
+          <span class="px-4 text-sm text-gray-600 font-medium">o regístrate con email</span>
+          <div class="flex-1 h-px bg-gray-400"></div>
+        </div>
 
         <!-- Register Form -->
         <RegisterForm client:load />

@@ -17,19 +17,24 @@ export function FormField({
 	className = '',
 	maxLength,
 	showCharCount = false,
+	autoComplete,
 	...props
 }) {
 	const baseClassName = `neo-input ${error ? 'border-red-500' : ''} ${className}`;
 
+	// Always use event format - components should adapt
 	const handleChange = (e) => {
-		// Check if onChange expects (name, value) or (event)
-		if (onChange.length === 2) {
-			// New format: (name, value)
-			onChange(name, e.target.value);
-		} else {
-			// Old format: (event)
-			onChange(e);
-		}
+		onChange(e);
+	};
+
+	// Determine autocomplete attribute based on field type/name
+	const getAutoComplete = () => {
+		if (autoComplete) return autoComplete;
+		if (type === 'email') return 'email';
+		if (type === 'password' && name === 'password') return 'current-password';
+		if (type === 'tel') return 'tel';
+		if (name === 'fullName' || name === 'name') return 'name';
+		return undefined;
 	};
 
 	return (
@@ -52,6 +57,7 @@ export function FormField({
 				disabled={disabled}
 				required={required}
 				maxLength={maxLength}
+				autoComplete={getAutoComplete()}
 				{...props}
 			/>
 			{showCharCount && maxLength && (
@@ -85,14 +91,7 @@ export function TextAreaField({
 	const baseClassName = `neo-input neo-textarea ${error ? 'border-red-500' : ''} ${className}`;
 
 	const handleChange = (e) => {
-		// Check if onChange expects (name, value) or (event)
-		if (onChange.length === 2) {
-			// New format: (name, value)
-			onChange(name, e.target.value);
-		} else {
-			// Old format: (event)
-			onChange(e);
-		}
+		onChange(e);
 	};
 
 	return (
@@ -147,14 +146,7 @@ export function SelectField({
 	const baseClassName = `neo-input neo-select ${error ? 'border-red-500' : ''} ${className}`;
 
 	const handleChange = (e) => {
-		// Check if onChange expects (name, value) or (event)
-		if (onChange.length === 2) {
-			// New format: (name, value)
-			onChange(name, e.target.value);
-		} else {
-			// Old format: (event)
-			onChange(e);
-		}
+		onChange(e);
 	};
 
 	return (

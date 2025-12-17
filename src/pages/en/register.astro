@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { t } from "../../i18n/utils";
 import RegisterForm from "../../components/RegisterForm.jsx";
+import GoogleLoginButton from "../../components/auth/GoogleLoginButton.jsx";
 const lang = "en";
 ---
 <BaseLayout title={`${t('auth.register', lang)} - MenuPlus`} lang={lang}>
@@ -23,6 +24,19 @@ const lang = "en";
         <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
           Join and start showing your menu to the world.
         </p>
+
+        <!-- Google Sign Up Button -->
+        <div class="mb-4">
+          <GoogleLoginButton client:load />
+        </div>
+
+        <!-- Divider with "or" -->
+        <div class="flex items-center my-4">
+          <div class="flex-1 h-px bg-gray-400"></div>
+          <span class="px-4 text-sm text-gray-600 font-medium">or register with email</span>
+          <div class="flex-1 h-px bg-gray-400"></div>
+        </div>
+
         <RegisterForm client:load />
         <div class="neo-divider my-5"></div>
         <div class="text-center">
