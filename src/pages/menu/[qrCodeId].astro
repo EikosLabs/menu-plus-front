@@ -20,39 +20,39 @@ const { qrCodeId } = Astro.params;
   <main class="menu-page min-h-screen relative">
 
     {/* LOADING STATE */}
-    <div id="loading-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 backdrop-blur-md transition-all duration-500">
+    <div id="loading-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neo-lavender transition-all duration-500">
       <div class="relative flex flex-col items-center">
-        <div class="w-20 h-20 mb-6 relative">
-          <div class="absolute inset-0 rounded-full border-4 border-gray-100"></div>
-          <div class="absolute inset-0 rounded-full border-4 border-t-blue-500 animate-spin"></div>
-          <div class="absolute inset-0 flex items-center justify-center text-3xl animate-bounce">
-            🍽️
+        <div class="neo-card bg-white p-8 mb-6 relative animate-float">
+          <div class="absolute inset-0 border-neo border-neo-black -rotate-3 z-0"></div>
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-16 h-16 border-neo border-neo-flame border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div class="text-4xl animate-bounce">🍽️</div>
           </div>
         </div>
-        <h2 class="text-2xl font-bold mb-2 text-gray-800 tracking-tight">Preparando tu experiencia</h2>
-        <p class="text-gray-500 font-medium animate-pulse">Cargando menú delicioso...</p>
+        <h2 class="text-2xl font-black mb-2 text-neo-black tracking-tight uppercase">Preparando tu experiencia</h2>
+        <p class="text-neo-gray font-bold animate-pulse uppercase text-sm tracking-widest">Cargando menú delicioso...</p>
       </div>
     </div>
 
     {/* ERROR STATE */}
-    <div id="error-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/90 hidden backdrop-blur-md opacity-0 transition-opacity duration-300" style="opacity: 0;">
-      <div class="bg-white p-8 md:p-10 max-w-md w-full rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] text-center relative overflow-hidden border border-gray-100">
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-pink-500"></div>
+    <div id="error-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neo-lavender hidden backdrop-blur-md opacity-0 transition-opacity duration-300" style="opacity: 0;">
+      <div class="bg-white p-8 md:p-10 max-w-md w-full border-4 border-neo-black shadow-neo-xl text-center relative overflow-hidden transform -rotate-1">
+        <div class="absolute top-0 left-0 w-full h-4 bg-neo-flame border-b-4 border-neo-black"></div>
         
-        <div class="mb-6 mx-auto w-24 h-24 bg-red-50 rounded-full flex items-center justify-center text-5xl shadow-inner">
+        <div class="mb-6 mt-4 mx-auto w-24 h-24 bg-neo-sunset border-4 border-neo-black flex items-center justify-center text-5xl shadow-neo-sm rotate-3">
           ⚠️
         </div>
         
-        <h2 class="text-2xl font-black mb-3 text-gray-800">Menú no disponible</h2>
-        <p id="error-message" class="text-gray-500 mb-8 leading-relaxed">
+        <h2 class="text-3xl font-black mb-3 text-neo-black uppercase tracking-tighter">Menú no disponible</h2>
+        <p id="error-message" class="text-neo-gray mb-8 font-semibold leading-relaxed">
           No pudimos cargar el menú solicitado. Por favor verifica el código QR o intenta nuevamente.
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-3 justify-center">
-          <button onclick="window.location.reload()" class="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl font-bold transition-transform hover:-translate-y-1 shadow-lg hover:shadow-xl active:scale-95">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button onclick="window.location.reload()" class="neo-btn neo-btn-primary px-8">
             🔄 Reintentar
           </button>
-          <a href="/" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-xl font-bold transition-transform hover:-translate-y-1 active:scale-95">
+          <a href="/" class="neo-btn neo-btn-secondary px-8">
             🏠 Inicio
           </a>
         </div>
@@ -82,6 +82,13 @@ const { qrCodeId } = Astro.params;
           <div id="modal-dish-price"></div>
           <p id="modal-dish-description"></p>
           <div id="modal-dish-allergens"></div>
+          
+          <div class="mt-6 pt-4 border-t border-gray-100">
+             <button id="modal-add-to-cart-btn" class="w-full py-3.5 px-6 rounded-xl font-bold text-lg shadow-lg flex items-center justify-between transform transition-all active:scale-95" style="background: var(--brand-primary); color: white;">
+              <span>Agregar al pedido</span>
+              <span id="modal-add-price" class="bg-black/20 px-3 py-1 rounded-lg text-sm"></span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

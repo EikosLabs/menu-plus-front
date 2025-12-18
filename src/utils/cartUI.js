@@ -6,7 +6,7 @@ import { cart } from './cartManager.js';
 
 // Render floating cart button
 export function renderCartButton() {
-    return `
+  return `
     <button id="cart-fab" class="cart-fab" aria-label="Ver carrito" style="display: none;">
       <svg class="cart-fab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="9" cy="21" r="1"></circle>
@@ -20,9 +20,9 @@ export function renderCartButton() {
 
 // Render cart drawer
 export function renderCartDrawer(business) {
-    const hasWhatsApp = business?.whatsAppNumber;
+  const hasWhatsApp = business?.whatsAppNumber;
 
-    return `
+  return `
     <div id="cart-drawer" class="cart-drawer">
       <div class="cart-drawer-backdrop"></div>
       <div class="cart-drawer-content">
@@ -86,42 +86,42 @@ export function renderCartDrawer(business) {
 
 // Initialize cart UI interactions
 export function initCartUI(business) {
-    cart.init(business);
+  cart.init(business);
 
-    const fab = document.getElementById('cart-fab');
-    const fabCount = document.getElementById('cart-fab-count');
-    const drawer = document.getElementById('cart-drawer');
-    const drawerClose = document.getElementById('cart-drawer-close');
-    const backdrop = drawer?.querySelector('.cart-drawer-backdrop');
-    const itemsList = document.getElementById('cart-items-list');
-    const emptyState = document.getElementById('cart-empty');
-    const footer = document.getElementById('cart-footer');
-    const totalEl = document.getElementById('cart-total');
-    const whatsappBtn = document.getElementById('cart-whatsapp-btn');
-    const counterBtn = document.getElementById('cart-counter-btn');
-    const confirmation = document.getElementById('order-confirmation');
-    const confirmationClose = document.getElementById('order-confirmation-close');
-    const orderSummary = document.getElementById('order-summary');
+  const fab = document.getElementById('cart-fab');
+  const fabCount = document.getElementById('cart-fab-count');
+  const drawer = document.getElementById('cart-drawer');
+  const drawerClose = document.getElementById('cart-drawer-close');
+  const backdrop = drawer?.querySelector('.cart-drawer-backdrop');
+  const itemsList = document.getElementById('cart-items-list');
+  const emptyState = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const totalEl = document.getElementById('cart-total');
+  const whatsappBtn = document.getElementById('cart-whatsapp-btn');
+  const counterBtn = document.getElementById('cart-counter-btn');
+  const confirmation = document.getElementById('order-confirmation');
+  const confirmationClose = document.getElementById('order-confirmation-close');
+  const orderSummary = document.getElementById('order-summary');
 
-    // Update cart UI
-    function updateCartUI(state) {
-        if (!fab) return;
+  // Update cart UI
+  function updateCartUI(state) {
+    if (!fab) return;
 
-        // FAB visibility and count
-        fab.style.display = state.count > 0 ? 'flex' : 'none';
-        fabCount.textContent = state.count;
+    // FAB visibility and count
+    fab.style.display = state.count > 0 ? 'flex' : 'none';
+    fabCount.textContent = state.count;
 
-        // Cart items list
-        if (state.items.length === 0) {
-            emptyState.style.display = 'flex';
-            itemsList.style.display = 'none';
-            footer.style.display = 'none';
-        } else {
-            emptyState.style.display = 'none';
-            itemsList.style.display = 'block';
-            footer.style.display = 'block';
+    // Cart items list
+    if (state.items.length === 0) {
+      emptyState.style.display = 'flex';
+      itemsList.style.display = 'none';
+      footer.style.display = 'none';
+    } else {
+      emptyState.style.display = 'none';
+      itemsList.style.display = 'block';
+      footer.style.display = 'block';
 
-            itemsList.innerHTML = state.items.map(item => `
+      itemsList.innerHTML = state.items.map(item => `
         <div class="cart-item" data-id="${item.id}">
           <div class="cart-item-info">
             <span class="cart-item-name">${item.name}</span>
@@ -135,80 +135,125 @@ export function initCartUI(business) {
         </div>
       `).join('');
 
-            // Total
-            const currency = state.items[0]?.currency || 'USD';
-            totalEl.textContent = `${currency} ${state.total.toFixed(2)}`;
-        }
+      // Total
+      const currency = state.items[0]?.currency || 'USD';
+      totalEl.textContent = `${currency} ${state.total.toFixed(2)}`;
+    }
+  }
+
+  // Subscribe to cart changes
+  cart.subscribe(updateCartUI);
+  updateCartUI(cart.getState());
+
+  // Open drawer
+  fab?.addEventListener('click', () => {
+    drawer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+
+  // Close drawer
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  drawerClose?.addEventListener('click', closeDrawer);
+  backdrop?.addEventListener('click', closeDrawer);
+
+  // Swipe-to-dismiss gesture for mobile
+  let touchStartY = 0;
+  let touchCurrentY = 0;
+  let isDragging = false;
+  const drawerContent = drawer?.querySelector('.cart-drawer-content');
+
+  drawerContent?.addEventListener('touchstart', (e) => {
+    // Only handle touches near the top (header area)
+    const touch = e.touches[0];
+    const rect = drawerContent.getBoundingClientRect();
+    if (touch.clientY - rect.top < 60) {
+      touchStartY = touch.clientY;
+      isDragging = true;
+      drawerContent.style.transition = 'none';
+    }
+  }, { passive: true });
+
+  drawerContent?.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    touchCurrentY = e.touches[0].clientY;
+    const deltaY = touchCurrentY - touchStartY;
+
+    // Only allow downward swipe
+    if (deltaY > 0) {
+      drawerContent.style.transform = `translateY(${deltaY}px)`;
+    }
+  }, { passive: true });
+
+  drawerContent?.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    drawerContent.style.transition = '';
+
+    const deltaY = touchCurrentY - touchStartY;
+
+    // Close if swiped down more than 100px
+    if (deltaY > 100) {
+      closeDrawer();
     }
 
-    // Subscribe to cart changes
-    cart.subscribe(updateCartUI);
-    updateCartUI(cart.getState());
+    drawerContent.style.transform = '';
+    touchStartY = 0;
+    touchCurrentY = 0;
+  }, { passive: true });
 
-    // Open drawer
-    fab?.addEventListener('click', () => {
-        drawer.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    });
+  // Item quantity controls
+  itemsList?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.cart-item-btn');
+    if (!btn) return;
 
-    // Close drawer
-    function closeDrawer() {
-        drawer.classList.remove('open');
-        document.body.style.overflow = '';
+    const id = btn.dataset.id;
+    if (btn.classList.contains('cart-item-increase')) {
+      const item = cart.items.find(i => i.id === id);
+      if (item) cart.addItem(item);
+    } else if (btn.classList.contains('cart-item-decrease')) {
+      cart.decreaseItem(id);
     }
+  });
 
-    drawerClose?.addEventListener('click', closeDrawer);
-    backdrop?.addEventListener('click', closeDrawer);
+  // WhatsApp order
+  whatsappBtn?.addEventListener('click', () => {
+    if (cart.hasWhatsApp()) {
+      window.open(cart.getWhatsAppUrl(), '_blank');
+    }
+  });
 
-    // Item quantity controls
-    itemsList?.addEventListener('click', (e) => {
-        const btn = e.target.closest('.cart-item-btn');
-        if (!btn) return;
+  // Counter order
+  counterBtn?.addEventListener('click', () => {
+    const state = cart.getState();
+    const currency = state.items[0]?.currency || 'USD';
 
-        const id = btn.dataset.id;
-        if (btn.classList.contains('cart-item-increase')) {
-            const item = cart.items.find(i => i.id === id);
-            if (item) cart.addItem(item);
-        } else if (btn.classList.contains('cart-item-decrease')) {
-            cart.decreaseItem(id);
-        }
-    });
+    orderSummary.innerHTML = state.items.map(item =>
+      `<div class="order-item">${item.quantity}x ${item.name}</div>`
+    ).join('') + `<div class="order-total"><strong>Total: ${currency} ${state.total.toFixed(2)}</strong></div>`;
 
-    // WhatsApp order
-    whatsappBtn?.addEventListener('click', () => {
-        if (cart.hasWhatsApp()) {
-            window.open(cart.getWhatsAppUrl(), '_blank');
-        }
-    });
+    confirmation.classList.add('open');
+    closeDrawer();
+  });
 
-    // Counter order
-    counterBtn?.addEventListener('click', () => {
-        const state = cart.getState();
-        const currency = state.items[0]?.currency || 'USD';
-
-        orderSummary.innerHTML = state.items.map(item =>
-            `<div class="order-item">${item.quantity}x ${item.name}</div>`
-        ).join('') + `<div class="order-total"><strong>Total: ${currency} ${state.total.toFixed(2)}</strong></div>`;
-
-        confirmation.classList.add('open');
-        closeDrawer();
-    });
-
-    // Close confirmation
-    confirmationClose?.addEventListener('click', () => {
-        confirmation.classList.remove('open');
-        cart.clear();
-    });
+  // Close confirmation
+  confirmationClose?.addEventListener('click', () => {
+    confirmation.classList.remove('open');
+    cart.clear();
+  });
 }
 
 // Add to cart from menu item
 export function addToCartFromItem(itemData) {
-    cart.addItem(itemData);
+  cart.addItem(itemData);
 
-    // Visual feedback
-    const fab = document.getElementById('cart-fab');
-    if (fab) {
-        fab.classList.add('cart-fab-bounce');
-        setTimeout(() => fab.classList.remove('cart-fab-bounce'), 300);
-    }
+  // Visual feedback
+  const fab = document.getElementById('cart-fab');
+  if (fab) {
+    fab.classList.add('cart-fab-bounce');
+    setTimeout(() => fab.classList.remove('cart-fab-bounce'), 300);
+  }
 }

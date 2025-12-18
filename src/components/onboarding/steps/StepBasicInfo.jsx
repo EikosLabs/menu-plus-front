@@ -9,12 +9,12 @@ import { BUSINESS_TYPES, THEME_PALETTES, getPaletteByBusinessType } from '../../
 /**
  * Paso 1: Información Básica del Negocio
  */
-export default function StepBasicInfo({ 
-  formData, 
-  updateFormData, 
-  updateErrors, 
+export default function StepBasicInfo({
+  formData,
+  updateFormData,
+  updateErrors,
   errors = {},
-  isActive 
+  isActive
 }) {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -55,16 +55,16 @@ export default function StepBasicInfo({
   }, [formData.name, formData.description, formData.businessCategoryId, isActive, updateErrors]);
 
   const icon = (
-    <svg 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       className="w-full h-full"
     >
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={2} 
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
         d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
       />
     </svg>
@@ -108,6 +108,7 @@ export default function StepBasicInfo({
         required={true}
         placeholder="Ej: Restaurante El Buen Sabor"
         maxLength={100}
+        useNameValue={true}
       />
 
       <TextAreaField
@@ -121,6 +122,7 @@ export default function StepBasicInfo({
         maxLength={500}
         rows={4}
         showCharCount={true}
+        useNameValue={true}
       />
 
       <FormField
@@ -132,6 +134,7 @@ export default function StepBasicInfo({
         required={false}
         placeholder="Ej: La mejor comida de la ciudad (opcional)"
         maxLength={100}
+        useNameValue={true}
       />
 
       <SelectField
@@ -144,6 +147,7 @@ export default function StepBasicInfo({
         required={true}
         placeholder={loadingCategories ? 'Cargando categorías...' : 'Selecciona una categoría'}
         disabled={loadingCategories}
+        useNameValue={true}
       />
 
       <SelectField
@@ -154,6 +158,7 @@ export default function StepBasicInfo({
         options={businessTypeOptions}
         required={false}
         placeholder="Selecciona el estilo que mejor te represente"
+        useNameValue={true}
       />
 
       <SelectField
@@ -168,6 +173,7 @@ export default function StepBasicInfo({
         error={errors.defaultCurrency}
         required={false}
         placeholder="Selecciona la moneda de tu negocio"
+        useNameValue={true}
       />
     </OnboardingStep>
   );

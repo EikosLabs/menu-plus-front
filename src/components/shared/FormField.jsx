@@ -2,6 +2,9 @@ import React from 'react';
 
 /**
  * Componente reutilizable para campos de formulario
+ * 
+ * @param {boolean} useNameValue - If true, onChange is called as (name, value). 
+ *                                 If false (default), onChange is called with event.
  */
 export function FormField({
 	label,
@@ -18,13 +21,17 @@ export function FormField({
 	maxLength,
 	showCharCount = false,
 	autoComplete,
+	useNameValue = false,
 	...props
 }) {
 	const baseClassName = `neo-input ${error ? 'border-red-500' : ''} ${className}`;
 
-	// Always use event format - components should adapt
 	const handleChange = (e) => {
-		onChange(e);
+		if (useNameValue) {
+			onChange(name, e.target.value);
+		} else {
+			onChange(e);
+		}
 	};
 
 	// Determine autocomplete attribute based on field type/name
@@ -86,12 +93,17 @@ export function TextAreaField({
 	className = '',
 	maxLength,
 	showCharCount = true,
+	useNameValue = false,
 	...props
 }) {
 	const baseClassName = `neo-input neo-textarea ${error ? 'border-red-500' : ''} ${className}`;
 
 	const handleChange = (e) => {
-		onChange(e);
+		if (useNameValue) {
+			onChange(name, e.target.value);
+		} else {
+			onChange(e);
+		}
 	};
 
 	return (
@@ -141,12 +153,17 @@ export function SelectField({
 	placeholder = 'Seleccionar...',
 	className = '',
 	children,
+	useNameValue = false,
 	...props
 }) {
 	const baseClassName = `neo-input neo-select ${error ? 'border-red-500' : ''} ${className}`;
 
 	const handleChange = (e) => {
-		onChange(e);
+		if (useNameValue) {
+			onChange(name, e.target.value);
+		} else {
+			onChange(e);
+		}
 	};
 
 	return (
