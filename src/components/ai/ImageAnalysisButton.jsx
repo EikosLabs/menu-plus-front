@@ -186,6 +186,7 @@ const ErrorDisplay = ({ error, onRetry, file }) => {
 const ImageAnalysisButton = ({
 	onAnalysisComplete,
 	entityType = "MenuItem",
+	businessContext = null,
 	disabled = false,
 	// NUEVAS PROPS
 	imageFile = null,        // File object from useImageUpload
@@ -275,11 +276,11 @@ const ImageAnalysisButton = ({
 				error instanceof AppError
 					? error.toJSON()
 					: {
-							name: error.name,
-							message: error.message,
-							stack: error.stack,
-							string: error.toString(),
-						},
+						name: error.name,
+						message: error.message,
+						stack: error.stack,
+						string: error.toString(),
+					},
 			context,
 		};
 
@@ -287,13 +288,13 @@ const ImageAnalysisButton = ({
 			error instanceof AppError
 				? error
 				: new AppError(
-						ERROR_TYPES.UNKNOWN_ERROR,
-						error.message || "Error desconocido",
-						{
-							originalError: error,
-							...context,
-						},
-					),
+					ERROR_TYPES.UNKNOWN_ERROR,
+					error.message || "Error desconocido",
+					{
+						originalError: error,
+						...context,
+					},
+				),
 		);
 
 		console.error("[ImageAnalysisButton] Error detallado:", {
@@ -454,7 +455,7 @@ const ImageAnalysisButton = ({
 		}
 	};
 
-	
+
 	const analyzeImage = async (fileToAnalyze = null) => {
 		const file = fileToAnalyze || currentFile;
 
@@ -493,6 +494,7 @@ const ImageAnalysisButton = ({
 			const response = await aiService.analyzeImage(
 				base64,
 				entityType,
+				businessContext
 			);
 			setAnalysisProgress(80);
 
@@ -544,11 +546,11 @@ const ImageAnalysisButton = ({
 					normalizedError = await AppError.fromResponse(err.response);
 				} else {
 					// Error genérico
-						normalizedError = AppError.fromError(err, {
-							fileName: file.name,
-							entityType,
-							dimensions: imageDimensions,
-						});
+					normalizedError = AppError.fromError(err, {
+						fileName: file.name,
+						entityType,
+						dimensions: imageDimensions,
+					});
 				}
 			}
 

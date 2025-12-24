@@ -14,11 +14,13 @@ import { FormField, SelectField, CheckboxField } from "./shared/FormField";
 import TextImprovementButton from "./ai/TextImprovementButton";
 import ImageAnalysisButton from "./ai/ImageAnalysisButton";
 import { normalizeId } from '../utils/idNormalization';
+import { getBusinessAIContext } from '../utils/aiContextMapper';
 
 export default function AddMenuItem({
 	menuId,
 	sectionId,
 	businessCurrency = 0,
+	businessCategoryId = null,
 	onItemAdded,
 	onCancel,
 	onRefresh,
@@ -324,6 +326,7 @@ export default function AddMenuItem({
 							// NUEVAS PROPS - conectar con useImageUpload
 							imageFile={image}           // File object del hook (línea 55)
 							imagePreview={preview}      // Preview URL del hook (línea 56)
+							businessContext={getBusinessAIContext(businessCategoryId)}
 							allowManualUpload={false}   // Solo usar imagen compartida
 						/>
 
@@ -376,7 +379,7 @@ export default function AddMenuItem({
 							disabled={loading || loadingCategories}
 							placeholder="Sin categoría"
 						/>
-						
+
 						{/* Debug info */}
 						{process.env.NODE_ENV !== 'production' && (
 							<div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">

@@ -161,7 +161,7 @@ class AIService {
 	}
 
 	// Image Analysis Methods - Analiza imágenes y extrae información
-	async analyzeImage(imageBase64, entityType = "MenuItem") {
+	async analyzeImage(imageBase64, entityType = "MenuItem", businessContext = null) {
 		const operation = "analyzeImage";
 
 		// Verificar cache primero
@@ -211,6 +211,7 @@ class AIService {
 							body: JSON.stringify({
 								image: imageBase64,
 								entityType: entityType,
+								businessContext: businessContext
 							}),
 						},
 						this.timeouts.imageAnalysis,

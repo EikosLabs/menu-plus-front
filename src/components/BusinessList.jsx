@@ -23,6 +23,7 @@ export default function BusinessList({
 	const [selectedSection, setSelectedSection] = useState(null);
 	const [selectedMenuId, setSelectedMenuId] = useState(null);
 	const [selectedBusinessCurrency, setSelectedBusinessCurrency] = useState(0); // Default USD
+	const [selectedBusinessCategoryId, setSelectedBusinessCategoryId] = useState(null);
 	const [showMenuCard, setShowMenuCard] = useState(null); // { businessId, menuId }
 	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null); // { businessId, menuId }
 	const [showSavedFlyers, setShowSavedFlyers] = useState(null); // { menuId }
@@ -59,6 +60,9 @@ export default function BusinessList({
 		setSelectedSection(sectionId);
 		setSelectedMenuId(menuId);
 		setSelectedBusinessCurrency(businessCurrency);
+		// Encontrar la categoría del negocio
+		const business = businesses.find(b => b.menus?.some(m => compareIds(m.id, menuId)));
+		setSelectedBusinessCategoryId(business?.businessCategoryId || business?.BusinessCategoryId || null);
 	};
 
 	const handleCancelAddMenuItem = (menuId) => {
@@ -76,6 +80,9 @@ export default function BusinessList({
 		setSelectedMenuId(menuId);
 		setSelectedBusinessCurrency(businessCurrency);
 		setSelectedSection(sectionId || menuItem.sectionId || null);
+		// Encontrar la categoría del negocio
+		const business = businesses.find(b => b.menus?.some(m => compareIds(m.id, menuId)));
+		setSelectedBusinessCategoryId(business?.businessCategoryId || business?.BusinessCategoryId || null);
 	};
 
 	const handleCancelEditMenuItem = () => {
@@ -866,6 +873,7 @@ export default function BusinessList({
 					menuId={selectedMenuId}
 					sectionId={selectedSection}
 					businessCurrency={selectedBusinessCurrency}
+					businessCategoryId={selectedBusinessCategoryId}
 					onItemAdded={(newItem) => {
 						if (menuItemToEdit) {
 							handleItemUpdated(newItem);

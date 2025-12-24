@@ -352,6 +352,8 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
             onPrev={prevStep}
             onSkip={skipStep}
           />
+        </div>
+
         {/* Global Scanner Component (Always mounted if scanning or open) */}
         {(isScannerOpen || formData.isScanning) && (
           <div className={`${isScannerOpen ? 'fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4' : 'hidden'}`}>
