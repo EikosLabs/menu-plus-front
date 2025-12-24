@@ -63,7 +63,7 @@ export const validateImageFile = (file) => {
   if (!file) return { isValid: true, error: null }; // Imagen es opcional
 
   const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  const maxSize = 1024 * 1024; // 1MB
+  const maxSize = 5 * 1024 * 1024; // 5MB
 
   if (!validTypes.includes(file.type)) {
     return {

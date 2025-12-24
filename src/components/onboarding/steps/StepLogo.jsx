@@ -7,13 +7,13 @@ import menuService from '../../../services/menuService';
 /**
  * Paso 2: Logo del Negocio
  */
-export default function StepLogo({ 
-  formData, 
+export default function StepLogo({
+  formData,
   updateFormData,
   updateMultipleFields,
-  updateErrors, 
+  updateErrors,
   errors = {},
-  isActive 
+  isActive
 }) {
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -43,9 +43,9 @@ export default function StepLogo({
   const handleFileChange = async (event) => {
     setUploadError(null);
     const file = event.target.files[0];
-    
+
     if (!file) return;
-    
+
     // Validar el archivo
     const validation = validateStepLogo({ logoFile: file });
     if (Object.keys(validation).length > 0) {
@@ -55,18 +55,18 @@ export default function StepLogo({
 
     // Guardar el archivo en el estado
     updateFormData('logoFile', file);
-    
+
     // Subir el archivo inmediatamente
     try {
       setUploading(true);
       const imageKey = await menuService.uploadImage(file);
-      
+
       // Guardar el imageKey
       updateMultipleFields({
         logoFile: file,
         imageKey: imageKey
       });
-      
+
       setUploadError(null);
     } catch (error) {
       console.error('Error al subir imagen:', error);
@@ -88,16 +88,16 @@ export default function StepLogo({
   };
 
   const icon = (
-    <svg 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       className="w-full h-full"
     >
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={2} 
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
       />
     </svg>
@@ -117,23 +117,23 @@ export default function StepLogo({
         required={false}
         preview={preview}
         onClearImage={handleRemove}
-        acceptedFormats="JPEG, PNG, GIF, WebP hasta 1MB"
+        acceptedFormats="JPEG, PNG, GIF, WebP hasta 5MB"
       />
 
       {uploading && (
         <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mt-4">
           <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-            <circle 
-              className="opacity-25" 
-              cx="12" 
-              cy="12" 
-              r="10" 
-              stroke="currentColor" 
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
               strokeWidth="4"
             />
-            <path 
-              className="opacity-75" 
-              fill="currentColor" 
+            <path
+              className="opacity-75"
+              fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
@@ -152,7 +152,7 @@ export default function StepLogo({
 
       <div className="mt-4 text-xs text-gray-500">
         <p>• Formatos aceptados: JPEG, PNG, GIF, WebP</p>
-        <p>• Tamaño máximo: 1MB</p>
+        <p>• Tamaño máximo: 5MB</p>
         <p>• Dimensiones recomendadas: 500x500px</p>
       </div>
     </OnboardingStep>
