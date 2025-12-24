@@ -22,7 +22,7 @@ export default function StepColors({
     if (isActive) {
       const primaryValidation = validateHexColor(formData.primaryColor);
       const validationErrors = {};
-      if (!primaryValidation.valid) {
+      if (!primaryValidation.isValid) {
         validationErrors.primaryColor = primaryValidation.error;
       }
       updateErrors(validationErrors);
