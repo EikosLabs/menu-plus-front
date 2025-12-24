@@ -9,15 +9,9 @@ import MultiImageMenuScanner from '../../MultiImageMenuScanner';
 export default function StepScanMenu({
     formData,
     updateFormData,
+    onOpenScanner,
     isActive
 }) {
-    const [showScanner, setShowScanner] = useState(false);
-
-    const handleAnalysisComplete = (data) => {
-        updateFormData('scannedSections', data.sections);
-        setShowScanner(false);
-    };
-
     const icon = (
         <svg
             fill="none"
@@ -39,20 +33,35 @@ export default function StepScanMenu({
     return (
         <OnboardingStep
             title="Digitaliza tu Menú"
-            description="Sube fotos de tu menú físico y nuestra IA extraerá los platos automáticamente (opcional)"
+            description="Sube fotos de tu menú físico y nuestra IA extraerá los platos automáticamente mientras continúas"
             icon={icon}
             isActive={isActive}
         >
             <div className="flex flex-col items-center gap-6 py-4">
-                {!formData.scannedSections ? (
+                {formData.isScanning ? (
+                    <div className="text-center space-y-4 w-full">
+                        <div className="bg-orange-50 border-2 border-orange-500 p-6 rounded-2xl shadow-neo-sm">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-flame mx-auto mb-4"></div>
+                            <h3 className="text-neo-black font-black uppercase mb-2">Análisis en curso</h3>
+                            <p className="text-sm text-gray-600 mb-4">Estamos digitalizando tu menú. Puedes seguir con los siguientes pasos mientras terminamos.</p>
+                            <div className="w-full bg-gray-200 rounded-full h-4 border-2 border-black overflow-hidden">
+                                <div
+                                    className="bg-neo-flame h-full transition-all duration-500"
+                                    style={{ width: `${formData.scanProgress}%` }}
+                                ></div>
+                            </div>
+                            <p className="mt-2 text-xs font-black text-neo-flame">{Math.round(formData.scanProgress)}%</p>
+                        </div>
+                    </div>
+                ) : !formData.scannedSections ? (
                     <div className="text-center space-y-4">
                         <div className="bg-neo-lavender-dark p-6 rounded-2xl border-2 border-black shadow-neo-sm">
                             <p className="text-neo-black font-bold mb-4 italic">
-                                "¿Tienes tu menú en papel o en un PDF? Ahórrate el trabajo manual."
+                                "¿Tienes tu menú en papel o en un PDF? Digitalízalo ahora y nosotros hacemos el trabajo."
                             </p>
                             <button
                                 type="button"
-                                onClick={() => setShowScanner(true)}
+                                onClick={onOpenScanner}
                                 className="neo-btn neo-btn-primary px-8 py-3 flex items-center justify-center gap-2 mx-auto"
                             >
                                 <span>Escanear ahora con IA</span>
@@ -79,7 +88,7 @@ export default function StepScanMenu({
                             </div>
                             <button
                                 type="button"
-                                onClick={() => setShowScanner(true)}
+                                onClick={onOpenScanner}
                                 className="text-xs font-black uppercase text-neo-flame hover:underline"
                             >
                                 Volver a escanear
@@ -94,15 +103,6 @@ export default function StepScanMenu({
                                 </div>
                             ))}
                         </div>
-                    </div>
-                )}
-
-                {showScanner && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                        <MultiImageMenuScanner
-                            onAnalysisComplete={handleAnalysisComplete}
-                            onCancel={() => setShowScanner(false)}
-                        />
                     </div>
                 )}
             </div>

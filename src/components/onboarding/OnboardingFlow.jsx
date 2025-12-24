@@ -12,6 +12,7 @@ import StepContact from './steps/StepContact';
 import StepSocial from './steps/StepSocial';
 import StepColors from './steps/StepColors';
 import StepScanMenu from './steps/StepScanMenu';
+import MultiImageMenuScanner from '../MultiImageMenuScanner';
 
 /**
  * Componente principal del flujo de onboarding
@@ -19,7 +20,7 @@ import StepScanMenu from './steps/StepScanMenu';
  */
 export default function OnboardingFlow({ userId: propUserId = null, onComplete }) {
   const totalSteps = 6;
-  const stepLabels = ['Básico', 'Logo', 'Contacto', 'Social', 'Colores', 'Escaneo'];
+  const stepLabels = ['Escaneo', 'Básico', 'Logo', 'Contacto', 'Social', 'Colores'];
   const [userId, setUserId] = useState(propUserId);
   const [loading, setLoading] = useState(!propUserId);
 
@@ -62,6 +63,24 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
 
   const [isComplete, setIsComplete] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  const handleAnalysisStart = () => {
+    updateMultipleFields({ isScanning: true, scanProgress: 0 });
+    setIsScannerOpen(false); // Close modal but keep process (will handle this in scanner)
+  };
+
+  const handleAnalysisProgress = (progress) => {
+    updateFormData('scanProgress', progress);
+  };
+
+  const handleAnalysisComplete = (data) => {
+    updateMultipleFields({
+      scannedSections: data.sections,
+      isScanning: false,
+      scanProgress: 100
+    });
+  };
 
   // Validar el paso actual cuando cambia
   useEffect(() => {
@@ -71,14 +90,20 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
 
   // Determinar si el paso actual puede ser omitido
   const canSkipCurrentStep = () => {
-    // Los pasos 2, 3, 4 y 6 son completamente opcionales
-    return currentStep === 2 || currentStep === 3 || currentStep === 4 || currentStep === 6;
+    // Paso 1 (Escaneo), 3 (Logo), 4 (Contacto), 5 (Social) son opcionales
+    // Paso 2 (Básico) y 6 (Colores) son requeridos usualmente, pero Colores es el final
+    return currentStep === 1 || currentStep === 3 || currentStep === 4 || currentStep === 5;
   };
 
   // Manejar el avance al siguiente paso
   const handleNext = async () => {
     if (currentStep === totalSteps) {
-      // Último paso: enviar datos
+      // Último paso: verificar si el escaneo ha terminado si se inició
+      if (formData.isScanning) {
+        // Podríamos mostrar un mensaje o simplemente esperar aquí
+        return;
+      }
+      // enviar datos
       await handleSubmit();
     } else {
       // Avanzar al siguiente paso
@@ -243,12 +268,20 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
 
       {/* Step Content */}
       <div className="container mx-auto px-3 py-4 sm:py-6">
+        <StepScanMenu
+          formData={formData}
+          updateFormData={updateFormData}
+          updateMultipleFields={updateMultipleFields}
+          onOpenScanner={() => setIsScannerOpen(true)}
+          isActive={currentStep === 1}
+        />
+
         <StepBasicInfo
           formData={formData}
           updateFormData={updateFormData}
           updateErrors={updateErrors}
           errors={errors}
-          isActive={currentStep === 1}
+          isActive={currentStep === 2}
         />
 
         <StepLogo
@@ -257,7 +290,7 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
           updateMultipleFields={updateMultipleFields}
           updateErrors={updateErrors}
           errors={errors}
-          isActive={currentStep === 2}
+          isActive={currentStep === 3}
         />
 
         <StepContact
@@ -265,7 +298,7 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
           updateFormData={updateFormData}
           updateErrors={updateErrors}
           errors={errors}
-          isActive={currentStep === 3}
+          isActive={currentStep === 4}
         />
 
         <StepSocial
@@ -273,7 +306,7 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
           updateFormData={updateFormData}
           updateErrors={updateErrors}
           errors={errors}
-          isActive={currentStep === 4}
+          isActive={currentStep === 5}
         />
 
         <StepColors
@@ -282,14 +315,30 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
           updateMultipleFields={updateMultipleFields}
           updateErrors={updateErrors}
           errors={errors}
-          isActive={currentStep === 5}
-        />
-
-        <StepScanMenu
-          formData={formData}
-          updateFormData={updateFormData}
           isActive={currentStep === 6}
         />
+
+        {/* Global Scanning Indicator */}
+        {formData.isScanning && (
+          <div className="max-w-2xl mx-auto px-3 mb-4">
+            <div className="bg-neo-lavender-dark border-2 border-black p-3 rounded-xl flex items-center justify-between shadow-neo-sm animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-neo-flame"></div>
+                <span className="text-sm font-bold text-neo-black">Digitalizando menú en segundo plano...</span>
+              </div>
+              <span className="text-xs font-black text-neo-flame">{Math.round(formData.scanProgress || 0)}%</span>
+            </div>
+          </div>
+        )}
+
+        {/* Final step waiting message */}
+        {currentStep === totalSteps && formData.isScanning && (
+          <div className="max-w-2xl mx-auto px-3 mb-6 text-center">
+            <p className="text-neo-flame font-bold animate-bounce">
+              Estamos terminando de procesar tu menú... Por favor espera un momento para finalizar.
+            </p>
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="max-w-2xl mx-auto px-3">
@@ -303,7 +352,18 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
             onPrev={prevStep}
             onSkip={skipStep}
           />
-        </div>
+        {/* Global Scanner Component (Always mounted if scanning or open) */}
+        {(isScannerOpen || formData.isScanning) && (
+          <div className={`${isScannerOpen ? 'fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4' : 'hidden'}`}>
+            <MultiImageMenuScanner
+              onAnalysisComplete={handleAnalysisComplete}
+              onProgress={handleAnalysisProgress}
+              onStart={handleAnalysisStart}
+              onCancel={() => setIsScannerOpen(false)}
+              isBackground={!isScannerOpen && formData.isScanning}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

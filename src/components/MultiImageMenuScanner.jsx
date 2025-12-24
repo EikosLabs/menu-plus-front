@@ -9,9 +9,12 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLi
 
 export default function MultiImageMenuScanner({
     onAnalysisComplete,
+    onProgress,
+    onStart,
     onCancel,
     menuId,
-    foodBusinessId
+    foodBusinessId,
+    isBackground = false
 }) {
     const [files, setFiles] = useState([]); // { id, type: 'image'|'pdf', url, name, size, file, pageNumber? }
     const [loading, setLoading] = useState(false);
@@ -178,6 +181,8 @@ export default function MultiImageMenuScanner({
         setOverallProgress(0);
         setCurrentImageIndex(0);
 
+        if (onStart) onStart();
+
         // Helper function to cycle through messages
         const cycleMessages = (phase) => {
             const messages = analysisMessages[phase];
@@ -202,7 +207,9 @@ export default function MultiImageMenuScanner({
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 setCurrentImageIndex(i + 1);
-                setOverallProgress(10 + (i * progressPerImage));
+                const progress = 10 + (i * progressPerImage);
+                setOverallProgress(progress);
+                if (onProgress) onProgress(progress);
 
                 // Set analyzing phase with message cycling
                 setAnalysisPhase('analyzing');
@@ -258,6 +265,7 @@ export default function MultiImageMenuScanner({
             setAnalysisPhase('finalizing');
             setCurrentAnalysisMessage('Finalizando análisis...');
             setOverallProgress(95);
+            if (onProgress) onProgress(95);
 
             if (allSections.length === 0) {
                 throw new Error('No se pudieron extraer datos del menú de las imágenes');
@@ -509,8 +517,8 @@ export default function MultiImageMenuScanner({
                                                 />
                                                 {/* File type badge */}
                                                 <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm ${file.type === 'pdf-page'
-                                                        ? 'bg-red-500 text-white'
-                                                        : 'bg-blue-500 text-white'
+                                                    ? 'bg-red-500 text-white'
+                                                    : 'bg-blue-500 text-white'
                                                     }`}>
                                                     {getFileIcon(file.type)}
                                                     {file.type === 'pdf-page' ? `P${file.pageNumber}` : 'IMG'}

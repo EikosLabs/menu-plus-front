@@ -20,10 +20,10 @@ export const useOnboarding = (userId = null, totalSteps = 6) => {
     instagramUrl: '',
     twitterUrl: '',
     whatsAppNumber: '',
-    primaryColor: '#1a1a1a',
-    secondaryColor: '#004E71',
     accentColor: '#0A3342',
-    scannedSections: null
+    scannedSections: null,
+    isScanning: false,
+    scanProgress: 0
   });
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
@@ -203,7 +203,9 @@ export const useOnboarding = (userId = null, totalSteps = 6) => {
       primaryColor: '#1a1a1a',
       secondaryColor: '#004E71',
       accentColor: '#0A3342',
-      scannedSections: null
+      scannedSections: null,
+      isScanning: false,
+      scanProgress: 0
     });
     setErrors({});
     setIsValid(false);

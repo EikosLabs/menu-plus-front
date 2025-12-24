@@ -287,17 +287,17 @@ export const validateStepScanMenu = (formData) => {
 export const validateStep = (stepNumber, formData) => {
   switch (stepNumber) {
     case 1:
-      return validateStepBasicInfo(formData);
-    case 2:
-      return validateStepLogo(formData);
-    case 3:
-      return validateStepContact(formData);
-    case 4:
-      return validateStepSocial(formData);
-    case 5:
-      return validateStepColors(formData);
-    case 6:
       return validateStepScanMenu(formData);
+    case 2:
+      return validateStepBasicInfo(formData);
+    case 3:
+      return validateStepLogo(formData);
+    case 4:
+      return validateStepContact(formData);
+    case 5:
+      return validateStepSocial(formData);
+    case 6:
+      return validateStepColors(formData);
     default:
       return {};
   }
