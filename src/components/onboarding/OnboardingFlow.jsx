@@ -11,14 +11,15 @@ import StepLogo from './steps/StepLogo';
 import StepContact from './steps/StepContact';
 import StepSocial from './steps/StepSocial';
 import StepColors from './steps/StepColors';
+import StepScanMenu from './steps/StepScanMenu';
 
 /**
  * Componente principal del flujo de onboarding
  * Orquesta todos los pasos y maneja la lógica de navegación
  */
 export default function OnboardingFlow({ userId: propUserId = null, onComplete }) {
-  const totalSteps = 5;
-  const stepLabels = ['Básico', 'Logo', 'Contacto', 'Social', 'Colores'];
+  const totalSteps = 6;
+  const stepLabels = ['Básico', 'Logo', 'Contacto', 'Social', 'Colores', 'Escaneo'];
   const [userId, setUserId] = useState(propUserId);
   const [loading, setLoading] = useState(!propUserId);
 
@@ -40,7 +41,7 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
       }
     }
   }, [propUserId]);
-  
+
   const {
     currentStep,
     formData,
@@ -70,8 +71,8 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
 
   // Determinar si el paso actual puede ser omitido
   const canSkipCurrentStep = () => {
-    // Los pasos 2, 3 y 4 son completamente opcionales
-    return currentStep === 2 || currentStep === 3 || currentStep === 4;
+    // Los pasos 2, 3, 4 y 6 son completamente opcionales
+    return currentStep === 2 || currentStep === 3 || currentStep === 4 || currentStep === 6;
   };
 
   // Manejar el avance al siguiente paso
@@ -117,6 +118,41 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
 
       // Crear el negocio
       const result = await menuService.createFoodBusiness(businessData);
+
+      // Si hay secciones escaneadas, crearlas
+      if (formData.scannedSections && formData.scannedSections.length > 0) {
+        try {
+          // 1. Crear el menú principal
+          const menu = await menuService.createMenu({
+            name: 'Menú Principal',
+            description: 'Menú extraído mediante escaneo'
+          });
+
+          // 2. Crear cada sección e item
+          for (const section of formData.scannedSections) {
+            const newSection = await menuService.createSection(menu.id, {
+              name: section.name,
+              description: section.description || ''
+            });
+
+            if (section.items && section.items.length > 0) {
+              for (const item of section.items) {
+                await menuService.createMenuItem({
+                  menuId: menu.id,
+                  sectionId: newSection.id,
+                  name: item.name,
+                  description: item.description || '',
+                  price: item.price !== undefined ? item.price : 0,
+                  isAvailable: true
+                });
+              }
+            }
+          }
+        } catch (menuError) {
+          console.error('Error al crear el menú desde el escaneo:', menuError);
+          // No es crítico para el onboarding, el negocio ya se creó
+        }
+      }
 
       // Refrescar el token para obtener uno nuevo con el FoodBusinessId actualizado
       try {
@@ -165,7 +201,7 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
   // Si el onboarding está completo, mostrar pantalla de éxito
   if (isComplete) {
     return (
-      <OnboardingComplete 
+      <OnboardingComplete
         businessName={formData.name}
         onContinue={handleContinue}
       />
@@ -248,6 +284,12 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
           updateErrors={updateErrors}
           errors={errors}
           isActive={currentStep === 5}
+        />
+
+        <StepScanMenu
+          formData={formData}
+          updateFormData={updateFormData}
+          isActive={currentStep === 6}
         />
 
         {/* Navigation */}

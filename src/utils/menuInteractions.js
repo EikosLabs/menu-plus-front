@@ -57,6 +57,13 @@ function setupCategoryNavigation() {
 
         document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
         this.classList.add('active');
+
+        // Center the clicked chip
+        this.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
       }
     });
   });
@@ -238,13 +245,12 @@ function setupActiveCategory() {
   function centerActiveChip() {
     const activeChip = document.querySelector('.category-chip.active');
     if (!track || !activeChip) return;
-    const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (!isMobile) return;
 
-    const paddingLeft = parseFloat(getComputedStyle(track).paddingLeft) || 0;
-    const targetLeft = activeChip.offsetLeft - paddingLeft + (activeChip.offsetWidth / 2) - (track.clientWidth / 2);
-    const clamped = Math.max(0, targetLeft);
-    track.scrollTo({ left: clamped, behavior: 'smooth' });
+    activeChip.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    });
   }
 
   window.addEventListener('scroll', () => {

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
  * Custom hook para gestionar el flujo de onboarding
  * Maneja navegación, validación, persistencia y estado del formulario
  */
-export const useOnboarding = (userId = null, totalSteps = 5) => {
+export const useOnboarding = (userId = null, totalSteps = 6) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -22,7 +22,8 @@ export const useOnboarding = (userId = null, totalSteps = 5) => {
     whatsAppNumber: '',
     primaryColor: '#1a1a1a',
     secondaryColor: '#004E71',
-    accentColor: '#0A3342'
+    accentColor: '#0A3342',
+    scannedSections: null
   });
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
@@ -54,12 +55,12 @@ export const useOnboarding = (userId = null, totalSteps = 5) => {
     try {
       const key = `onboarding_progress_${userId}`;
       const saved = localStorage.getItem(key);
-      
+
       if (saved) {
         const progressData = JSON.parse(saved);
         const timestamp = progressData.timestamp || 0;
         const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-        
+
         // Verificar si los datos no han expirado (7 días)
         if (timestamp > sevenDaysAgo) {
           setCurrentStep(progressData.currentStep || 1);
@@ -91,7 +92,7 @@ export const useOnboarding = (userId = null, totalSteps = 5) => {
         },
         timestamp: Date.now()
       };
-      
+
       localStorage.setItem(key, JSON.stringify(progressData));
     } catch (error) {
       console.error('Error al guardar progreso:', error);
@@ -147,7 +148,7 @@ export const useOnboarding = (userId = null, totalSteps = 5) => {
       if (!completedSteps.includes(currentStep)) {
         setCompletedSteps(prev => [...prev, currentStep]);
       }
-      
+
       setCurrentStep(prev => prev + 1);
       saveProgress();
       setErrors({});
@@ -173,7 +174,7 @@ export const useOnboarding = (userId = null, totalSteps = 5) => {
       if (!completedSteps.includes(currentStep)) {
         setCompletedSteps(prev => [...prev, currentStep]);
       }
-      
+
       setCurrentStep(prev => prev + 1);
       saveProgress();
       setErrors({});
@@ -201,7 +202,8 @@ export const useOnboarding = (userId = null, totalSteps = 5) => {
       whatsAppNumber: '',
       primaryColor: '#1a1a1a',
       secondaryColor: '#004E71',
-      accentColor: '#0A3342'
+      accentColor: '#0A3342',
+      scannedSections: null
     });
     setErrors({});
     setIsValid(false);
@@ -218,11 +220,11 @@ export const useOnboarding = (userId = null, totalSteps = 5) => {
     isValid,
     isSaving,
     completedSteps,
-    
+
     // Setters
     setIsValid,
     setIsSaving,
-    
+
     // Métodos
     updateFormData,
     updateMultipleFields,
