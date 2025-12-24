@@ -116,19 +116,27 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
         fontFamily: 'poppins'
       };
 
-      // Crear el negocio
+      // 1. Crear el negocio
       const result = await menuService.createFoodBusiness(businessData);
 
-      // Si hay secciones escaneadas, crearlas
+      // 2. Refrescar el token para obtener uno nuevo con el FoodBusinessId actualizado
+      // Esto es CRÍTICO para que las siguientes llamadas al API funcionen correctamente
+      try {
+        await authService.refreshToken();
+      } catch (refreshError) {
+        console.error('Error al refrescar token:', refreshError);
+      }
+
+      // 3. Si hay secciones escaneadas, crearlas
       if (formData.scannedSections && formData.scannedSections.length > 0) {
         try {
-          // 1. Crear el menú principal
+          // 4. Crear el menú principal
           const menu = await menuService.createMenu({
             name: 'Menú Principal',
             description: 'Menú extraído mediante escaneo'
           });
 
-          // 2. Crear cada sección e item
+          // 5. Crear cada sección e item
           for (const section of formData.scannedSections) {
             const newSection = await menuService.createSection(menu.id, {
               name: section.name,
@@ -150,16 +158,7 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
           }
         } catch (menuError) {
           console.error('Error al crear el menú desde el escaneo:', menuError);
-          // No es crítico para el onboarding, el negocio ya se creó
         }
-      }
-
-      // Refrescar el token para obtener uno nuevo con el FoodBusinessId actualizado
-      try {
-        await authService.refreshToken();
-      } catch (refreshError) {
-        console.error('Error al refrescar token:', refreshError);
-        // No es crítico, continuar de todas formas
       }
 
       // Limpiar el progreso guardado
