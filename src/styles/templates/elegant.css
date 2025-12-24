@@ -77,13 +77,20 @@
 }
 
 [data-template="elegant"] .item-price-wrapper {
-  background: transparent;
-  border: 1px solid var(--brand-secondary);
-  border-radius: 14px;
-  box-shadow: none;
-  color: var(--brand-secondary-text);
+  background: var(--brand-primary);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px var(--brand-shadow-color);
+  padding: 0.4rem 0.75rem;
+}
+
+[data-template="elegant"] .item-price {
+  color: white;
   font-weight: 700;
-  padding: 0.25rem 0.6rem;
+}
+
+[data-template="elegant"] .item-currency-code {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 [data-template="elegant"] .item-image-overlay {

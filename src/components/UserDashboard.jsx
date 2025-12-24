@@ -7,7 +7,7 @@ import LoadingSpinner from "./ui/LoadingSpinner";
 import ErrorAlert from "./ui/ErrorAlert";
 import DashboardHeader from "./ui/DashboardHeader";
 import Footer from "./ui/Footer";
-import MenuScanner from "./MenuScanner";
+import MultiImageMenuScanner from "./MultiImageMenuScanner";
 import MenuAnalysisReview from "./MenuAnalysisReview";
 import ProfileCompletionWidget from "./business/ProfileCompletionWidget";
 
@@ -171,7 +171,7 @@ export default function UserDashboard() {
 			{showMenuScanner && (
 				<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
 					<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
-						<MenuScanner
+						<MultiImageMenuScanner
 							onAnalysisComplete={handleAnalysisComplete}
 							onCancel={handleScannerCancel}
 							menuId={selectedMenuId}

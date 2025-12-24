@@ -3,14 +3,14 @@ import aiService from '../services/aiService';
 import LoadingSpinner from './ui/LoadingSpinner';
 import ErrorAlert from './ui/ErrorAlert';
 
-export default function MenuAnalysisReview({ 
-    analysisData, 
-    onBack, 
-    onComplete, 
-    menuId, 
-    foodBusinessId 
+export default function MenuAnalysisReview({
+    analysisData,
+    onBack,
+    onComplete,
+    menuId,
+    foodBusinessId
 }) {
-    const [mergedSections, setMergedSections] = useState(analysisData.mergedSections || []);
+    const [mergedSections, setMergedSections] = useState(analysisData.sections || analysisData.mergedSections || []);
     const [editingSection, setEditingSection] = useState(null);
     const [editingItem, setEditingItem] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function MenuAnalysisReview({
 
     const selectAll = () => {
         const allSectionIds = mergedSections.map(section => section.id);
-        const allItemIds = mergedSections.flatMap(section => 
+        const allItemIds = mergedSections.flatMap(section =>
             section.items.map(item => item.id)
         );
         setSelectedSections(new Set(allSectionIds));
@@ -53,7 +53,7 @@ export default function MenuAnalysisReview({
     };
 
     const updateSection = (sectionId, updates) => {
-        setMergedSections(prev => prev.map(section => 
+        setMergedSections(prev => prev.map(section =>
             section.id === sectionId ? { ...section, ...updates } : section
         ));
     };
@@ -61,7 +61,7 @@ export default function MenuAnalysisReview({
     const updateItem = (itemId, updates) => {
         setMergedSections(prev => prev.map(section => ({
             ...section,
-            items: section.items.map(item => 
+            items: section.items.map(item =>
                 item.id === itemId ? { ...item, ...updates } : item
             )
         })));
@@ -103,7 +103,7 @@ export default function MenuAnalysisReview({
             // If section is not selected, we probably shouldn't send it, even if items are selected?
             // Or we should include the section but ONLY with the selected items?
             // Let's assume we include section if it has selected items OR is explicitly selected.
-            
+
             const sectionsWithSelectedItems = mergedSections
                 .map(section => ({
                     ...section,
@@ -163,7 +163,7 @@ export default function MenuAnalysisReview({
                         </button>
                     </div>
                 </div>
-                
+
                 <div className="bg-blue-50 border-2 border-black p-3 font-bold text-sm flex justify-between items-center">
                     <span>RESUMEN DE SELECCIÓN:</span>
                     <span className="bg-black text-white px-2 py-1 rounded text-xs">
@@ -195,7 +195,7 @@ export default function MenuAnalysisReview({
                                         </svg>
                                     </div>
                                 </label>
-                                
+
                                 <div className="flex-1">
                                     {editingSection === section.id ? (
                                         <input
@@ -210,13 +210,13 @@ export default function MenuAnalysisReview({
                                         />
                                     ) : (
                                         <div className="flex items-center gap-3 group">
-                                            <h3 
+                                            <h3
                                                 className="text-xl font-black uppercase cursor-pointer hover:text-blue-600"
                                                 onClick={() => setEditingSection(section.id)}
                                             >
                                                 {section.name}
                                             </h3>
-                                            <button 
+                                            <button
                                                 onClick={() => setEditingSection(section.id)}
                                                 className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-black transition-opacity"
                                             >
@@ -228,7 +228,7 @@ export default function MenuAnalysisReview({
                                     )}
                                 </div>
                             </div>
-                            
+
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-bold bg-gray-100 px-2 py-1 border border-gray-300 rounded">
                                     {section.items.length} ITEMS
@@ -248,13 +248,12 @@ export default function MenuAnalysisReview({
                         {/* Items Grid */}
                         <div className="grid grid-cols-1 gap-4">
                             {section.items.map((item) => (
-                                <div 
-                                    key={item.id} 
-                                    className={`flex items-start gap-4 p-4 border-2 transition-all ${
-                                        selectedItems.has(item.id) 
-                                            ? 'border-blue-500 bg-blue-50' 
+                                <div
+                                    key={item.id}
+                                    className={`flex items-start gap-4 p-4 border-2 transition-all ${selectedItems.has(item.id)
+                                            ? 'border-blue-500 bg-blue-50'
                                             : 'border-gray-200 bg-gray-50 hover:border-gray-400'
-                                    }`}
+                                        }`}
                                 >
                                     <label className="relative flex items-center cursor-pointer mt-1">
                                         <input
@@ -302,7 +301,7 @@ export default function MenuAnalysisReview({
                                                     rows={2}
                                                 />
                                                 <div className="flex justify-end">
-                                                    <button 
+                                                    <button
                                                         onClick={() => setEditingItem(null)}
                                                         className="text-xs font-bold uppercase text-blue-600 hover:underline"
                                                     >
@@ -311,7 +310,7 @@ export default function MenuAnalysisReview({
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div 
+                                            <div
                                                 onClick={() => setEditingItem(item.id)}
                                                 className="cursor-pointer group"
                                             >

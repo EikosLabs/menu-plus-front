@@ -216,21 +216,6 @@ class UploadMetricsTracker {
     };
 
     console.log('[UploadMetrics] ✅ Upload successful:', logData);
-
-    // Track in Sentry if available
-    if (typeof window !== 'undefined' && window.Sentry) {
-      window.Sentry.addBreadcrumb({
-        category: 'upload',
-        message: 'Image uploaded successfully',
-        level: 'info',
-        data: logData
-      });
-
-      // Set user context for better tracking
-      window.Sentry.setUser({
-        upload_session_id: metrics.sessionId
-      });
-    }
   }
 
   /**
@@ -252,26 +237,6 @@ class UploadMetricsTracker {
     };
 
     console.error('[UploadMetrics] ❌ Upload failed:', logData);
-
-    // Track in Sentry if available
-    if (typeof window !== 'undefined' && window.Sentry) {
-      window.Sentry.addBreadcrumb({
-        category: 'upload',
-        message: 'Image upload failed',
-        level: 'error',
-        data: logData
-      });
-
-      // Send exception to Sentry
-      window.Sentry.captureException(new Error(metrics.errorMessage), {
-        tags: {
-          upload_error_type: metrics.errorType,
-          file_type: metrics.fileType,
-          http_status: metrics.httpStatus
-        },
-        extra: logData
-      });
-    }
   }
 
   /**

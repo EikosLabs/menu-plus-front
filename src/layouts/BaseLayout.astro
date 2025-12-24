@@ -2,7 +2,6 @@
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import { t, localizeUrl } from "../i18n/utils";
 import "../styles/global.css";
-import "../sentry.js";
 
 export interface Props {
 	title?: string;
@@ -50,6 +49,7 @@ const showLanguageSwitcher = !Astro.url.pathname.startsWith("/admin-super");
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={layoutDescription} />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -123,11 +123,9 @@ const showLanguageSwitcher = !Astro.url.pathname.startsWith("/admin-super");
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-20">
           <!-- Logo y título -->
-          <div class="flex items-center space-x-3">
-            <div class="neo-icon-3d neo-icon-3d-flame w-12 h-12">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
+          <div class="flex items-center space-x-3 group cursor-pointer" onClick={() => window.location.href = localizeUrl('/', currentLang)}>
+            <div class="neo-icon-3d neo-icon-3d-flame w-12 h-12 flex items-center justify-center bg-white group-hover:rotate-6 transition-transform">
+              <img src="/logo.png" alt="MenuPlus Logo" class="h-8 w-8" />
             </div>
             <h1 class="neo-heading neo-h3 text-neo-flame mb-0">MenuPlus</h1>
           </div>

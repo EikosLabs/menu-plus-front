@@ -48,7 +48,7 @@ export function renderSection(section, items, index, business) {
           <img src="${sanitizeUrl(imageUrl)}" alt="${sanitizeHtml(item.name)}" class="item-image" loading="${idx < 6 ? 'eager' : 'lazy'}" decoding="async" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex';">
           ${item.popular ? '<div class="item-tag-badge"><span>🔥 Popular</span></div>' : ''}
         </div>
-        <div class="item-image-placeholder"${imageUrl ? ' style="display:none"' : ''}><span class="placeholder-emoji">🥘</span></div>
+
         <div class="item-content">
           <div class="item-header">
             <h3 class="item-name">${sanitizeHtml(item.name)}</h3>
@@ -67,9 +67,8 @@ export function renderSection(section, items, index, business) {
   return `
     <section id="section-${section.id}" class="menu-section">
       <div class="section-header">
-        <div class="section-icon">${emoji}</div>
         <div class="section-header-content">
-          <h2 class="section-title">${sanitizeHtml(section.name)}</h2>
+          <h2 class="section-title"><span class="section-emoji">${emoji}</span> ${sanitizeHtml(section.name)}</h2>
           ${section.description ? `<p class="section-description">${sanitizeHtml(section.description)}</p>` : ''}
         </div>
       </div>

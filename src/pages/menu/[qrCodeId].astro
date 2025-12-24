@@ -19,20 +19,129 @@ const { qrCodeId } = Astro.params;
 <Layout title="Menu">
   <main class="menu-page min-h-screen relative">
 
-    {/* LOADING STATE */}
-    <div id="loading-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neo-lavender transition-all duration-500">
-      <div class="relative flex flex-col items-center">
-        <div class="neo-card bg-white p-8 mb-6 relative animate-float">
-          <div class="absolute inset-0 border-neo border-neo-black -rotate-3 z-0"></div>
-          <div class="relative z-10 flex flex-col items-center">
-            <div class="w-16 h-16 border-neo border-neo-flame border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div class="text-4xl animate-bounce">🍽️</div>
+    {/* LOADING STATE - Premium Experience */}
+    <div id="loading-state" class="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+      <!-- Animated Background -->
+      <div class="absolute inset-0 bg-gradient-to-br from-orange-500 via-red-500 to-pink-500">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_50%)]"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.15),transparent_50%)]"></div>
+      </div>
+      
+      <!-- Floating Food Icons -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="loading-food-icon" style="--delay: 0s; --x: 10%; --duration: 4s;">🍕</div>
+        <div class="loading-food-icon" style="--delay: 0.5s; --x: 25%; --duration: 5s;">🍔</div>
+        <div class="loading-food-icon" style="--delay: 1s; --x: 40%; --duration: 4.5s;">🍜</div>
+        <div class="loading-food-icon" style="--delay: 1.5s; --x: 55%; --duration: 3.5s;">🥗</div>
+        <div class="loading-food-icon" style="--delay: 2s; --x: 70%; --duration: 5.5s;">🍰</div>
+        <div class="loading-food-icon" style="--delay: 2.5s; --x: 85%; --duration: 4s;">☕</div>
+        <div class="loading-food-icon" style="--delay: 0.8s; --x: 15%; --duration: 6s;">🍣</div>
+        <div class="loading-food-icon" style="--delay: 1.8s; --x: 90%; --duration: 4.2s;">🥘</div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="relative z-10 flex flex-col items-center px-6 text-center">
+        <!-- Logo/Icon Container -->
+        <div class="relative mb-8">
+          <div class="w-28 h-28 bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center border border-white/30 shadow-2xl loading-logo-pulse">
+            <div class="text-6xl loading-icon-bounce">🍽️</div>
           </div>
+          <!-- Glowing Ring -->
+          <div class="absolute -inset-3 rounded-[2rem] border-2 border-white/20 loading-ring-rotate"></div>
+          <div class="absolute -inset-5 rounded-[2.5rem] border border-white/10 loading-ring-rotate-reverse"></div>
         </div>
-        <h2 class="text-2xl font-black mb-2 text-neo-black tracking-tight uppercase">Preparando tu experiencia</h2>
-        <p class="text-neo-gray font-bold animate-pulse uppercase text-sm tracking-widest">Cargando menú delicioso...</p>
+        
+        <!-- Text -->
+        <h2 class="text-3xl md:text-4xl font-black text-white mb-3 tracking-tight drop-shadow-lg">
+          Preparando tu menú
+        </h2>
+        <p class="text-white/80 font-medium mb-8 text-lg">
+          Un momento, estamos cocinando algo especial...
+        </p>
+        
+        <!-- Progress Bar -->
+        <div class="w-64 h-2 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+          <div class="h-full bg-white rounded-full loading-progress-bar"></div>
+        </div>
+        
+        <!-- Loading Dots -->
+        <div class="flex gap-2 mt-6">
+          <div class="w-3 h-3 bg-white rounded-full loading-dot" style="--delay: 0s;"></div>
+          <div class="w-3 h-3 bg-white rounded-full loading-dot" style="--delay: 0.15s;"></div>
+          <div class="w-3 h-3 bg-white rounded-full loading-dot" style="--delay: 0.3s;"></div>
+        </div>
       </div>
     </div>
+
+    <style>
+      .loading-food-icon {
+        position: absolute;
+        font-size: 2rem;
+        left: var(--x);
+        animation: floatUp var(--duration) ease-in-out infinite;
+        animation-delay: var(--delay);
+        opacity: 0.6;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+      }
+      
+      @keyframes floatUp {
+        0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.6; }
+        90% { opacity: 0.6; }
+        100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+      }
+      
+      .loading-logo-pulse {
+        animation: logoPulse 2s ease-in-out infinite;
+      }
+      
+      @keyframes logoPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 0 40px 10px rgba(255,255,255,0.2); }
+      }
+      
+      .loading-icon-bounce {
+        animation: iconBounce 1s ease-in-out infinite;
+      }
+      
+      @keyframes iconBounce {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-8px) scale(1.1); }
+      }
+      
+      .loading-ring-rotate {
+        animation: ringRotate 8s linear infinite;
+      }
+      
+      .loading-ring-rotate-reverse {
+        animation: ringRotate 12s linear infinite reverse;
+      }
+      
+      @keyframes ringRotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      .loading-progress-bar {
+        animation: progressMove 2s ease-in-out infinite;
+      }
+      
+      @keyframes progressMove {
+        0% { width: 0%; margin-left: 0; }
+        50% { width: 70%; margin-left: 15%; }
+        100% { width: 0%; margin-left: 100%; }
+      }
+      
+      .loading-dot {
+        animation: dotPulse 1s ease-in-out infinite;
+        animation-delay: var(--delay);
+      }
+      
+      @keyframes dotPulse {
+        0%, 100% { opacity: 0.3; transform: scale(0.8); }
+        50% { opacity: 1; transform: scale(1.2); }
+      }
+    </style>
 
     {/* ERROR STATE */}
     <div id="error-state" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neo-lavender hidden backdrop-blur-md opacity-0 transition-opacity duration-300" style="opacity: 0;">
@@ -72,9 +181,6 @@ const { qrCodeId } = Astro.params;
         
         <div class="dish-modal-image-wrapper">
           <img id="modal-dish-image" class="w-full h-full object-cover" alt="" />
-          <div class="dish-modal-image-placeholder absolute inset-0 flex items-center justify-center text-6xl text-gray-300">
-            <span>🥘</span>
-          </div>
         </div>
         
         <div class="dish-modal-body">

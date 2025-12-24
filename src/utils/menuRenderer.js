@@ -40,11 +40,7 @@ export function renderMenu(menu, business, itemsBySection) {
                 </div>
               </div>
             ` : ''}
-            <div class="hero-fallback-icon ${hasLogo ? 'hidden' : ''}">
-              <div class="fallback-icon-wrapper">
-                <span class="fallback-icon">🍽️</span>
-              </div>
-            </div>
+
             <div class="hero-text">
               <div class="hero-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; margin-bottom: 24px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.2);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
@@ -151,7 +147,6 @@ export function renderMenu(menu, business, itemsBySection) {
   if (Object.keys(itemsBySection).length === 0) {
     html += `
       <div class="empty-state">
-        <div class="empty-icon" style="font-size: 4rem; margin-bottom: 1rem;">🍽️</div>
         <h2 class="empty-title">Pronto Disponible</h2>
         <p class="empty-text">Estamos preparando un menú delicioso.</p>
       </div>
@@ -172,17 +167,25 @@ export function renderMenu(menu, business, itemsBySection) {
             ${business.address ? `
               <div class="footer-contact-item">
                 <span class="footer-icon">📍</span>
-                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}" target="_blank" class="footer-link">${sanitizeHtml(business.address)}</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}" target="_blank" rel="noopener" class="footer-link">${sanitizeHtml(business.address)}</a>
               </div>
             ` : ''}
-            <div class="footer-social-links" style="display:flex; justify-content:center; gap: 1rem; margin-top: 1.5rem;">
-               ${business.instagramUrl ? `<a href="${sanitizeUrl(business.instagramUrl)}" class="social-link">Instagram</a>` : ''}
-               ${business.facebookUrl ? `<a href="${sanitizeUrl(business.facebookUrl)}" class="social-link">Facebook</a>` : ''}
-            </div>
+            ${business.phone ? `
+              <div class="footer-contact-item">
+                <span class="footer-icon">📞</span>
+                <a href="tel:${sanitizeHtml(business.phone)}" class="footer-link">${sanitizeHtml(business.phone)}</a>
+              </div>
+            ` : ''}
+            ${(business.instagramUrl || business.facebookUrl) ? `
+              <div class="footer-social-links">
+                ${business.instagramUrl ? `<a href="${sanitizeUrl(business.instagramUrl)}" target="_blank" rel="noopener" class="social-link">📸 Instagram</a>` : ''}
+                ${business.facebookUrl ? `<a href="${sanitizeUrl(business.facebookUrl)}" target="_blank" rel="noopener" class="social-link">👍 Facebook</a>` : ''}
+              </div>
+            ` : ''}
           </div>
         ` : ''}
-        <div style="margin-top: 3rem; opacity: 0.5; font-size: 0.8rem;">
-            Powered by <strong>MenuPlus</strong>
+        <div class="footer-powered">
+          ✨ Powered by <strong>MenuPlus</strong>
         </div>
       </div>
     </footer>

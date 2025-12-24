@@ -31,6 +31,9 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy the rest of the application source code
 COPY . .
 
+# Set environment variables for build time (needed for Astro static generation)
+ENV PUBLIC_GA_MEASUREMENT_ID=G-4CR1T8KDNS
+
 # Build the project for production
 # This will remove console.log and comments as configured in astro.config.mjs
 RUN npm run build

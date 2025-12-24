@@ -1,9 +1,10 @@
 /* Dark Template - Premium: High Contrast & Deep Colors */
 :root[data-template="dark"] {
   --template-primary: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
-  --template-bg: #121212; /* Solid dark background for better reliability */
+  --template-bg: #121212;
+  /* Solid dark background for better reliability */
   --template-card-bg: #1e1e1e;
-  --template-border: 1px solid rgba(255,255,255,0.1);
+  --template-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 [data-template="dark"] .menu-page {
@@ -14,7 +15,8 @@
 /* Hero Section */
 [data-template="dark"] .hero-gradient {
   background: var(--template-primary);
-  opacity: 0.15; /* Subtle tint instead of full background */
+  opacity: 0.15;
+  /* Subtle tint instead of full background */
   border-bottom: none;
 }
 
@@ -24,32 +26,34 @@
 
 [data-template="dark"] .hero-title,
 [data-template="dark"] .hero-title-main {
-  color: #ffffff; /* Always white text on dark mode */
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  color: #ffffff;
+  /* Always white text on dark mode */
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 [data-template="dark"] .hero-description {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
 [data-template="dark"] .hero-badge {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Navigation */
 [data-template="dark"] .category-nav {
   background: #1e1e1e;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 [data-template="dark"] .category-chip {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.7);
-  opacity: 1; /* Fix washed out look */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 1;
+  /* Fix washed out look */
 }
 
 [data-template="dark"] .category-chip.active {
@@ -63,8 +67,9 @@
 [data-template="dark"] .menu-item {
   background: var(--template-card-bg);
   border: var(--template-border);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  opacity: 1; /* Fix washed out look */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  /* Fix washed out look */
 }
 
 [data-template="dark"] .item-name {
@@ -72,34 +77,38 @@
 }
 
 [data-template="dark"] .item-description {
-  color: rgba(255,255,255,0.7);
-}
-
-[data-template="dark"] .item-price {
-  color: var(--brand-secondary);
-  text-shadow: 0 0 20px rgba(0,0,0,0.5);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 [data-template="dark"] .item-price-wrapper {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 50px;
-  padding: 0.35rem 1rem;
+  background: var(--brand-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+}
+
+[data-template="dark"] .item-price {
+  color: white;
+  text-shadow: none;
+}
+
+[data-template="dark"] .item-currency-code {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 [data-template="dark"] .section-header {
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 [data-template="dark"] .section-title {
   color: var(--brand-primary);
-  text-shadow: 0 0 30px rgba(0,0,0,0.5);
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Modals */
 [data-template="dark"] .dish-modal-content {
   background: #1e1e1e;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 [data-template="dark"] #modal-dish-name {
@@ -107,7 +116,7 @@
 }
 
 [data-template="dark"] #modal-dish-description {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 [data-template="dark"] #modal-dish-price {
@@ -122,5 +131,5 @@
 /* Footer */
 [data-template="dark"] .menu-footer {
   background: #000000;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }

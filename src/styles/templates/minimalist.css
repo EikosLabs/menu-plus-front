@@ -100,12 +100,20 @@
 }
 
 [data-template="minimalist"] .item-price-wrapper {
-  background: var(--brand-secondary);
+  background: var(--brand-primary);
   border: none;
   border-radius: 8px;
   box-shadow: none;
-  color: var(--brand-secondary-contrast);
+  padding: 0.4rem 0.7rem;
+}
+
+[data-template="minimalist"] .item-price {
+  color: white;
   font-weight: 700;
+}
+
+[data-template="minimalist"] .item-currency-code {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Image overlay removed */
@@ -197,6 +205,7 @@
 [data-template="minimalist"] .footer-logo span {
   color: var(--brand-secondary);
 }
+
 [data-template="minimalist"] .menu-page {
   background: var(--brand-background, var(--template-bg));
 }

@@ -95,12 +95,20 @@
 }
 
 [data-template="casual"] .item-price-wrapper {
-  background: var(--template-primary);
-  border: var(--template-border);
-  border-radius: 50px;
+  background: var(--brand-primary);
+  border: 2px solid var(--brand-primary);
+  border-radius: 10px;
   box-shadow: 3px 3px 0 var(--brand-shadow-color);
-  color: var(--brand-primary-contrast);
+  padding: 0.45rem 0.8rem;
+}
+
+[data-template="casual"] .item-price {
+  color: white;
   font-weight: 800;
+}
+
+[data-template="casual"] .item-currency-code {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Image overlay removed */
@@ -159,6 +167,7 @@
 [data-template="casual"] .footer-logo span {
   color: var(--brand-secondary);
 }
+
 [data-template="casual"] .menu-page {
   background: var(--brand-background, var(--template-bg));
 }
