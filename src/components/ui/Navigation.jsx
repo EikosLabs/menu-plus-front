@@ -36,8 +36,8 @@ const Navigation = ({ userData, showMobileMenu, setShowMobileMenu, activeSection
 				<div className="flex items-center justify-between h-14 sm:h-16">
 					{/* Logo and Brand */}
 					<div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-						<div className="neo-icon-3d neo-icon-3d-flame w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 flex items-center justify-center bg-white">
-							<img src="/logo.png" alt="Menu Plus Logo" className="h-6 w-6 sm:h-7 sm:w-7" />
+						<div className="neo-icon-3d neo-icon-3d-flame w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 flex items-center justify-center bg-white">
+							<img src="/logo.png" alt="Menu Plus Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
 						</div>
 						<h1 className="neo-heading neo-h4 text-neo-flame mb-0 truncate text-sm sm:text-base">Menu Plus</h1>
 					</div>
