@@ -34,11 +34,12 @@ export default function UserDashboard() {
 	useEffect(() => {
 		if (businessLoading) return; // Esperar a que carguen los negocios
 
-		const needsOnboarding = localStorage.getItem('needs_onboarding');
 		const hasBusinesses = businesses && businesses.length > 0;
 
-		// 1. Si no tiene negocios, redirigir a onboarding del negocio
-		if (needsOnboarding === 'true' && !hasBusinesses) {
+		// Si no tiene negocios, redirigir a onboarding (aplica tanto para registro normal como Google)
+		if (!hasBusinesses) {
+			// Limpiar la bandera de onboarding si existe
+			localStorage.removeItem('needs_onboarding');
 			window.location.href = '/onboarding';
 			return;
 		}
