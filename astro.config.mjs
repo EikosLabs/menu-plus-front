@@ -45,7 +45,7 @@ export default defineConfig({
             minify: 'terser',
             terserOptions: {
                 compress: {
-                    drop_console: false,  // Keep console.log for debugging
+                    drop_console: true,  // Remove console.log in production
                     drop_debugger: true, // Remove debugger statements
                 },
                 format: {
@@ -58,11 +58,11 @@ export default defineConfig({
         defaultLocale: "es",
         locales: ["es", "en"],
         routing: {
-			prefixDefaultLocale: false,
-			redirectToDefaultLocale: true,
-		},
-		fallback: {
-			en: "es",
-		},
-	},
+            prefixDefaultLocale: false,
+            redirectToDefaultLocale: true,
+        },
+        fallback: {
+            en: "es",
+        },
+    },
 });
