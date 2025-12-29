@@ -117,7 +117,7 @@ export default function StepLogo({
         required={false}
         preview={preview}
         onClearImage={handleRemove}
-        acceptedFormats="JPEG, PNG, GIF, WebP hasta 5MB"
+        acceptedFormats="JPEG, PNG, GIF, WebP hasta 10MB"
       />
 
       {uploading && (
@@ -152,7 +152,7 @@ export default function StepLogo({
 
       <div className="mt-4 text-xs text-gray-500">
         <p>• Formatos aceptados: JPEG, PNG, GIF, WebP</p>
-        <p>• Tamaño máximo: 5MB</p>
+        <p>• Tamaño máximo: 10MB</p>
         <p>• Dimensiones recomendadas: 500x500px</p>
       </div>
     </OnboardingStep>

@@ -63,7 +63,7 @@ export const validateImageFile = (file) => {
   if (!file) return { isValid: true, error: null }; // Imagen es opcional
 
   const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  const maxSize = 10 * 1024 * 1024; // 10MB
 
   if (!validTypes.includes(file.type)) {
     return {
@@ -75,7 +75,7 @@ export const validateImageFile = (file) => {
   if (file.size > maxSize) {
     return {
       isValid: false,
-      error: 'El archivo es demasiado grande (máximo 1MB)'
+      error: 'El archivo es demasiado grande (máximo 10MB)'
     };
   }
 
