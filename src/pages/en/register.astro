@@ -1,14 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { t } from "../../i18n/utils";
-import RegisterForm from "../../components/RegisterForm.jsx";
-import MagicLinkForm from "../../components/MagicLinkForm.jsx";
-import GoogleLoginButton from "../../components/auth/GoogleLoginButton.jsx";
+import RegisterWithOptions from "../../components/RegisterWithOptions.jsx";
 
 const lang = "en";
-const url = new URL(Astro.request.url);
-const mode = url.searchParams.get('mode');
-const usePasswordForm = mode === 'password';
 ---
 <BaseLayout title={`${t('auth.register', lang)} - MenuPlus`} lang={lang}>
   <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
@@ -24,31 +19,14 @@ const usePasswordForm = mode === 'password';
           </div>
         </div>
         <h1 class="neo-heading neo-h3 text-center mb-1">
-          {usePasswordForm ? t('auth.register', lang) : 'Start in Seconds'}
+          Start in Seconds
         </h1>
         <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
-          {usePasswordForm 
-            ? 'Join and start showing your menu to the world.'
-            : 'No passwords. Just your email and you\'re in.'}
+          Choose how you want to register.
         </p>
 
-        <!-- Google Sign Up Button -->
-        <div class="mb-4">
-          <GoogleLoginButton client:load />
-        </div>
-
-        <!-- Divider with "or" -->
-        <div class="flex items-center my-4">
-          <div class="flex-1 h-px bg-gray-400"></div>
-          <span class="px-4 text-sm text-gray-600 font-medium">or register with email</span>
-          <div class="flex-1 h-px bg-gray-400"></div>
-        </div>
-
-        {usePasswordForm ? (
-          <RegisterForm client:load />
-        ) : (
-          <MagicLinkForm client:load showNameField={true} />
-        )}
+        <!-- Register Form with Options (Magic Link / Password) -->
+        <RegisterWithOptions client:load />
         
         <div class="neo-divider my-5"></div>
         <div class="text-center">
@@ -66,4 +44,3 @@ const usePasswordForm = mode === 'password';
     </div>
   </main>
 </BaseLayout>
-

@@ -1,12 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import RegisterForm from "../components/RegisterForm.jsx";
-import MagicLinkForm from "../components/MagicLinkForm.jsx";
-import GoogleLoginButton from "../components/auth/GoogleLoginButton.jsx";
-
-const url = new URL(Astro.request.url);
-const mode = url.searchParams.get('mode');
-const usePasswordForm = mode === 'password';
+import RegisterWithOptions from "../components/RegisterWithOptions.jsx";
 ---
 <Layout title="Crear Cuenta - Menu Plus Platform">
   <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
@@ -32,32 +26,14 @@ const usePasswordForm = mode === 'password';
 
         <!-- Title -->
         <h1 class="neo-heading neo-h3 text-center mb-1">
-          {usePasswordForm ? 'Crea tu Cuenta' : 'Empieza en Segundos'}
+          Empieza en Segundos
         </h1>
         <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
-          {usePasswordForm 
-            ? 'Únete y empieza a mostrar tu menú al mundo.'
-            : 'Sin contraseñas. Solo tu email y listo.'}
+          Elige cómo quieres registrarte.
         </p>
 
-        <!-- Google Sign Up Button -->
-        <div class="mb-4">
-          <GoogleLoginButton client:load />
-        </div>
-
-        <!-- Divider with "or" -->
-        <div class="flex items-center my-4">
-          <div class="flex-1 h-px bg-gray-400"></div>
-          <span class="px-4 text-sm text-gray-600 font-medium">o regístrate con email</span>
-          <div class="flex-1 h-px bg-gray-400"></div>
-        </div>
-
-        <!-- Form - Magic Link by default, Password if explicit -->
-        {usePasswordForm ? (
-          <RegisterForm client:load />
-        ) : (
-          <MagicLinkForm client:load showNameField={true} />
-        )}
+        <!-- Register Form with Options (Magic Link / Password) -->
+        <RegisterWithOptions client:load />
 
         <!-- Divider -->
         <div class="neo-divider my-5"></div>
@@ -81,4 +57,3 @@ const usePasswordForm = mode === 'password';
     </div>
   </main>
 </Layout>
-
