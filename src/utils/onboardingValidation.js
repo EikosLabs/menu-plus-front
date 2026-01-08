@@ -282,9 +282,39 @@ export const validateStepScanMenu = (formData) => {
 };
 
 /**
- * Valida un paso específico según su número
+ * Valida Quick Start: Solo nombre y categoría
  */
-export const validateStep = (stepNumber, formData) => {
+export const validateStepQuickStart = (formData) => {
+  const errors = {};
+
+  // Nombre del negocio (requerido)
+  const nameValidation = validateLength(formData.name, 2, 100);
+  if (!nameValidation.isValid) {
+    errors.name = nameValidation.error;
+  }
+
+  // Categoría (requerida)
+  const categoryValidation = validateRequired(formData.businessCategoryId, 'La categoría');
+  if (!categoryValidation.isValid) {
+    errors.businessCategoryId = categoryValidation.error;
+  }
+
+  return errors;
+};
+
+/**
+ * Valida un paso específico según su número
+ * @param {number} stepNumber - Número del paso
+ * @param {object} formData - Datos del formulario
+ * @param {boolean} quickStartMode - Si está en modo Quick Start (1 solo paso)
+ */
+export const validateStep = (stepNumber, formData, quickStartMode = false) => {
+  // Quick Start mode: solo 1 paso
+  if (quickStartMode) {
+    return validateStepQuickStart(formData);
+  }
+
+  // Flow completo (legacy)
   switch (stepNumber) {
     case 1:
       return validateStepScanMenu(formData);
@@ -302,3 +332,4 @@ export const validateStep = (stepNumber, formData) => {
       return {};
   }
 };
+

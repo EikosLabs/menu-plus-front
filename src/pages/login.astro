@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import LoginForm from "../components/LoginForm.jsx";
+import LoginWithOptions from "../components/LoginWithOptions.jsx";
 ---
 <Layout title="Iniciar Sesión - Menu Plus Platform">
   <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
@@ -32,8 +32,8 @@ import LoginForm from "../components/LoginForm.jsx";
           Accede a tu cuenta para gestionar tus menús.
         </p>
 
-        <!-- Login Form -->
-        <LoginForm client:load />
+        <!-- Login Form with Options (Magic Link / Password) -->
+        <LoginWithOptions client:load />
 
         <!-- Divider -->
         <div class="neo-divider my-5"></div>
@@ -57,3 +57,4 @@ import LoginForm from "../components/LoginForm.jsx";
     </div>
   </main>
 </Layout>
+

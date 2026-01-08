@@ -1,0 +1,61 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Iniciando sesión... - Menu Plus Platform">
+  <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
+    <!-- Animated Background Pattern -->
+    <div class="absolute inset-0 neo-bg-grid-colorful opacity-15 pointer-events-none"></div>
+
+    <div class="relative z-10 w-full max-w-md">
+      <div class="neo-card-3d-sunset p-8 text-center">
+        <!-- Loading Animation -->
+        <div class="mb-6">
+          <div class="inline-block animate-bounce">
+            <span class="text-6xl">🔮</span>
+          </div>
+        </div>
+        
+        <h1 class="neo-heading neo-h3 mb-4">¡Magia en acción!</h1>
+        <p class="neo-text text-lg mb-6">Estamos iniciando tu sesión...</p>
+        
+        <div class="flex justify-center">
+          <svg class="animate-spin h-8 w-8 text-neo-flame" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import authService from '../services/authService';
+  
+  // Get tokens from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  const refresh = urlParams.get('refresh');
+  const redirect = urlParams.get('redirect') || '/dashboard';
+
+  if (token) {
+    // Store tokens using authService
+    authService._storeTokens(token, refresh);
+    
+    // Set onboarding flag if redirecting to onboarding
+    if (redirect.includes('onboarding')) {
+      localStorage.setItem('needs_onboarding', 'true');
+    }
+    
+    // Clear sensitive data from URL and redirect
+    window.history.replaceState({}, document.title, '/magic-link-callback');
+    
+    // Small delay for visual feedback, then redirect
+    setTimeout(() => {
+      window.location.href = redirect;
+    }, 1000);
+  } else {
+    // No token, redirect to login
+    window.location.href = '/login?error=invalid_magic_link';
+  }
+</script>

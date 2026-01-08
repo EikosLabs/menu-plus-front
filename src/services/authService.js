@@ -274,22 +274,22 @@ export const authService = {
 		return cookieManager.get(cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name);
 	},
 
-		_storeTokens(token, refreshToken) {
-			cookieManager.set(
-				cookieManager.COOKIE_OPTIONS.AUTH_TOKEN.name,
-				token,
-				cookieManager.COOKIE_OPTIONS.AUTH_TOKEN
-			);
+	_storeTokens(token, refreshToken) {
+		cookieManager.set(
+			cookieManager.COOKIE_OPTIONS.AUTH_TOKEN.name,
+			token,
+			cookieManager.COOKIE_OPTIONS.AUTH_TOKEN
+		);
 
-			// Almacenar refresh_token si existe
-			if (refreshToken) {
-				cookieManager.set(
-					cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name,
-					refreshToken,
-					cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN
-				);
-			}
-		},
+		// Almacenar refresh_token si existe
+		if (refreshToken) {
+			cookieManager.set(
+				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name,
+				refreshToken,
+				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN
+			);
+		}
+	},
 
 	getBusinessIdFromToken() {
 		const token = this.getToken();
@@ -297,7 +297,7 @@ export const authService = {
 
 		// Usar jwtHelper para extraer el claim correcto: FoodBusinessId
 		const businessId = jwtHelper.getBusinessIdFromToken(token);
-		
+
 		if (!businessId) {
 			errorLogger.warn('FoodBusinessId not found in token');
 		}
@@ -365,7 +365,7 @@ export const authService = {
 
 	getUserId() {
 		const userId = this.getUserIdFromToken();
-		
+
 		if (userId) {
 			const numericUserId = Number.parseInt(userId, 10);
 			if (!Number.isNaN(numericUserId)) {
@@ -374,6 +374,53 @@ export const authService = {
 		}
 
 		return null;
+	},
+
+	/**
+	 * Request a magic link for passwordless registration/login
+	 * @param {string} email - User's email address
+	 * @param {string|null} fullName - Optional full name for new users
+	 */
+	async requestMagicLink(email, fullName = null) {
+		const emailError = validateEmail(email);
+		if (emailError) {
+			throw new AppError(ERROR_TYPES.INVALID_EMAIL, emailError);
+		}
+
+		const requestBody = {
+			Email: email.trim(),
+			FullName: fullName?.trim() || null
+		};
+
+		try {
+			const response = await fetch(`${API_URL}/auth/magic-link/register`, {
+				method: 'POST',
+				headers: addCsrfHeader({
+					'Content-Type': 'application/json'
+				}),
+				body: JSON.stringify(requestBody),
+				credentials: 'include'
+			});
+
+			if (!response.ok) {
+				if (response.status === 400) {
+					throw await AppError.fromResponse(response);
+				}
+				throw await AppError.fromResponse(response);
+			}
+
+			const data = await response.json();
+			errorLogger.info('Magic link requested', { email });
+			return data;
+
+		} catch (error) {
+			if (error instanceof AppError) {
+				errorLogger.error(error, { endpoint: '/auth/magic-link/register', email });
+				throw error;
+			}
+			errorLogger.error(error, { endpoint: '/auth/magic-link/register', email });
+			throw AppError.fromNetworkError(error, { endpoint: '/auth/magic-link/register' });
+		}
 	},
 };
 

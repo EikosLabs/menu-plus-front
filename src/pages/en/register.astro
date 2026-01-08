@@ -2,8 +2,13 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { t } from "../../i18n/utils";
 import RegisterForm from "../../components/RegisterForm.jsx";
+import MagicLinkForm from "../../components/MagicLinkForm.jsx";
 import GoogleLoginButton from "../../components/auth/GoogleLoginButton.jsx";
+
 const lang = "en";
+const url = new URL(Astro.request.url);
+const mode = url.searchParams.get('mode');
+const usePasswordForm = mode === 'password';
 ---
 <BaseLayout title={`${t('auth.register', lang)} - MenuPlus`} lang={lang}>
   <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
@@ -19,10 +24,12 @@ const lang = "en";
           </div>
         </div>
         <h1 class="neo-heading neo-h3 text-center mb-1">
-          {t('auth.register', lang)}
+          {usePasswordForm ? t('auth.register', lang) : 'Start in Seconds'}
         </h1>
         <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
-          Join and start showing your menu to the world.
+          {usePasswordForm 
+            ? 'Join and start showing your menu to the world.'
+            : 'No passwords. Just your email and you\'re in.'}
         </p>
 
         <!-- Google Sign Up Button -->
@@ -37,7 +44,12 @@ const lang = "en";
           <div class="flex-1 h-px bg-gray-400"></div>
         </div>
 
-        <RegisterForm client:load />
+        {usePasswordForm ? (
+          <RegisterForm client:load />
+        ) : (
+          <MagicLinkForm client:load showNameField={true} />
+        )}
+        
         <div class="neo-divider my-5"></div>
         <div class="text-center">
           <p class="neo-text mb-3 text-sm" style="color: var(--neo-black);">
@@ -54,3 +66,4 @@ const lang = "en";
     </div>
   </main>
 </BaseLayout>
+

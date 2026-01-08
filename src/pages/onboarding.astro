@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { t } from '../i18n/utils';
-import OnboardingFlow from '../components/onboarding/OnboardingFlow';
+import OnboardingFlowQuickStart from '../components/onboarding/OnboardingFlowQuickStart';
 import '../styles/onboarding.css';
 
 // Verificar autenticación - buscar en ambas cookies posibles
@@ -17,7 +17,8 @@ if (!token) {
     <div class="absolute inset-0 neo-bg-gradient-sunset-lavender opacity-50 pointer-events-none"></div>
 
     <div class="relative z-10">
-      <OnboardingFlow client:only="react" onComplete={null} />
+      <OnboardingFlowQuickStart client:only="react" onComplete={null} />
     </div>
   </div>
 </Layout>
+
