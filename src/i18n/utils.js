@@ -1,5 +1,7 @@
 import en from "./locales/en.json";
 import es from "./locales/es.json";
+import { useTranslation as useI18nextTranslation } from 'react-i18next';
+import './i18n'; // Initialize i18next
 
 const translations = {
 	es,
@@ -13,18 +15,18 @@ export const languages = {
 };
 
 export function getCurrentLang() {
-    if (typeof window !== "undefined") {
-        // Preferir el idioma del path para coincidir con SSR
-        const path = window.location.pathname;
-        const langFromPath = path.split("/")[1];
-        if (languages[langFromPath]) {
-            return langFromPath;
-        }
+	if (typeof window !== "undefined") {
+		// Preferir el idioma del path para coincidir con SSR
+		const path = window.location.pathname;
+		const langFromPath = path.split("/")[1];
+		if (languages[langFromPath]) {
+			return langFromPath;
+		}
 
-        // Si no hay idioma en el path, usar el idioma por defecto
-        // para evitar desajustes de hidratación con el HTML del servidor
-        return defaultLang;
-    }
+		// Si no hay idioma en el path, usar el idioma por defecto
+		// para evitar desajustes de hidratación con el HTML del servidor
+		return defaultLang;
+	}
 
 	try {
 		if (typeof globalThis !== "undefined" && globalThis.Astro?.url) {
@@ -35,12 +37,13 @@ export function getCurrentLang() {
 			}
 		}
 
-        return defaultLang;
+		return defaultLang;
 	} catch (_error) {
 		return defaultLang;
 	}
 }
 
+// Legacy t function for non-React contexts (Astro components)
 export function t(key, lang = null) {
 	const currentLang = lang || getCurrentLang();
 	const keys = key.split(".");
@@ -123,15 +126,21 @@ export function localizeUrl(url, lang = null) {
 	return `/${targetLang}${cleanUrl === "/" ? "" : cleanUrl}`;
 }
 
+/**
+ * React hook for translations using react-i18next
+ * Maintains backward compatibility with existing code
+ */
 export function useTranslation() {
+	const { t, i18n } = useI18nextTranslation();
 	const currentLang = getCurrentLang();
 
 	return {
-		t: (key) => t(key, currentLang),
+		t,
 		currentLang,
 		changeLang,
 		languages,
 		localizeUrl: (url) => localizeUrl(url, currentLang),
+		i18n, // Expose i18n instance for advanced usage
 	};
 }
 
