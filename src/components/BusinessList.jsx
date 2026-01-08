@@ -7,6 +7,7 @@ import MenuCardGenerator from "./FlyerEditor/MenuCardGenerator";
 import PromotionalFlyerGenerator from "./FlyerEditor/PromotionalFlyerGenerator";
 import SavedFlyersList from "./FlyerEditor/SavedFlyersList";
 import { compareIds, normalizeMenuItemIds } from '../utils/idNormalization';
+import SmartHint from "./ui/SmartHint";
 
 export default function BusinessList({
 	businesses,
@@ -813,22 +814,28 @@ export default function BusinessList({
 																))}
 															</div>
 														) : (
-															<div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-2 rounded">
-																<p className="text-sm text-yellow-700">
-																	No hay platos en esta sección.
-																</p>
-															</div>
+															<SmartHint
+																icon="🍽️"
+																title="Añade tu primer plato"
+																description="Esta sección está vacía. Agrega productos con precios y descripciones."
+																actionLabel="+ Añadir Plato"
+																onAction={() => {
+																	setSelectedSection(section.id);
+																	handleShowAddMenuItem(menu.id, section.id, business.defaultCurrency);
+																}}
+															/>
 														)}
 													</div>
 												))}
 										</div>
 									) : (
-										<div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded">
-											<p className="text-sm text-yellow-700">
-												Este menú no tiene secciones todavía. Usa el botón
-												"Secciones" para crearlas y empezar a añadir platos.
-											</p>
-										</div>
+										<SmartHint
+											icon="📂"
+											title="Crea tu primera sección"
+											description="Organiza tu menú en categorías como Entradas, Platos Principales, Postres, etc."
+											actionLabel="+ Crear Sección"
+											onAction={() => handleManageSections(menu.id)}
+										/>
 									)}
 								</div>
 							))
