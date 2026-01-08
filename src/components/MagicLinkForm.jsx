@@ -6,7 +6,7 @@ import FormField from "./ui/FormField";
 import { validateEmail, validateRequired } from "../utils/validation";
 import { useTranslation } from "../i18n/utils";
 
-export default function MagicLinkForm({ showNameField = true }) {
+export default function MagicLinkForm({ showNameField = false }) {
 	const [email, setEmail] = useState("");
 	const [fullName, setFullName] = useState("");
 	const [loading, setLoading] = useState(false);

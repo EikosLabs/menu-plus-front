@@ -30,8 +30,8 @@ export default function RegisterWithOptions() {
                     type="button"
                     onClick={() => setUseMagicLink(true)}
                     className={`flex-1 py-3 px-4 font-bold text-sm transition-all ${useMagicLink
-                            ? 'bg-neo-flame text-white'
-                            : 'bg-white text-neo-black hover:bg-gray-100'
+                        ? 'bg-neo-flame text-white'
+                        : 'bg-white text-neo-black hover:bg-gray-100'
                         }`}
                 >
                     🔮 Enlace Mágico
@@ -40,8 +40,8 @@ export default function RegisterWithOptions() {
                     type="button"
                     onClick={() => setUseMagicLink(false)}
                     className={`flex-1 py-3 px-4 font-bold text-sm transition-all ${!useMagicLink
-                            ? 'bg-neo-flame text-white'
-                            : 'bg-white text-neo-black hover:bg-gray-100'
+                        ? 'bg-neo-flame text-white'
+                        : 'bg-white text-neo-black hover:bg-gray-100'
                         }`}
                 >
                     🔐 Contraseña
@@ -50,7 +50,7 @@ export default function RegisterWithOptions() {
 
             {/* Register Forms */}
             {useMagicLink ? (
-                <MagicLinkForm showNameField={true} onSwitchToPassword={() => setUseMagicLink(false)} />
+                <MagicLinkForm onSwitchToPassword={() => setUseMagicLink(false)} />
             ) : (
                 <RegisterForm />
             )}
