@@ -1,8 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import LoginWithOptions from "../components/LoginWithOptions.jsx";
+import { t } from "../i18n/utils";
+
+const lang = "es";
 ---
-<Layout title="Iniciar Sesión - Menu Plus Platform">
+<Layout title={`${t('auth.login', lang)} - Menu Plus Platform`}>
   <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
     <!-- Animated Background Pattern -->
     <div class="absolute inset-0 neo-bg-grid-colorful opacity-15 pointer-events-none"></div>
@@ -20,16 +23,16 @@ import LoginWithOptions from "../components/LoginWithOptions.jsx";
 
           <!-- Badge -->
           <div class="inline-block neo-sticker mb-2 text-sm" style="background-color: white; color: var(--neo-black);">
-            🔐 INICIAR SESIÓN
+            🔐 {t('auth.signInBadge', lang)}
           </div>
         </div>
 
         <!-- Title -->
         <h1 class="neo-heading neo-h3 text-center mb-1">
-          Bienvenido de Nuevo
+          {t('auth.welcomeBack', lang)}
         </h1>
         <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
-          Accede a tu cuenta para gestionar tus menús.
+          {t('auth.signInToManage', lang)}
         </p>
 
         <!-- Login Form with Options (Magic Link / Password) -->
@@ -41,13 +44,13 @@ import LoginWithOptions from "../components/LoginWithOptions.jsx";
         <!-- Register Link -->
         <div class="text-center">
           <p class="neo-text mb-3 text-sm" style="color: var(--neo-black);">
-            ¿No tienes una cuenta?
+            {t('auth.dontHaveAccount', lang)}
           </p>
           <a
             href="/register"
             class="neo-btn neo-btn-secondary w-full inline-flex items-center justify-center"
           >
-            Regístrate Gratis
+            {t('auth.signUpFree', lang)}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
@@ -57,4 +60,3 @@ import LoginWithOptions from "../components/LoginWithOptions.jsx";
     </div>
   </main>
 </Layout>
-

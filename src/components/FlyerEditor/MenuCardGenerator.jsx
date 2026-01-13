@@ -8,6 +8,7 @@ import { exportMultipleToPDF } from './utils/pdfExport';
 import { CARTA_TEMPLATES, COLOR_PALETTES } from './utils/flyerTemplates';
 import MenuCardPreview from './MenuCardPreview';
 import menuService from '../../services/menuService';
+import { useTranslation } from '../../i18n/utils';
 
 /**
  * Menu Card Generator - Full menu for printing
@@ -20,6 +21,7 @@ export default function MenuCardGenerator({
   onClose,
   savedFlyer = null
 }) {
+  const { t } = useTranslation();
   const [selectedTemplate, setSelectedTemplate] = useState(savedFlyer?.templateId || 'elegante');
   const FONT_MAP = {
     poppins: "'Poppins', sans-serif",
@@ -145,7 +147,7 @@ export default function MenuCardGenerator({
   const getItemsPerPage = () => {
     // Si autoSplit está desactivado, mostramos todos los ítems en una página (para que el usuario lo vea todo junto)
     if (!autoSplit) return 9999;
-    
+
     // Si está activado, paginamos según la capacidad del diseño
     const map = { elegante: 12, compacto: 36, moderno: 24, minimalista: 32 };
     return map[selectedTemplate] || 24;
@@ -223,11 +225,10 @@ export default function MenuCardGenerator({
                   <button
                     key={tmpl.id}
                     onClick={() => { setSelectedTemplate(tmpl.id); }}
-                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
-                      selectedTemplate === tmpl.id
+                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${selectedTemplate === tmpl.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                         : 'hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
                       <span className="text-xl sm:text-2xl flex-shrink-0">{tmpl.icon}</span>
@@ -282,11 +283,10 @@ export default function MenuCardGenerator({
               <div className="space-y-2 max-h-[300px] overflow-auto">
                 <button
                   onClick={() => setSelectedPalette(null)}
-                  className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
-                    selectedPalette === null
+                  className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${selectedPalette === null
                       ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                       : 'hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-lg">🎨</span>
@@ -304,11 +304,10 @@ export default function MenuCardGenerator({
                   <button
                     key={palette.id}
                     onClick={() => setSelectedPalette(palette.id)}
-                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
-                      selectedPalette === palette.id
+                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${selectedPalette === palette.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                         : 'hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{palette.icon}</span>
@@ -417,7 +416,7 @@ export default function MenuCardGenerator({
               onClick={onClose}
               className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              Cancelar
+              {t("common.cancel")}
             </button>
             <button
               onClick={handleSave}
@@ -425,7 +424,7 @@ export default function MenuCardGenerator({
               className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               {isSaving ? '⏳' : savedId ? '💾' : '💾'}
-              <span className="hidden sm:inline ml-1">{isSaving ? 'Guardando...' : savedId ? 'Actualizar' : 'Guardar'}</span>
+              <span className="hidden sm:inline ml-1">{isSaving ? t("common.saving") : savedId ? t("common.update") : t("common.save")}</span>
             </button>
             <button
               onClick={handleExport}
@@ -433,7 +432,7 @@ export default function MenuCardGenerator({
               className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               {isExporting ? '⏳' : '📄'}
-              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
+              <span className="hidden sm:inline ml-1">{isExporting ? t("common.generating") : t("common.downloadPDF")}</span>
             </button>
             {pages.length > 1 && (
               <button

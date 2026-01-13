@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../../i18n/utils';
 
 const GoogleLoginButton = ({ onLoginStart, onLoginSuccess, onLoginError, disabled = false }) => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
@@ -42,7 +44,7 @@ const GoogleLoginButton = ({ onLoginStart, onLoginSuccess, onLoginError, disable
       {isLoading ? (
         <div className="flex items-center justify-center gap-3">
           <div className="animate-spin w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full"></div>
-          <span>Conectando con Google...</span>
+          <span>{t('auth.connectingGoogle')}</span>
         </div>
       ) : (
         <div className="flex items-center justify-center gap-3">
@@ -71,7 +73,7 @@ const GoogleLoginButton = ({ onLoginStart, onLoginSuccess, onLoginError, disable
 
           {/* Button Text */}
           <span className="text-gray-700 group-hover:text-black transition-colors duration-200">
-            Continuar con Google
+            {t('auth.continueWithGoogle')}
           </span>
         </div>
       )}

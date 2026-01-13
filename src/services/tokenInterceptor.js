@@ -1,6 +1,7 @@
 import { AppError } from '../utils/AppError.js';
 import { ERROR_TYPES } from '../utils/errorTypes.js';
 import { errorLogger } from '../utils/errorLogger.js';
+import { localizeUrl } from '../i18n/utils.js';
 
 const API_URL = "import.meta.env.PUBLIC_API_URL || '/api'"; // HARDCODED FOR DEBUG
 
@@ -30,11 +31,11 @@ export class TokenInterceptor {
 					return await requestFn();
 				} catch (refreshError) {
 					errorLogger.error('Token refresh failed', refreshError);
-					
+
 					if (typeof window !== 'undefined') {
-						window.location.href = '/login';
+						window.location.href = localizeUrl('/login');
 					}
-					
+
 					throw refreshError;
 				}
 			}
@@ -81,7 +82,7 @@ export class TokenInterceptor {
 			'authentication failed'
 		];
 
-		return authErrorMessages.some(function(msg) {
+		return authErrorMessages.some(function (msg) {
 			return errorMessage.includes(msg);
 		});
 	}

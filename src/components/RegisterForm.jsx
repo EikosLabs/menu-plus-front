@@ -124,7 +124,7 @@ export default function RegisterForm() {
   if (success) {
     return (
       <SuccessAlert
-        message="¡Registro exitoso! Serás redirigido a configurar tu negocio en unos momentos..."
+        message={t("auth.registerSuccess")}
       />
     );
   }
@@ -154,7 +154,7 @@ export default function RegisterForm() {
 
       {/* Username Field (Optional) */}
       <FormField
-        label={t("auth.userName") + " (opcional)"}
+        label={`${t("auth.userName")} ${t("common.optional")}`}
         name="userName"
         value={formData.userName}
         onChange={handleChange}

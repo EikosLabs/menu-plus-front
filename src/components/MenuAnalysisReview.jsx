@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import aiService from '../services/aiService';
 import LoadingSpinner from './ui/LoadingSpinner';
 import ErrorAlert from './ui/ErrorAlert';
+import { useTranslation } from '../i18n/utils';
 
 export default function MenuAnalysisReview({
     analysisData,
@@ -10,6 +11,7 @@ export default function MenuAnalysisReview({
     menuId,
     foodBusinessId
 }) {
+    const { t } = useTranslation();
     const [mergedSections, setMergedSections] = useState(analysisData.sections || analysisData.mergedSections || []);
     const [editingSection, setEditingSection] = useState(null);
     const [editingItem, setEditingItem] = useState(null);
@@ -251,8 +253,8 @@ export default function MenuAnalysisReview({
                                 <div
                                     key={item.id}
                                     className={`flex items-start gap-4 p-4 border-2 transition-all ${selectedItems.has(item.id)
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-gray-200 bg-gray-50 hover:border-gray-400'
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : 'border-gray-200 bg-gray-50 hover:border-gray-400'
                                         }`}
                                 >
                                     <label className="relative flex items-center cursor-pointer mt-1">
@@ -361,7 +363,7 @@ export default function MenuAnalysisReview({
                     disabled={loading}
                     className="w-full sm:w-auto px-8 py-3 border-2 border-black bg-white text-black font-bold uppercase tracking-wide hover:bg-gray-100 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50"
                 >
-                    Volver
+                    {t("common.back")}
                 </button>
                 <button
                     onClick={handleSave}
@@ -375,7 +377,7 @@ export default function MenuAnalysisReview({
                         </>
                     ) : (
                         <>
-                            <span>Guardar Menú</span>
+                            <span>{t("scanner.saveMenu")}</span>
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>

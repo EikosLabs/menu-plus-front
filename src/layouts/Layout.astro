@@ -3,12 +3,13 @@ import "../styles/global.css"; // Asegura que Tailwind CSS se aplique globalment
 
 interface Props {
 	title: string;
+	lang?: string;
 }
 
-const { title } = Astro.props;
+const { title, lang = "es" } = Astro.props;
 ---
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content="Plataforma para mostrar tu menú al mundo." />
@@ -45,6 +46,29 @@ const { title } = Astro.props;
 				gtag('js', new Date());
 				gtag('config', gaId);
 			}
+		</script>
+		
+		<!-- Auto-detect browser language on first visit -->
+		<script is:inline>
+			(function() {
+				const currentPath = window.location.pathname;
+				const savedLang = localStorage.getItem('preferred-language');
+				
+				// Si es primera visita, detectar idioma del navegador
+				if (!savedLang) {
+					const browserLang = navigator.language || navigator.languages?.[0] || 'es';
+					const detectedLang = browserLang.startsWith('en') ? 'en' : 'es';
+					
+					// Guardar la preferencia detectada
+					localStorage.setItem('preferred-language', detectedLang);
+					
+					// Si el navegador es inglés y no estamos en /en/, redirigir
+					if (detectedLang === 'en' && !currentPath.startsWith('/en')) {
+						const newPath = `/en${currentPath === '/' ? '' : currentPath}`;
+						window.location.replace(newPath);
+					}
+				}
+			})();
 		</script>
 	</head>
 	<body class="bg-neo-lavender text-neo-black min-h-screen font-sans">

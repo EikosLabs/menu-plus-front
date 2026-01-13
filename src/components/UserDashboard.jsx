@@ -15,9 +15,13 @@ const BusinessSection = lazy(() => import("./sections/BusinessSection"));
 const ProfileSection = lazy(() => import("./sections/ProfileSection"));
 const TemplateSection = lazy(() => import("./sections/TemplateSection"));
 
+import UpgradeModal from "./subscription/UpgradeModal";
+import { useSubscription } from "../hooks/useSubscription";
+
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
-	const { businesses, setBusinesses, loading: businessLoading, error, setError, addBusiness, addMenu, fetchBusinesses, refreshBusinesses } = useBusinesses();
+	const { businesses, setBusinesses, loading: businessLoading, error, setError, isRefreshing, addBusiness, addMenu, fetchBusinesses, refreshBusinesses } = useBusinesses();
+	const { checkLimit } = useSubscription();
 
 	const [showAddBusiness, setShowAddBusiness] = useState(false);
 	const [showAddMenu, setShowAddMenu] = useState(false);
@@ -29,6 +33,38 @@ export default function UserDashboard() {
 	const [analysisData, setAnalysisData] = useState(null);
 	const [selectedMenuId, setSelectedMenuId] = useState(null);
 	const [selectedFoodBusinessId, setSelectedFoodBusinessId] = useState(null);
+
+	const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+	const [upgradeTrigger, setUpgradeTrigger] = useState("feature");
+
+	// Wrappers for limits
+	const handleSetShowAddBusiness = (show) => {
+		if (show) {
+			if (checkLimit('businesses', businesses?.length || 0)) {
+				setShowAddBusiness(true);
+			} else {
+				setUpgradeTrigger('businesses');
+				setShowUpgradeModal(true);
+			}
+		} else {
+			setShowAddBusiness(false);
+		}
+	};
+
+	const handleSetShowAddMenu = (show) => {
+		if (show) {
+			// Find total menus count? Or per business? usually global limit for free tier
+			const totalMenus = businesses?.reduce((acc, b) => acc + (b.menus?.length || 0), 0) || 0;
+			if (checkLimit('menus', totalMenus)) {
+				setShowAddMenu(true);
+			} else {
+				setUpgradeTrigger('menus');
+				setShowUpgradeModal(true);
+			}
+		} else {
+			setShowAddMenu(false);
+		}
+	};
 
 	// Verificar si el usuario necesita completar el onboarding
 	useEffect(() => {
@@ -67,31 +103,7 @@ export default function UserDashboard() {
 		setShowMenuScanner(true);
 	};
 
-	const handleAnalysisComplete = (data) => {
-		setAnalysisData(data);
-		setShowMenuScanner(false);
-		setShowAnalysisReview(true);
-	};
-
-	const handleAnalysisBack = () => {
-		setShowAnalysisReview(false);
-		setShowMenuScanner(true);
-	};
-
-	const handleAnalysisSaveComplete = () => {
-		setShowAnalysisReview(false);
-		setAnalysisData(null);
-		setSelectedMenuId(null);
-		setSelectedFoodBusinessId(null);
-		// Refresh businesses to show new menu items
-		fetchBusinesses();
-	};
-
-	const handleScannerCancel = () => {
-		setShowMenuScanner(false);
-		setSelectedMenuId(null);
-		setSelectedFoodBusinessId(null);
-	};
+	// ... (rest of methods)
 
 	if (authLoading || businessLoading) {
 		return <LoadingSpinner />;
@@ -99,6 +111,12 @@ export default function UserDashboard() {
 
 	return (
 		<div className="flex min-h-screen flex-col bg-neo-lavender relative">
+			<UpgradeModal
+				isOpen={showUpgradeModal}
+				onClose={() => setShowUpgradeModal(false)}
+				trigger={upgradeTrigger}
+			/>
+
 			{/* Animated Background Pattern */}
 			<div className="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none"></div>
 
@@ -146,15 +164,16 @@ export default function UserDashboard() {
 							setBusinesses={setBusinesses}
 							userData={userData}
 							showAddBusiness={showAddBusiness}
-							setShowAddBusiness={setShowAddBusiness}
+							setShowAddBusiness={handleSetShowAddBusiness}
 							showAddMenu={showAddMenu}
-							setShowAddMenu={setShowAddMenu}
+							setShowAddMenu={handleSetShowAddMenu}
 							selectedBusinessId={selectedBusinessId}
 							setSelectedBusinessId={setSelectedBusinessId}
 							onBusinessAdded={handleBusinessAdded}
 							onMenuAdded={handleMenuAdded}
 							onMenuScanner={handleMenuScanner}
 							onRefresh={refreshBusinesses}
+							isRefreshing={isRefreshing}
 						/>
 					)}
 

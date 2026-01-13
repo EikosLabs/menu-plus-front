@@ -3,6 +3,24 @@ import { proxyApiRequest } from './api-proxy.js';
 
 const API_URL = import.meta.env.PUBLIC_API_URL || "import.meta.env.PUBLIC_API_URL || '/api'";
 
+// Helper to get localized login path based on current URL
+function getLocalizedLoginPath(currentPath) {
+	// If user is on /en/... path, redirect to /en/login
+	if (currentPath.startsWith('/en/') || currentPath === '/en') {
+		return '/en/login';
+	}
+	return '/login';
+}
+
+// Helper to get localized dashboard path based on current URL
+function getLocalizedRedirectPath(currentPath, targetPath) {
+	if (currentPath.startsWith('/en/') || currentPath === '/en') {
+		const cleanTarget = targetPath.startsWith('/') ? targetPath : '/' + targetPath;
+		return `/en${cleanTarget}`;
+	}
+	return targetPath;
+}
+
 /**
  * Valida el formato y expiración de un JWT
  * @param {string} token - Token JWT a validar
@@ -91,7 +109,7 @@ async function tryRefreshToken(refreshToken, context) {
 
 		context.cookies.set('token', newToken, {
 			path: '/',
-			maxAge: 7200,
+			maxAge: 7200, // 2 horas
 			sameSite: 'strict',
 			secure: true
 		});
@@ -131,15 +149,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	}
 
 	// Rutas públicas que no requieren autenticación
-	const reserved = ["dashboard", "login", "register", "admin", "api", "404", "menu", "admin-super"];
+	const reserved = ["dashboard", "login", "register", "admin", "api", "404", "menu", "admin-super", "en"];
 	const singleSegment = /^\/[^/]+$/.test(currentPath);
 	const segment = singleSegment ? currentPath.slice(1) : null;
 	const isRootLanding = singleSegment && segment && !reserved.includes(segment);
 	const isPublicRoute =
 		currentPath === "/login" ||
 		currentPath === "/register" ||
+		currentPath === "/en/login" ||
+		currentPath === "/en/register" ||
 		currentPath.startsWith("/login/") ||
 		currentPath.startsWith("/register/") ||
+		currentPath.startsWith("/en/login/") ||
+		currentPath.startsWith("/en/register/") ||
 		currentPath.startsWith("/menu/") ||
 		currentPath.startsWith("/business/") ||
 		currentPath.startsWith("/auth/") ||  // OAuth callback routes
@@ -161,7 +183,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			context.cookies.delete("auth_token", { path: "/" });
 			context.cookies.delete("token", { path: "/" });
 			context.cookies.delete("refresh_token", { path: "/" });
-			return context.redirect("/login");
+			return context.redirect(getLocalizedLoginPath(currentPath));
 		}
 
 		// Si el token está expirado, intentar renovarlo
@@ -174,7 +196,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 				context.cookies.delete("auth_token", { path: "/" });
 				context.cookies.delete("token", { path: "/" });
 				context.cookies.delete("refresh_token", { path: "/" });
-				return context.redirect("/login");
+				return context.redirect(getLocalizedLoginPath(currentPath));
 			}
 		}
 
@@ -182,7 +204,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		const finalValidation = validateJwtToken(context.cookies.get("auth_token")?.value);
 		if (!finalValidation.valid || finalValidation.payload?.role !== "Super Admin") {
 			console.log('[Middleware] Not a SuperAdmin, redirecting to login');
-			return context.redirect("/login");
+			return context.redirect(getLocalizedLoginPath(currentPath));
 		}
 
 		// Si es SuperAdmin válido, permitir acceso
@@ -201,7 +223,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			context.cookies.delete("auth_token", { path: "/" });
 			context.cookies.delete("token", { path: "/" });
 			context.cookies.delete("refresh_token", { path: "/" });
-			return context.redirect("/login");
+			return context.redirect(getLocalizedLoginPath(currentPath));
 		}
 
 		// Si el token está expirado, intentar renovarlo
@@ -215,7 +237,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 				context.cookies.delete("auth_token", { path: "/" });
 				context.cookies.delete("token", { path: "/" });
 				context.cookies.delete("refresh_token", { path: "/" });
-				return context.redirect("/login");
+				return context.redirect(getLocalizedLoginPath(currentPath));
 			}
 
 			// Si la renovación fue exitosa, continuar con el request
@@ -224,31 +246,32 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	}
 
 	// Si está en la raíz y tiene token válido, ir al dashboard
-	if (currentPath === "/") {
+	// También redireccionar si está en /en raíz
+	if (currentPath === "/" || currentPath === "/en" || currentPath === "/en/") {
 		const validation = validateJwtToken(token);
 		if (token && validation.valid) {
 			// Si es SuperAdmin, ir a SuperAdmin dashboard
 			if (validation.payload?.role === "Super Admin") {
 				return context.redirect("/admin-super");
 			}
-			return context.redirect("/dashboard");
+			return context.redirect(getLocalizedRedirectPath(currentPath, "/dashboard"));
 		}
 	}
 
 	// Si está en login/register y tiene token válido, redirigir a dashboard
-	if ((currentPath === "/login" || currentPath === "/register") && currentPath !== "/admin-super") {
+	if ((currentPath === "/login" || currentPath === "/register" || currentPath === "/en/login" || currentPath === "/en/register") && currentPath !== "/admin-super") {
 		const validation = validateJwtToken(token);
 		if (token && validation.valid) {
 			// Si es SuperAdmin, ir a SuperAdmin dashboard
 			if (validation.payload?.role === "Super Admin") {
 				return context.redirect("/admin-super");
 			}
-			return context.redirect("/dashboard");
+			return context.redirect(getLocalizedRedirectPath(currentPath, "/dashboard"));
 		}
 	}
 
 	// Si es SuperAdmin pero está en onboarding, redirigir a SuperAdmin dashboard
-	if (currentPath === "/onboarding" || currentPath === "/dashboard") {
+	if (currentPath === "/onboarding" || currentPath === "/dashboard" || currentPath === "/en/dashboard") {
 		const validation = validateJwtToken(token);
 		if (token && validation.valid && validation.payload?.role === "Super Admin") {
 			return context.redirect("/admin-super");
@@ -257,3 +280,4 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 	return next();
 });
+

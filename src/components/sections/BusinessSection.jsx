@@ -1,7 +1,8 @@
 import React from "react";
+import { useTranslation, formatNumber } from "../../i18n/utils";
 import AddBusinessForm from "../AddBusinessForm";
 import AddMenuForm from "../AddMenuForm";
-import BusinessList from "../BusinessList";
+import BusinessList from "../BusinessListSafe";
 
 const BusinessSection = ({
 	businesses,
@@ -16,8 +17,10 @@ const BusinessSection = ({
 	onBusinessAdded,
 	onMenuAdded,
 	onMenuScanner,
-	onRefresh
+	onRefresh,
+	isRefreshing
 }) => {
+	const { t } = useTranslation();
 	const [editingBusiness, setEditingBusiness] = React.useState(null);
 
 	const handleAddBusinessClick = () => {
@@ -57,10 +60,10 @@ const BusinessSection = ({
 								d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
 							/>
 						</svg>
-						Mi Negocio
+						{t("dashboard.myBusinesses")}
 					</h2>
 					<p className="neo-text text-neo-gray text-sm sm:text-base lg:text-lg max-w-2xl">
-						Gestiona tu negocio y menús digitales desde aquí
+						{t("dashboard.welcome")}
 					</p>
 
 					{/* Stats Summary */}
@@ -72,13 +75,13 @@ const BusinessSection = ({
 							</svg>
 						</div>
 						<div>
-							<p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Vistas Totales</p>
+							<p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{t("common.totalViews")}</p>
 							<p className="text-xl font-black text-neo-black leading-none">
-								{(businesses?.reduce((acc, business) => {
+								{formatNumber(businesses?.reduce((acc, business) => {
 									return acc + (business.menus?.reduce((menuAcc, menu) => {
 										return menuAcc + (menu.scanCount || menu.ScanCount || 0);
 									}, 0) || 0);
-								}, 0) || 0).toLocaleString()}
+								}, 0) || 0)}
 							</p>
 						</div>
 					</div>
@@ -98,7 +101,7 @@ const BusinessSection = ({
 							>
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
 							</svg>
-							<span>Añadir Negocio</span>
+							<span>{t("business.addBusiness")}</span>
 						</button>
 					</div>
 				)}
@@ -132,6 +135,7 @@ const BusinessSection = ({
 							setBusinesses={setBusinesses}
 							onMenuScanner={onMenuScanner}
 							onRefresh={onRefresh}
+							isRefreshing={isRefreshing}
 						/>
 					</div>
 				)

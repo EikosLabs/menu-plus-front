@@ -134,6 +134,13 @@ export function useTranslation() {
 	const { t, i18n } = useI18nextTranslation();
 	const currentLang = getCurrentLang();
 
+	// Force sync between URL language and i18next instance
+	// This fixes issues where components might render in default lang (es) 
+	// even when on an english route (/en/...)
+	if (i18n.language !== currentLang) {
+		i18n.changeLanguage(currentLang);
+	}
+
 	return {
 		t,
 		currentLang,

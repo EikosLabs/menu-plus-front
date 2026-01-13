@@ -9,6 +9,10 @@ import SavedFlyersList from "./FlyerEditor/SavedFlyersList";
 import { compareIds, normalizeMenuItemIds } from '../utils/idNormalization';
 import SmartHint from "./ui/SmartHint";
 
+import UpgradeModal from "./subscription/UpgradeModal";
+import { useSubscription } from "../hooks/useSubscription";
+import { useTranslation } from "../i18n/utils";
+
 export default function BusinessList({
 	businesses,
 	onAddMenuClick,
@@ -16,268 +20,133 @@ export default function BusinessList({
 	setBusinesses,
 	onMenuScanner,
 	onRefresh,
+	isRefreshing,
 }) {
+	const { checkLimit, isPro } = useSubscription();
+	const { t } = useTranslation();
+	const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+	const [upgradeTrigger, setUpgradeTrigger] = useState("feature");
+
 	const [showAddMenuItem, setShowAddMenuItem] = useState({});
 	const [menuItemToEdit, setMenuItemToEdit] = useState(null);
+
+	// Missing state variables
+	const [selectedMenuId, setSelectedMenuId] = useState(null);
+	const [selectedSection, setSelectedSection] = useState(null);
+	const [selectedBusinessCurrency, setSelectedBusinessCurrency] = useState(null);
+	const [selectedBusinessCategoryId, setSelectedBusinessCategoryId] = useState(null);
+
 	const [showQr, setShowQr] = useState(null);
 	const [showSectionManager, setShowSectionManager] = useState(null);
-	const [selectedSection, setSelectedSection] = useState(null);
-	const [selectedMenuId, setSelectedMenuId] = useState(null);
-	const [selectedBusinessCurrency, setSelectedBusinessCurrency] = useState(0); // Default USD
-	const [selectedBusinessCategoryId, setSelectedBusinessCategoryId] = useState(null);
-	const [showMenuCard, setShowMenuCard] = useState(null); // { businessId, menuId }
-	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null); // { businessId, menuId }
-	const [showSavedFlyers, setShowSavedFlyers] = useState(null); // { menuId }
-	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [showMenuCard, setShowMenuCard] = useState(null);
+	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null);
+	const [showSavedFlyers, setShowSavedFlyers] = useState(null);
 
-	// Función para refrescar datos desde el servidor
-	const handleRefreshBusinessData = async () => {
-		try {
-			setIsRefreshing(true);
-			console.log('Refrescando datos de negocios desde servidor...');
 
-			// Usar el callback onRefresh proporcionado por UserDashboard
-			if (onRefresh && typeof onRefresh === 'function') {
-				await onRefresh();
-				console.log('Datos de negocios actualizados correctamente vía callback');
-			} else {
-				console.error('onRefresh no es una función o no está disponible');
-				// Fallback: Obtener datos actualizados del servidor
-				const updatedBusinesses = await menuService.getUserBusinesses();
-				setBusinesses(updatedBusinesses);
-			}
-		} catch (error) {
-			console.error('Error al refrescar datos:', error);
-		} finally {
-			setIsRefreshing(false);
+	const checkAndExecute = (feature, currentUsage, callback) => {
+		if (checkLimit(feature, currentUsage)) {
+			callback();
+		} else {
+			setUpgradeTrigger(feature);
+			setShowUpgradeModal(true);
 		}
 	};
 
-	// Sin polling automático - las actualizaciones ocurren solo cuando el usuario realiza acciones
+	// Helper to count total items
+	const getTotalItems = (businesses) => {
+		let count = 0;
+		businesses.forEach(b => {
+			b.menus?.forEach(m => {
+				m.sections?.forEach(s => {
+					count += s.menuItems?.length || 0;
+				});
+				// Also count unsectioned items if any? usually they are in sections
+				count += m.menuItems?.length || 0;
+			});
+		});
+		return count;
+	};
 
-	const handleShowAddMenuItem = (menuId, sectionId = null, businessCurrency = 0) => {
-		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
-		setMenuItemToEdit(null);
-		setSelectedSection(sectionId);
+	// Wrappers for actions
+	const handleAddMenuItemClick = (menuId, sectionId, currency) => {
+		const totalItems = getTotalItems(businesses);
+		checkAndExecute('items', totalItems, () => {
+			handleShowAddMenuItem(menuId, sectionId, currency);
+		});
+	};
+
+	const handleAiScanClick = (businessId, menuId) => {
+		// Assuming we track scans in backend, or just block for now if not Pro
+		// For demo, just check isPro
+		if (isPro) {
+			onMenuScanner(businessId, menuId);
+		} else {
+			setUpgradeTrigger('aiScans');
+			setShowUpgradeModal(true);
+		}
+	};
+
+	// Handlers
+	const handleShowAddMenuItem = (menuId, sectionId, currency) => {
 		setSelectedMenuId(menuId);
-		setSelectedBusinessCurrency(businessCurrency);
-		// Encontrar la categoría del negocio
-		const business = businesses.find(b => b.menus?.some(m => compareIds(m.id, menuId)));
-		setSelectedBusinessCategoryId(business?.businessCategoryId || business?.BusinessCategoryId || null);
+		setSelectedSection(sectionId);
+		setSelectedBusinessCurrency(currency);
+
+		const business = businesses.find(b => b.menus?.some(m => m.id === menuId));
+		if (business) {
+			setSelectedBusinessCategoryId(business.businessCategoryId);
+		}
+
+		setShowAddMenuItem(prev => ({ ...prev, [menuId]: true }));
+	};
+
+	const handleShowEditMenuItem = (item, menuId, currency, sectionId) => {
+		setMenuItemToEdit(item);
+		setSelectedMenuId(menuId);
+		setSelectedSection(sectionId);
+		setSelectedBusinessCurrency(currency);
+
+		const business = businesses.find(b => b.menus?.some(m => m.id === menuId));
+		if (business) {
+			setSelectedBusinessCategoryId(business.businessCategoryId);
+		}
+
+		setShowAddMenuItem(prev => ({ ...prev, [menuId]: true }));
 	};
 
 	const handleCancelAddMenuItem = (menuId) => {
-		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: false });
+		setShowAddMenuItem(prev => ({ ...prev, [menuId]: false }));
+		setMenuItemToEdit(null);
 		setSelectedMenuId(null);
-	};
-
-	const handleShowEditMenuItem = (menuItem, menuId, businessCurrency = 0, sectionId = null) => {
-		setMenuItemToEdit({
-			...menuItem,
-			menuId: menuId,
-			sectionId: sectionId || menuItem.sectionId || null,
-		});
-		setShowAddMenuItem({ ...showAddMenuItem, [menuId]: true });
-		setSelectedMenuId(menuId);
-		setSelectedBusinessCurrency(businessCurrency);
-		setSelectedSection(sectionId || menuItem.sectionId || null);
-		// Encontrar la categoría del negocio
-		const business = businesses.find(b => b.menus?.some(m => compareIds(m.id, menuId)));
-		setSelectedBusinessCategoryId(business?.businessCategoryId || business?.BusinessCategoryId || null);
+		setSelectedSection(null);
 	};
 
 	const handleCancelEditMenuItem = () => {
-		setMenuItemToEdit(null);
 		setShowAddMenuItem({});
+		setMenuItemToEdit(null);
 		setSelectedMenuId(null);
+		setSelectedSection(null);
 	};
 
-	const handleItemAdded = async (menuId, newItem) => {
-		try {
-			const normalizedNewItem = normalizeMenuItemIds(newItem);
-			console.log('Agregando item con IDs normalizados:', normalizedNewItem);
-
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) =>
-						compareIds(menu.id, menuId)  // ← COMPARACIÓN SEGURA
-							? {
-								...menu,
-								menuItems: [...(menu.menuItems || []), normalizedNewItem],
-								sections: menu.sections?.map((section) =>
-									compareIds(section.id, normalizedNewItem.sectionId)  // ← COMPARACIÓN SEGURA
-										? {
-											...section,
-											menuItems: [...(section.menuItems || []), normalizedNewItem],
-										}
-										: section,
-								),
-							}
-							: menu,
-					),
-				})),
-			);
-		} catch (error) {
-			console.error('Error adding item:', error);
-		}
+	const handleItemAdded = (menuId, newItem) => {
+		onRefresh();
+		handleCancelAddMenuItem(menuId);
 	};
 
-	const handleItemUpdated = async (updatedItem) => {
-		try {
-			const normalizedItem = normalizeMenuItemIds(updatedItem);
-			console.log('Actualizando item con IDs normalizados:', normalizedItem);
-
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) => {
-						// Encontrar el item actual y ver si cambió de sección usando comparaciones seguras
-						let oldSectionId = null;
-						menu.sections?.forEach((section) => {
-							const found = section.menuItems?.find(item => compareIds(item.id, normalizedItem.id));
-							if (found) {
-								oldSectionId = section.id;
-							}
-						});
-
-						const changedSection = !compareIds(oldSectionId, normalizedItem.sectionId);
-
-						// Actualizar en menuItems general del menú
-						const updatedMenuItems = menu.menuItems?.map((item) =>
-							compareIds(item.id, normalizedItem.id)
-								? { ...item, ...normalizedItem }
-								: item
-						) || [];
-
-						// Actualizar en secciones
-						const updatedSections = menu.sections?.map((section) => {
-							// Si cambió de sección
-							if (changedSection) {
-								// Eliminar de la sección anterior
-								if (compareIds(section.id, oldSectionId)) {
-									return {
-										...section,
-										menuItems: section.menuItems?.filter((item) => !compareIds(item.id, normalizedItem.id)) || [],
-									};
-								}
-								// Agregar a la nueva sección
-								if (compareIds(section.id, normalizedItem.sectionId)) {
-									return {
-										...section,
-										menuItems: [...(section.menuItems || []), normalizedItem],
-									};
-								}
-								// Otras secciones: sin cambios
-								return section;
-							}
-
-							// Si NO cambió de sección, solo actualizar en su sección actual
-							if (compareIds(section.id, oldSectionId)) {
-								return {
-									...section,
-									menuItems: section.menuItems?.map((item) =>
-										compareIds(item.id, normalizedItem.id)
-											? { ...item, ...normalizedItem }
-											: item
-									) || [],
-								};
-							}
-
-							// Otras secciones: sin cambios
-							return section;
-						}) || [];
-
-						return {
-							...menu,
-							menuItems: updatedMenuItems,
-							sections: updatedSections,
-						};
-					}),
-				})),
-			);
-
-			console.log('Item actualizado correctamente');
-		} catch (error) {
-			console.error('Error updating item:', error);
-		}
-	};
-
-	const handleLoadFlyer = (flyer, businessId, menuId) => {
-		setShowSavedFlyers(null);
-
-		// Parse the data with error handling
-		let selectedItemIds = [];
-		let itemsOrder = [];
-
-		try {
-			selectedItemIds = flyer.selectedItemIds ? JSON.parse(flyer.selectedItemIds) : [];
-		} catch (error) {
-			console.error('Error parsing selectedItemIds:', error);
-		}
-
-		try {
-			itemsOrder = flyer.itemsOrder ? JSON.parse(flyer.itemsOrder) : [];
-		} catch (error) {
-			console.error('Error parsing itemsOrder:', error);
-		}
-
-		// Open the appropriate editor with the saved configuration
-		if (flyer.type === 'carta') {
-			setShowMenuCard({
-				businessId,
-				menuId,
-				savedFlyer: {
-					id: flyer.id,
-					name: flyer.name,
-					templateId: flyer.templateId,
-					itemsOrder: itemsOrder,
-					paperSize: flyer.paperSize
-				}
-			});
-		} else {
-			setShowPromotionalFlyer({
-				businessId,
-				menuId,
-				savedFlyer: {
-					id: flyer.id,
-					name: flyer.name,
-					templateId: flyer.templateId,
-					selectedItemIds: selectedItemIds,
-					paperSize: flyer.paperSize
-				}
-			});
-		}
+	const handleItemUpdated = (updatedItem) => {
+		onRefresh();
+		handleCancelEditMenuItem();
 	};
 
 	const handleDeleteMenuItem = async (menuId, itemId, itemName, businessId) => {
-		if (!confirm(`¿Estás seguro de que quieres eliminar "${itemName}"?`)) {
-			return;
-		}
-
-		try {
-			await menuService.deleteMenuItem(itemId);
-			console.log('Eliminando item con ID:', itemId);
-
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) => ({
-						...menu,
-						menuItems: menu.menuItems?.filter((item) => !compareIds(item.id, itemId)) || [],  // ← COMPARACIÓN SEGURA
-						sections: menu.sections?.map((section) => ({
-							...section,
-							menuItems: section.menuItems?.filter(
-								(item) => !compareIds(item.id, itemId),  // ← COMPARACIÓN SEGURA
-							) || [],
-						})),
-					})),
-				})),
-			);
-
-			alert(`Plato "${itemName}" eliminado correctamente.`);
-		} catch (error) {
-			alert(`Error al eliminar el plato: ${error.message}`);
+		if (window.confirm(`¿Estás seguro de que quieres eliminar "${itemName}"?`)) {
+			try {
+				await menuService.deleteMenuItem(businessId, menuId, itemId);
+				onRefresh();
+			} catch (error) {
+				console.error("Error deleting item:", error);
+				alert("Error al eliminar el plato");
+			}
 		}
 	};
 
@@ -285,29 +154,29 @@ export default function BusinessList({
 		setShowSectionManager(menuId);
 	};
 
-	const handleSectionAdded = async (newSection) => {
-		try {
-			setBusinesses((prevBusinesses) =>
-				prevBusinesses.map((business) => ({
-					...business,
-					menus: business.menus?.map((menu) =>
-						menu.id === newSection.menuId
-							? {
-								...menu,
-								sections: [
-									...(menu.sections || []),
-									{ ...newSection, menuItems: [] },
-								],
-							}
-							: menu,
-					),
-				})),
-			);
-		} catch (error) { }
+	const handleSectionAdded = () => {
+		onRefresh();
 	};
+
+	const handleRefreshBusinessData = () => {
+		onRefresh();
+	};
+
+	const handleLoadFlyer = (flyer, businessId, menuId) => {
+		setShowSavedFlyers(null);
+		setShowPromotionalFlyer({ businessId, menuId, savedFlyer: flyer });
+	};
+
+
 
 	return (
 		<div className="space-y-6 sm:space-y-8 lg:space-y-10">
+			<UpgradeModal
+				isOpen={showUpgradeModal}
+				onClose={() => setShowUpgradeModal(false)}
+				trigger={upgradeTrigger}
+			/>
+
 			{/* Indicador de refresco */}
 			{isRefreshing && (
 				<div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mb-6 flex items-center">
@@ -346,7 +215,7 @@ export default function BusinessList({
 									<div className="min-w-0 flex-1">
 										<h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 lg:mb-2 truncate">{business.name}</h2>
 										<p className="text-white text-opacity-90 text-sm sm:text-base lg:text-lg">
-											{business.businessCategory?.name || "Sin categoría"}
+											{business.businessCategory?.name || t("businessInfo.noCategory")}
 										</p>
 									</div>
 								</div>
@@ -635,7 +504,7 @@ export default function BusinessList({
 											</button>
 											{onMenuScanner && (
 												<button
-													onClick={() => onMenuScanner(business.id, menu.id)}
+													onClick={() => handleAiScanClick(business.id, menu.id)}
 													className="neo-btn neo-btn-secondary text-xs sm:text-sm flex items-center justify-center flex-1 sm:flex-initial"
 													title="Escanear menú con IA"
 												>
@@ -694,7 +563,7 @@ export default function BusinessList({
 															<button
 																onClick={() => {
 																	setSelectedSection(section.id);
-																	handleShowAddMenuItem(menu.id, section.id, business.defaultCurrency);
+																	handleAddMenuItemClick(menu.id, section.id, business.defaultCurrency);
 																}}
 																className="neo-btn neo-btn-primary neo-btn-sm flex items-center"
 															>

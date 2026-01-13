@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import aiService from '../services/aiService';
 import LoadingSpinner from './ui/LoadingSpinner';
 import ErrorAlert from './ui/ErrorAlert';
+import { useTranslation } from '../i18n/utils';
 
 // Configure PDF.js worker using unpkg which hosts npm packages
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
@@ -16,6 +17,7 @@ export default function MultiImageMenuScanner({
     foodBusinessId,
     isBackground = false
 }) {
+    const { t } = useTranslation();
     const [files, setFiles] = useState([]); // { id, type: 'image'|'pdf', url, name, size, file, pageNumber? }
     const [loading, setLoading] = useState(false);
     const [processingPdf, setProcessingPdf] = useState(false);
@@ -552,7 +554,7 @@ export default function MultiImageMenuScanner({
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                                 </svg>
                                             </div>
-                                            <p className="text-xs text-gray-500 group-hover:text-orange-600 font-medium">Agregar más</p>
+                                            <p className="text-xs text-gray-500 group-hover:text-orange-600 font-medium">{t("scanner.addMore")}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -573,7 +575,7 @@ export default function MultiImageMenuScanner({
                             onClick={onCancel}
                             className="px-6 py-2.5 border-2 border-gray-300 bg-white text-gray-700 font-bold rounded-xl hover:bg-gray-100 transition-colors"
                         >
-                            Cancelar
+                            {t("common.cancel")}
                         </button>
                         <button
                             onClick={handleAnalyze}

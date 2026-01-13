@@ -3,6 +3,7 @@ import { useOnboarding } from '../../hooks/useOnboarding';
 import { validateStep } from '../../utils/onboardingValidation';
 import menuService from '../../services/menuService';
 import authService from '../../services/authService';
+import { localizeUrl } from '../../i18n/utils';
 import OnboardingProgress from './OnboardingProgress';
 import OnboardingNavigation from './OnboardingNavigation';
 import OnboardingComplete from './OnboardingComplete';
@@ -32,11 +33,11 @@ export default function OnboardingFlow({ userId: propUserId = null, onComplete }
         if (userIdFromToken) {
           setUserId(userIdFromToken);
         } else {
-          window.location.href = '/login';
+          window.location.href = localizeUrl('/login');
         }
       } catch (error) {
         console.error('Error al obtener usuario:', error);
-        window.location.href = '/login';
+        window.location.href = localizeUrl('/login');
       } finally {
         setLoading(false);
       }

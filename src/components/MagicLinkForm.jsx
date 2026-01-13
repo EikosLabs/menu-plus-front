@@ -25,7 +25,7 @@ export default function MagicLinkForm({ showNameField = false }) {
 			case 'email':
 				return validateEmail(email);
 			case 'fullName':
-				return showNameField ? validateRequired(fullName, 'Tu nombre') : null;
+				return showNameField ? validateRequired(fullName, t('auth.fullName')) : null;
 			default:
 				return null;
 		}
@@ -37,7 +37,7 @@ export default function MagicLinkForm({ showNameField = false }) {
 		setTouched({ email: true, fullName: true });
 
 		const emailError = validateEmail(email);
-		const fullNameError = showNameField ? validateRequired(fullName, 'Tu nombre') : null;
+		const fullNameError = showNameField ? validateRequired(fullName, t('auth.fullName')) : null;
 
 		if (emailError || fullNameError) return;
 
@@ -56,16 +56,16 @@ export default function MagicLinkForm({ showNameField = false }) {
 		return (
 			<div className="neo-card neo-space-md text-center">
 				<div className="mb-6"><span className="text-6xl">✉️</span></div>
-				<h2 className="text-2xl font-black text-neo-black mb-4">¡Revisa tu email!</h2>
+				<h2 className="text-2xl font-black text-neo-black mb-4">{t("auth.checkYourEmail")}</h2>
 				<p className="neo-text text-lg mb-4">
-					Te hemos enviado un <strong>enlace mágico</strong> a <strong>{email}</strong>
+					{t("auth.magicLinkSentTo")} <strong>{email}</strong>
 				</p>
 				<div className="bg-neo-lavender border-neo border-neo-black p-4 neo-shadow-sm">
-					<p className="neo-text font-bold text-sm">🔮 Haz clic en el enlace del email para acceder automáticamente</p>
+					<p className="neo-text font-bold text-sm">🔮 {t("auth.clickLinkToAccess")}</p>
 				</div>
 				<p className="neo-text text-sm mt-4 opacity-70">
-					¿No lo ves? Revisa tu carpeta de spam o{" "}
-					<button type="button" onClick={() => setSuccess(false)} className="text-neo-flame hover:underline font-bold">intenta de nuevo</button>
+					{t("auth.dontSeeIt")}{" "}
+					<button type="button" onClick={() => setSuccess(false)} className="text-neo-flame hover:underline font-bold">{t("auth.resend")}</button>
 				</p>
 			</div>
 		);
@@ -76,30 +76,30 @@ export default function MagicLinkForm({ showNameField = false }) {
 			{error && <ErrorAlert error={error} onClose={clearError} onRetry={!loading ? handleSubmit : undefined} />}
 
 			<div className="bg-neo-sunset/20 border-neo border-neo-black p-4 neo-shadow-sm mb-6">
-				<p className="neo-text font-bold text-sm">✨ <strong>Sin contraseñas</strong> — Te enviaremos un enlace mágico a tu email para acceder.</p>
+				<p className="neo-text font-bold text-sm">✨ {t("auth.noPasswordNeeded")}</p>
 			</div>
 
 			{showNameField && (
 				<FormField
-					label={t("auth.fullName") || "Tu nombre"}
+					label={t("auth.fullName")}
 					name="fullName"
 					value={fullName}
 					onChange={(e) => setFullName(e.target.value)}
 					onBlur={() => handleBlur('fullName')}
 					error={getFieldError('fullName')}
-					placeholder="¿Cómo te llamamos?"
+					placeholder={t("auth.fullNamePlaceholder")}
 				/>
 			)}
 
 			<FormField
-				label={t("auth.email") || "Email"}
+				label={t("auth.email")}
 				name="email"
 				type="email"
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
 				onBlur={() => handleBlur('email')}
 				error={getFieldError('email')}
-				placeholder="tu@email.com"
+				placeholder={t("auth.emailPlaceholder")}
 			/>
 
 			<div>
@@ -110,17 +110,10 @@ export default function MagicLinkForm({ showNameField = false }) {
 								<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
 								<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 							</svg>
-							Enviando...
+							{t("common.sending")}
 						</>
-					) : "🔮 Enviar enlace mágico"}
+					) : `🔮 ${t("auth.sendMagicLink")}`}
 				</button>
-			</div>
-
-			<div className="text-center mt-6">
-				<p className="neo-text text-sm">
-					¿Prefieres contraseña?{" "}
-					<a href="/register?mode=password" className="text-neo-flame hover:underline font-bold">Registro tradicional</a>
-				</p>
 			</div>
 		</form>
 	);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import RegisterForm from "./RegisterForm";
 import MagicLinkForm from "./MagicLinkForm";
 import GoogleLoginButton from "./auth/GoogleLoginButton";
+import { useTranslation } from "../i18n/utils";
 
 /**
  * Register component with option to switch between password and magic link
@@ -9,6 +10,7 @@ import GoogleLoginButton from "./auth/GoogleLoginButton";
  */
 export default function RegisterWithOptions() {
     const [useMagicLink, setUseMagicLink] = useState(true);
+    const { t } = useTranslation();
 
     return (
         <div>
@@ -20,7 +22,7 @@ export default function RegisterWithOptions() {
             {/* Divider with "or" */}
             <div className="flex items-center my-4">
                 <div className="flex-1 h-px bg-gray-400"></div>
-                <span className="px-4 text-sm text-gray-600 font-medium">o regístrate con email</span>
+                <span className="px-4 text-sm text-gray-600 font-medium">{t("auth.orRegisterWithEmail")}</span>
                 <div className="flex-1 h-px bg-gray-400"></div>
             </div>
 
@@ -34,7 +36,7 @@ export default function RegisterWithOptions() {
                         : 'bg-white text-neo-black hover:bg-gray-100'
                         }`}
                 >
-                    🔮 Enlace Mágico
+                    🔮 {t("auth.magicLink")}
                 </button>
                 <button
                     type="button"
@@ -44,7 +46,7 @@ export default function RegisterWithOptions() {
                         : 'bg-white text-neo-black hover:bg-gray-100'
                         }`}
                 >
-                    🔐 Contraseña
+                    🔐 {t("auth.password")}
                 </button>
             </div>
 

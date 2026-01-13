@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { validateStepQuickStart } from '../../utils/onboardingValidation';
 import menuService from '../../services/menuService';
 import authService from '../../services/authService';
+import { localizeUrl } from '../../i18n/utils';
 import OnboardingComplete from './OnboardingComplete';
 import StepQuickStart from './steps/StepQuickStart';
 
@@ -35,11 +36,11 @@ export default function OnboardingFlowQuickStart({ userId: propUserId = null, on
                 if (userIdFromToken) {
                     setUserId(userIdFromToken);
                 } else {
-                    window.location.href = '/login';
+                    window.location.href = localizeUrl('/login');
                 }
             } catch (error) {
                 console.error('Error al obtener usuario:', error);
-                window.location.href = '/login';
+                window.location.href = localizeUrl('/login');
             } finally {
                 setLoading(false);
             }

@@ -29,6 +29,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 
 # Copy the rest of the application source code
+# Force cache bust
+ENV CACHE_BUST=20250113-2
 COPY . .
 
 # Set environment variables for build time (needed for Astro static generation)

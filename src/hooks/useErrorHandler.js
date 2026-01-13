@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { AppError, parseValidationErrors } from '../utils/AppError';
 import { ERROR_TYPES, requiresReAuth, isRetryableError } from '../utils/errorTypes';
 import { useSentryError } from './useSentryError';
+import { localizeUrl } from '../i18n/utils';
 
 /**
  * Hook para manejo centralizado de errores
@@ -77,7 +78,7 @@ export const useErrorHandler = () => {
         level: 'info',
       });
       setTimeout(() => {
-        window.location.href = '/login';
+        window.location.href = localizeUrl('/login');
       }, 2000);
     }
 

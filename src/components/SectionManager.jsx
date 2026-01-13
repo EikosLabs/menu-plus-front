@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import menuService from "../services/menuService";
+import { useTranslation } from "../i18n/utils";
 
 export default function SectionManager({
 	menuId,
@@ -8,6 +9,7 @@ export default function SectionManager({
 	onSectionMoved,
 	onClose,
 }) {
+	const { t } = useTranslation();
 	const [sections, setSections] = useState([]);
 	const [newSection, setNewSection] = useState({ name: "", description: "" });
 	const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +70,7 @@ export default function SectionManager({
 		// Encontrar la sección actual en el array ordenado
 		const sortedSections = sections.sort((a, b) => a.order - b.order);
 		const currentIndex = sortedSections.findIndex(section => section.id === sectionId);
-		
+
 		// Verificar si ya está en la primera posición
 		if (currentIndex <= 0) {
 			return;
@@ -82,7 +84,7 @@ export default function SectionManager({
 			if (onSectionMoved) {
 				onSectionMoved(updatedSection);
 			}
-			
+
 			// Recargar las secciones para obtener el orden actualizado
 			await loadSections();
 		} catch (error) {
@@ -97,7 +99,7 @@ export default function SectionManager({
 		// Encontrar la sección actual en el array ordenado
 		const sortedSections = sections.sort((a, b) => a.order - b.order);
 		const currentIndex = sortedSections.findIndex(section => section.id === sectionId);
-		
+
 		// Verificar si ya está en la última posición
 		if (currentIndex >= sortedSections.length - 1 || currentIndex === -1) {
 			return;
@@ -111,7 +113,7 @@ export default function SectionManager({
 			if (onSectionMoved) {
 				onSectionMoved(updatedSection);
 			}
-			
+
 			// Recargar las secciones para obtener el orden actualizado
 			await loadSections();
 		} catch (error) {
@@ -132,7 +134,7 @@ export default function SectionManager({
 			setError(null);
 			await menuService.deleteSection(menuId, sectionId);
 			setSections((prev) => prev.filter(s => s.id !== sectionId));
-			
+
 			// Recargar para asegurar sincronización
 			await loadSections();
 		} catch (error) {
@@ -310,7 +312,7 @@ export default function SectionManager({
 									Agregando...
 								</div>
 							) : (
-								"Agregar Sección"
+								t("sections.addSection")
 							)}
 						</button>
 					</form>
@@ -347,11 +349,10 @@ export default function SectionManager({
 												<button
 													onClick={() => handleMoveUp(section.id)}
 													disabled={isLoading || index === 0}
-													className={`neo-btn neo-btn-sm p-1.5 sm:p-2 ${
-														index === 0
-															? "opacity-50 cursor-not-allowed bg-gray-200"
-															: "bg-neo-sky hover:bg-neo-sky-dark"
-													}`}
+													className={`neo-btn neo-btn-sm p-1.5 sm:p-2 ${index === 0
+														? "opacity-50 cursor-not-allowed bg-gray-200"
+														: "bg-neo-sky hover:bg-neo-sky-dark"
+														}`}
 													title={
 														index === 0
 															? "No se puede mover hacia arriba (ya está en la primera posición)"
@@ -375,11 +376,10 @@ export default function SectionManager({
 												<button
 													onClick={() => handleMoveDown(section.id)}
 													disabled={isLoading || index === sections.length - 1}
-													className={`neo-btn neo-btn-sm p-1.5 sm:p-2 ${
-														index === sections.length - 1
-															? "opacity-50 cursor-not-allowed bg-gray-200"
-															: "bg-neo-sky hover:bg-neo-sky-dark"
-													}`}
+													className={`neo-btn neo-btn-sm p-1.5 sm:p-2 ${index === sections.length - 1
+														? "opacity-50 cursor-not-allowed bg-gray-200"
+														: "bg-neo-sky hover:bg-neo-sky-dark"
+														}`}
 													title={
 														index === sections.length - 1
 															? "No se puede mover hacia abajo (ya está en la última posición)"

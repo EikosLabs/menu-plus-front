@@ -4,6 +4,7 @@ import { exportToImage } from './utils/pdfExport';
 import { FOLLETO_TEMPLATES, FOLLETO_FORMATS, COLOR_PALETTES } from './utils/flyerTemplates';
 import PromotionalFlyerPreview from './PromotionalFlyerPreview';
 import menuService from '../../services/menuService';
+import { useTranslation } from '../../i18n/utils';
 
 /**
  * Promotional Flyer Generator - Small promotional prints
@@ -16,6 +17,7 @@ export default function PromotionalFlyerGenerator({
   onClose,
   savedFlyer = null
 }) {
+  const { t } = useTranslation();
   const [selectedTemplate, setSelectedTemplate] = useState(savedFlyer?.templateId || 'especiales');
   const [selectedItems, setSelectedItems] = useState(() => {
     if (savedFlyer?.selectedItemIds && savedFlyer.selectedItemIds.length > 0) {
@@ -263,11 +265,10 @@ export default function PromotionalFlyerGenerator({
                         setSelectedItems(selectedItems.slice(0, tmpl.maxItems));
                       }
                     }}
-                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${
-                      selectedTemplate === tmpl.id
+                    className={`w-full text-left p-2 sm:p-3 neo-border rounded-lg transition-all ${selectedTemplate === tmpl.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                         : 'hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
                       <span className="text-xl sm:text-2xl flex-shrink-0">{tmpl.icon}</span>
@@ -307,11 +308,10 @@ export default function PromotionalFlyerGenerator({
               <div className="space-y-1.5 max-h-[200px] overflow-auto">
                 <button
                   onClick={() => setSelectedPalette(null)}
-                  className={`w-full text-left p-2 neo-border rounded-lg transition-all ${
-                    selectedPalette === null
+                  className={`w-full text-left p-2 neo-border rounded-lg transition-all ${selectedPalette === null
                       ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                       : 'hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-base">🎨</span>
@@ -329,11 +329,10 @@ export default function PromotionalFlyerGenerator({
                   <button
                     key={palette.id}
                     onClick={() => setSelectedPalette(palette.id)}
-                    className={`w-full text-left p-2 neo-border rounded-lg transition-all ${
-                      selectedPalette === palette.id
+                    className={`w-full text-left p-2 neo-border rounded-lg transition-all ${selectedPalette === palette.id
                         ? 'neo-border-thick border-neo-flame bg-neo-lavender'
                         : 'hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-base">{palette.icon}</span>
@@ -426,11 +425,10 @@ export default function PromotionalFlyerGenerator({
                     <button
                       key={item.id}
                       onClick={() => toggleItemSelection(item)}
-                      className={`w-full text-left neo-border p-2 rounded flex items-center gap-1.5 sm:gap-2 transition-all ${
-                        isSelected
+                      className={`w-full text-left neo-border p-2 rounded flex items-center gap-1.5 sm:gap-2 transition-all ${isSelected
                           ? 'bg-neo-flame text-white border-neo-flame'
                           : 'bg-white hover:bg-gray-50'
-                      }`}
+                        }`}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="neo-text-bold text-xs sm:text-sm truncate">{item.name}</div>
@@ -494,7 +492,7 @@ export default function PromotionalFlyerGenerator({
               onClick={onClose}
               className="neo-btn neo-btn-white flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              Cancelar
+              {t("common.cancel")}
             </button>
             <button
               onClick={handleSave}
@@ -502,7 +500,7 @@ export default function PromotionalFlyerGenerator({
               className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               {isSaving ? '⏳' : savedId ? '💾' : '💾'}
-              <span className="hidden sm:inline ml-1">{isSaving ? 'Guardando...' : savedId ? 'Actualizar' : 'Guardar'}</span>
+              <span className="hidden sm:inline ml-1">{isSaving ? t("common.saving") : savedId ? t("common.update") : t("common.save")}</span>
             </button>
             <button
               onClick={handleExport}
@@ -510,7 +508,7 @@ export default function PromotionalFlyerGenerator({
               className="neo-btn neo-btn-primary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               {isExporting ? '⏳' : '🖼️'}
-              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PNG'}</span>
+              <span className="hidden sm:inline ml-1">{isExporting ? t("common.generating") : t("common.downloadPNG")}</span>
             </button>
             <button
               onClick={handleExportJpg}
@@ -518,7 +516,7 @@ export default function PromotionalFlyerGenerator({
               className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               {isExporting ? '⏳' : '🖼️'}
-              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar JPG'}</span>
+              <span className="hidden sm:inline ml-1">{isExporting ? t("common.generating") : t("common.downloadJPG")}</span>
             </button>
             <button
               onClick={handleExportPdf}
@@ -526,7 +524,7 @@ export default function PromotionalFlyerGenerator({
               className="neo-btn neo-btn-secondary flex-1 sm:flex-initial text-xs px-2 sm:px-3 py-1.5 sm:py-2"
             >
               {isExporting ? '⏳' : '📄'}
-              <span className="hidden sm:inline ml-1">{isExporting ? 'Generando...' : 'Descargar PDF'}</span>
+              <span className="hidden sm:inline ml-1">{isExporting ? t("common.generating") : t("common.downloadPDF")}</span>
             </button>
           </div>
         </div>

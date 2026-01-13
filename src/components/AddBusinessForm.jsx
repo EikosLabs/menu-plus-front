@@ -314,7 +314,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 					<svg className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 text-neo-flame flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
-					{isEditing ? "Editar Información del Negocio" : t("business.basicInfo")}
+					{isEditing ? t("business.editBusiness") : t("business.basicInfo")}
 				</h3>
 
 				<div className="space-y-3 sm:space-y-4">
@@ -361,7 +361,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 					/>
 
 					<SelectField
-						label="Moneda Predeterminada"
+						label={t("business.defaultCurrency")}
 						name="defaultCurrency"
 						value={formData.defaultCurrency}
 						onChange={handleFieldChange}
@@ -370,7 +370,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 							value: curr.value,
 							label: `${curr.symbol} ${curr.name} (${curr.code})`
 						}))}
-						placeholder="Selecciona la moneda"
+						placeholder={t("business.selectCurrency")}
 					/>
 				</div>
 			</div>
@@ -518,7 +518,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 				</h3>
 
 				<div className="mb-6">
-					<h4 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Presets Recomendados</h4>
+					<h4 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">{t("business.recommendedPresets")}</h4>
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
 						{Object.values(THEME_PALETTES).map((palette, index) => (
 							<button
@@ -544,7 +544,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 					<CircularColorPicker
 						color={formData.primaryColor}
 						onChange={(c) => handleColorChange("primaryColor", c)}
-						label="Color Principal"
+						label={t("business.primaryColor")}
 					/>
 
 					{/* Preview of auto-generated colors */}
@@ -566,7 +566,7 @@ export default function AddBusinessForm({ onBusinessAdded, onCancel, existingBus
 								title="Acento (auto)"
 							/>
 						</div>
-						<span className="text-xs text-gray-500">+ variantes automáticas</span>
+						<span className="text-xs text-gray-500">{t("business.automaticVariants")}</span>
 					</div>
 				</div>
 			</div>

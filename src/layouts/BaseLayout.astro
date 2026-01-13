@@ -87,27 +87,46 @@ const showLanguageSwitcher = !Astro.url.pathname.startsWith("/admin-super");
           return; // No aplicar lógica de idioma en rutas de SuperAdmin
         }
 
-        if (savedLang && savedLang !== htmlLang) {
+        // 1. Si estamos en una URL con idioma explícito (no 'es'), esa es la prioridad.
+        // Actualizamos la preferencia guardada y nos quedamos aquí.
+        if (htmlLang !== 'es') {
+          if (savedLang !== htmlLang) {
+            localStorage.setItem('preferred-language', htmlLang);
+          }
+          return;
+        }
+
+        // 2. Si es primera visita (no hay idioma guardado), detectar del navegador
+        if (!savedLang) {
+          const browserLang = navigator.language || navigator.languages?.[0] || 'es';
+          const detectedLang = browserLang.startsWith('en') ? 'en' : 'es';
+          
+          // Guardar la preferencia detectada
+          localStorage.setItem('preferred-language', detectedLang);
+          
+          // Si el navegador es inglés y no estamos en /en/, redirigir
+          if (detectedLang === 'en' && !currentPath.startsWith('/en')) {
+            const newPath = `/en${currentPath === '/' ? '' : currentPath}`;
+            window.location.replace(newPath);
+            return;
+          }
+        }
+
+        // 3. Si estamos en el idioma por defecto ('es') pero la preferencia es 'en', redirigir
+        if (savedLang && savedLang !== 'es' && htmlLang === 'es') {
           const pathSegments = currentPath.split('/').filter(segment => segment);
 
-          // Remover idioma actual si existe
+          // Remover idioma actual si existe (aunque si htmlLang es es, no debería haber prefijo usualmente)
           if (['es', 'en'].includes(pathSegments[0])) {
             pathSegments.shift();
           }
 
           // Construir nueva ruta
-          let newPath = '';
-          if (savedLang !== 'es') {
-            newPath = `/${savedLang}`;
-          }
-
+          let newPath = `/${savedLang}`;
           if (pathSegments.length > 0) {
             newPath += `/${pathSegments.join('/')}`;
           }
-
-          if (!newPath) {
-            newPath = '/';
-          }
+          if (!newPath) newPath = '/';
 
           if (newPath !== currentPath) {
             window.location.replace(newPath);

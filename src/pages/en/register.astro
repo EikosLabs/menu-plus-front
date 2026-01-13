@@ -1,40 +1,56 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { t } from "../../i18n/utils";
+import Layout from "../../layouts/Layout.astro";
 import RegisterWithOptions from "../../components/RegisterWithOptions.jsx";
+import { t } from "../../i18n/utils";
 
 const lang = "en";
 ---
-<BaseLayout title={`${t('auth.register', lang)} - MenuPlus`} lang={lang}>
+<Layout title={`${t('auth.register', lang)} - Menu Plus Platform`}>
   <main class="min-h-screen bg-neo-lavender flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden">
+    <!-- Animated Background Pattern -->
     <div class="absolute inset-0 neo-bg-grid-colorful opacity-15 pointer-events-none"></div>
+
+    <!-- Decorative Shapes -->
     <div class="absolute top-10 right-10 neo-shape-circle opacity-15 hidden lg:block" style="background-color: var(--neo-sunset); width: 60px; height: 60px;"></div>
     <div class="absolute bottom-10 left-10 neo-shape-square opacity-15 hidden lg:block" style="width: 60px; height: 60px;"></div>
+
     <div class="relative z-10 w-full max-w-md">
+      <!-- Register Card 3D -->
       <div class="neo-card-3d-sunset p-6 md:p-8 neo-corner-accent">
+        <!-- Logo -->
         <div class="text-center mb-4">
-          <img src="/logo.png" alt="Menu Plus Platform Logo" class="w-16 mx-auto mb-3" />
+          <img src="/logo.png" alt="Menu Plus Platform Logo" class="w-24 mx-auto mb-3" />
+
+          <!-- Badge -->
           <div class="inline-block neo-sticker mb-2 text-sm" style="background-color: white; color: var(--neo-black);">
-            ✨ {t('auth.register', lang)}
+            ✨ {t('auth.freeRegistration', lang)}
           </div>
         </div>
+
+        <!-- Title -->
         <h1 class="neo-heading neo-h3 text-center mb-1">
-          Start in Seconds
+          {t('auth.startInSeconds', lang)}
         </h1>
         <p class="neo-text text-center mb-5 text-sm" style="color: var(--neo-black);">
-          Choose how you want to register.
+          {t('auth.chooseRegisterMethod', lang)}
         </p>
 
         <!-- Register Form with Options (Magic Link / Password) -->
         <RegisterWithOptions client:load />
-        
+
+        <!-- Divider -->
         <div class="neo-divider my-5"></div>
+
+        <!-- Login Link -->
         <div class="text-center">
           <p class="neo-text mb-3 text-sm" style="color: var(--neo-black);">
             {t('auth.alreadyHaveAccount', lang)}
           </p>
-          <a href="/en/login" class="neo-btn neo-btn-secondary w-full inline-flex items-center justify-center">
-            {t('auth.login', lang)}
+          <a
+            href="/en/login"
+            class="neo-btn neo-btn-secondary w-full inline-flex items-center justify-center"
+          >
+            {t('auth.signIn', lang)}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
@@ -43,4 +59,4 @@ const lang = "en";
       </div>
     </div>
   </main>
-</BaseLayout>
+</Layout>

@@ -15,6 +15,7 @@ import TextImprovementButton from "./ai/TextImprovementButton";
 import ImageAnalysisButton from "./ai/ImageAnalysisButton";
 import { normalizeId } from '../utils/idNormalization';
 import { getBusinessAIContext } from '../utils/aiContextMapper';
+import { useTranslation } from "../i18n/utils";
 
 export default function AddMenuItem({
 	menuId,
@@ -27,6 +28,7 @@ export default function AddMenuItem({
 	existingItem,
 	isEditing,
 }) {
+	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState(null);
 	const [categories, setCategories] = useState([]);
@@ -279,7 +281,7 @@ export default function AddMenuItem({
 		<Modal
 			isOpen={true}
 			onClose={onCancel}
-			title={isEditing ? "Editar Plato" : "Agregar Nuevo Plato"}
+			title={isEditing ? t("menuItem.editItem") : t("menuItem.addItem")}
 			icon={icon}
 			iconBgColor={isEditing ? "bg-neo-sunset" : "bg-neo-flame"}
 			iconColor={isEditing ? "text-neo-sunset" : "text-neo-flame"}
@@ -306,7 +308,7 @@ export default function AddMenuItem({
 						fileInputRef={fileInputRef}
 						disabled={loading}
 						error={imageError}
-						label="Imagen del Plato"
+						label={t("menuItem.image")}
 					/>
 
 					<div className="space-y-3">
@@ -331,7 +333,7 @@ export default function AddMenuItem({
 						/>
 
 						<FormField
-							label="Nombre del Plato"
+							label={t("menuItem.itemName")}
 							name="name"
 							value={values.name}
 							onChange={handleChange}
@@ -377,7 +379,7 @@ export default function AddMenuItem({
 							onChange={handleChange}
 							options={categoryOptions}
 							disabled={loading || loadingCategories}
-							placeholder="Sin categoría"
+							placeholder={t("businessInfo.noCategory")}
 						/>
 
 						{/* Debug info */}
@@ -428,7 +430,7 @@ export default function AddMenuItem({
 						className="neo-btn neo-btn-white w-full sm:w-auto"
 						disabled={loading}
 					>
-						Cancelar
+						{t("common.cancel")}
 					</button>
 					<button
 						type="submit"
@@ -445,7 +447,7 @@ export default function AddMenuItem({
 								{isEditing ? "Actualizando..." : "Agregando..."}
 							</div>
 						) : (
-							<span>{isEditing ? "Actualizar Plato" : "Agregar Plato"}</span>
+							<span>{isEditing ? t("menuItem.editItem") : t("menuItem.addItem")}</span>
 						)}
 					</button>
 				</div>

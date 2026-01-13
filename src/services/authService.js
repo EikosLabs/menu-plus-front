@@ -422,6 +422,33 @@ export const authService = {
 			throw AppError.fromNetworkError(error, { endpoint: '/auth/magic-link/register' });
 		}
 	},
+
+	async getSubscription() {
+		try {
+			// Try to get from local storage first to be fast
+			const stored = localStorage.getItem('userSubscription');
+			if (stored) {
+				const parsed = JSON.parse(stored);
+				// If not expired (check timestamp if added), use it. For now just fetch fresh.
+			}
+
+			const response = await fetch(`${API_URL}/billing/subscription`, {
+				headers: this.getAuthHeaders()
+			});
+
+			if (!response.ok) {
+				// Fallback to free plan structure if endpoint fails (e.g. not implemented yet)
+				return { planType: 'free', isPro: false };
+			}
+
+			const data = await response.json();
+			localStorage.setItem('userSubscription', JSON.stringify(data));
+			return data;
+		} catch (error) {
+			console.warn('Could not fetch subscription', error);
+			return { planType: 'free', isPro: false };
+		}
+	}
 };
 
 export default authService;

@@ -3,6 +3,7 @@ import authService from "../services/authService";
 import menuService from "../services/menuService";
 import { AppError } from "../utils/AppError";
 import { ERROR_TYPES } from "../utils/errorTypes";
+import { localizeUrl, getCurrentLang } from "../i18n/utils";
 
 export const useAuth = () => {
 	const [userData, setUserData] = useState(null);
@@ -11,7 +12,7 @@ export const useAuth = () => {
 	const loadUserData = useCallback(async () => {
 		// Verificar autenticación
 		if (!authService.isAuthenticated()) {
-			window.location.href = "/login";
+			window.location.href = localizeUrl("/login");
 			return;
 		}
 
@@ -19,7 +20,7 @@ export const useAuth = () => {
 		if (authService.isTokenExpired()) {
 			console.log('[useAuth] Token expired, redirecting to login');
 			authService.logout();
-			window.location.href = "/login";
+			window.location.href = localizeUrl("/login");
 			return;
 		}
 
@@ -28,7 +29,7 @@ export const useAuth = () => {
 		if (!currentUserId) {
 			console.log('[useAuth] No userId found in token, redirecting to login');
 			authService.logout();
-			window.location.href = "/login";
+			window.location.href = localizeUrl("/login");
 			return;
 		}
 
@@ -64,7 +65,7 @@ export const useAuth = () => {
 			if (error instanceof AppError && error.type === ERROR_TYPES.UNAUTHORIZED) {
 				console.log('[useAuth] Unauthorized error, redirecting to login');
 				authService.logout();
-				window.location.href = "/login";
+				window.location.href = localizeUrl("/login");
 				return;
 			}
 
@@ -88,7 +89,7 @@ export const useAuth = () => {
 	const logout = () => {
 		authService.logout();
 		setUserData(null);
-		window.location.href = "/login";
+		window.location.href = localizeUrl("/login");
 	};
 
 	return { userData, setUserData, loading, logout, refreshUserData: loadUserData };

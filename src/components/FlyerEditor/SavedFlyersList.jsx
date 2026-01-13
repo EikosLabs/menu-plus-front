@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import menuService from '../../services/menuService';
+import { useTranslation } from '../../i18n/utils';
 
 /**
  * Saved Flyers List - Display saved flyers/cartas for a menu
  */
 export default function SavedFlyersList({ menu, onClose, onLoadFlyer }) {
+  const { t } = useTranslation();
   const [flyers, setFlyers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
@@ -88,14 +90,14 @@ export default function SavedFlyersList({ menu, onClose, onLoadFlyer }) {
         <div className="p-4 max-h-[60vh] overflow-auto">
           {loading ? (
             <div className="text-center py-8">
-              <div className="neo-text opacity-70">Cargando...</div>
+              <div className="neo-text opacity-70">{t("common.loading")}</div>
             </div>
           ) : flyers.length === 0 ? (
             <div className="text-center py-12">
               <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <h3 className="neo-h4 mb-2">No hay folletos guardados</h3>
+              <h3 className="neo-h4 mb-2">{t("flyers.noFlyers")}</h3>
               <p className="neo-text text-sm opacity-70">
                 Crea un folleto o carta y guárdalo para verlo aquí
               </p>
@@ -149,7 +151,7 @@ export default function SavedFlyersList({ menu, onClose, onLoadFlyer }) {
                         disabled={deleting === flyer.id}
                         className="neo-btn neo-btn-sm text-xs text-red-600 hover:bg-red-50"
                       >
-                        {deleting === flyer.id ? 'Eliminando...' : 'Eliminar'}
+                        {deleting === flyer.id ? t("common.deleting") : t("common.delete")}
                       </button>
                     </div>
                   </div>
@@ -165,7 +167,7 @@ export default function SavedFlyersList({ menu, onClose, onLoadFlyer }) {
             onClick={onClose}
             className="neo-btn neo-btn-white"
           >
-            Cerrar
+            {t("common.close")}
           </button>
         </div>
       </div>
