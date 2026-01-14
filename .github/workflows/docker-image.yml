@@ -55,3 +55,18 @@ jobs:
             
             echo "✅ Frontend deployed successfully!"
             sudo docker logs menusesqr-front --tail 20
+
+      - name: Run Playwright E2E Tests
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            echo "⏳ Waiting for frontend to be ready..."
+            sleep 10
+            
+            cd /home/ubuntu/menu-plus/menu-plus-front
+            ./run-tests.sh
