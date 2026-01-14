@@ -71,7 +71,7 @@ export default function LoginForm() {
   };
 
   return (
-    <form className="neo-space-md" onSubmit={handleSubmit}>
+    <form className="neo-space-md" onSubmit={handleSubmit} data-testid="login-form">
       {/* Error Alert */}
       {error && (
         <ErrorAlert
@@ -84,6 +84,7 @@ export default function LoginForm() {
       {success && (
         <LoginSuccessNotification
           visible={success}
+          data-testid="login-success"
           onComplete={() => {
             window.location.href = "/dashboard";
           }}

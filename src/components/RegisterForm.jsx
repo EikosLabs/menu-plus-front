@@ -125,12 +125,13 @@ export default function RegisterForm() {
     return (
       <SuccessAlert
         message={t("auth.registerSuccess")}
+        data-testid="register-success"
       />
     );
   }
 
   return (
-    <form className="neo-space-md" onSubmit={handleSubmit}>
+    <form className="neo-space-md" onSubmit={handleSubmit} data-testid="register-form">
       {/* Error Alert */}
       {error && (
         <ErrorAlert

@@ -79,7 +79,7 @@ export default function ErrorAlert({ error, onClose, onRetry, className = '' }) 
   };
 
   return (
-    <div className={`neo-alert neo-alert-error flex items-start gap-4 shadow-lg animate-neo-slide-down ${isShaking ? 'animate-neo-shake' : ''} ${className}`}>
+    <div className={`neo-alert neo-alert-error flex items-start gap-4 shadow-lg animate-neo-slide-down ${isShaking ? 'animate-neo-shake' : ''} ${className}`} role="alert" data-testid="error-alert">
       {/* Icon Box */}
       <div className="flex-shrink-0 bg-white/20 p-2 rounded-full text-white">
         {getIcon()}
@@ -137,7 +137,7 @@ export function SuccessAlert({ message, onClose, className = '', autoDismiss = f
   if (!message) return null;
 
   return (
-    <div className={`neo-alert neo-alert-success flex items-start gap-4 shadow-lg animate-neo-pop-in ${className}`}>
+    <div className={`neo-alert neo-alert-success flex items-start gap-4 shadow-lg animate-neo-pop-in ${className}`} role="alert" data-testid="success-alert">
       <div className="flex-shrink-0 bg-green-100 p-2 rounded-full border-2 border-green-600 text-green-700">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />

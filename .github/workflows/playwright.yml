@@ -1,0 +1,136 @@
+name: Playwright E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: weightless
+          POSTGRES_PASSWORD: devpassword123
+          POSTGRES_DB: menus
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: carbohydrate
+          MINIO_ROOT_PASSWORD: devpassword123
+        ports:
+          - 9000:9000
+          - 9001:9001
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Create MinIO bucket
+        run: |
+          # Wait for MinIO to be ready
+          sleep 5
+          # Install mc (MinIO client)
+          curl -O https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x mc
+          # Configure mc
+          ./mc alias set local http://localhost:9000 carbohydrate devpassword123
+          # Create bucket
+          ./mc mb local/menuplus-files --ignore-existing
+          # Set bucket policy to public
+          ./mc anonymous set download local/menuplus-files
+
+      - name: Clone and build backend
+        run: |
+          git clone https://github.com/glyphium/menu-plus-back.git ../menu-plus-back
+          cd ../menu-plus-back/MenuPlus/MenuPlus
+          # Create appsettings.Docker.json for CI
+          cat > appsettings.Docker.json << 'EOF'
+          {
+            "ConnectionStrings": {
+              "DefaultConnection": "Host=localhost;Port=5432;Database=menus;Username=weightless;Password=devpassword123"
+            },
+            "Jwt": {
+              "Secret": "ci-test-secret-key-that-is-long-enough-for-jwt-validation",
+              "Issuer": "MenuPlusAPI",
+              "Audience": "MenuPlusClient",
+              "AccessTokenExpirationMinutes": 60,
+              "RefreshTokenExpirationDays": 7
+            },
+            "MinIO": {
+              "Endpoint": "localhost:9000",
+              "AccessKey": "carbohydrate",
+              "SecretKey": "devpassword123",
+              "BucketName": "menuplus-files",
+              "UseSSL": false,
+              "PublicEndpoint": "http://localhost:9000"
+            }
+          }
+          EOF
+
+      - name: Start backend
+        run: |
+          cd ../menu-plus-back/MenuPlus/MenuPlus
+          dotnet run --environment Docker &
+          # Wait for backend to be ready
+          for i in {1..30}; do
+            if curl -s http://localhost:5000/api/health | grep -q "OK"; then
+              echo "Backend is ready"
+              break
+            fi
+            echo "Waiting for backend... ($i/30)"
+            sleep 2
+          done
+
+      - name: Run Playwright tests
+        run: npm test
+        env:
+          PUBLIC_API_URL: http://localhost:5000/api
+          PLAYWRIGHT_BASE_URL: http://localhost:4321
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
