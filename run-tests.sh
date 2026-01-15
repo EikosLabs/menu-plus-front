@@ -36,9 +36,7 @@ echo "📦 Installing dependencies..."
 npm install
 
 echo "🌐 Setting environment variables..."
-export PUBLIC_API_URL="http://localhost:8080/api"
 export PLAYWRIGHT_BASE_URL="http://localhost:4321"
-export API_BACKEND_URL="http://localhost:8080"
 export CI=true
 
 echo "🔧 Overriding .env for tests..."
@@ -67,7 +65,7 @@ docker stop menusesqr-front || true
 sleep 2
 
 echo "🚀 Starting frontend in dev mode..."
-npm run dev > /tmp/astro-dev.log 2>&1 &
+PUBLIC_API_URL="http://localhost:8080/api" API_BACKEND_URL="http://localhost:8080" npm run dev > /tmp/astro-dev.log 2>&1 &
 DEV_PID=$!
 echo "Dev server started with PID: $DEV_PID"
 
