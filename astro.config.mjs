@@ -26,7 +26,7 @@ export default defineConfig({
             ],
             proxy: {
                 '/api': {
-                    target: 'http://localhost:5000',
+                    target: import.meta.env.API_BACKEND_URL || 'http://localhost:5000',
                     changeOrigin: true,
                     rewrite: (path) => path,
                     bodyLimit: 50 * 1024 * 1024, // 50MB

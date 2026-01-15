@@ -38,11 +38,13 @@ npm install
 echo "🌐 Setting environment variables..."
 export PUBLIC_API_URL="http://localhost:8080/api"
 export PLAYWRIGHT_BASE_URL="http://localhost:4321"
+export API_BACKEND_URL="http://localhost:8080"
 export CI=true
 
 echo "🔧 Overriding .env for tests..."
 echo "PUBLIC_API_URL=http://localhost:8080/api" > .env.local
 echo "PLAYWRIGHT_BASE_URL=http://localhost:4321" >> .env.local
+echo "API_BACKEND_URL=http://localhost:8080" >> .env.local
 
 echo "✅ Verifying services are running..."
 if ! docker ps | grep -q menusesqr-back; then
