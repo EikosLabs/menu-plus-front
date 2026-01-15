@@ -64,8 +64,8 @@ test.describe('Login Flow', () => {
     // Submit form
     await page.click('button[type="submit"]');
 
-    // Should redirect to dashboard or onboarding
-    await expect(page).toHaveURL(/\/(dashboard|onboarding)/, { timeout: 10000 });
+    // Should redirect to dashboard or onboarding with longer timeout for server response
+    await expect(page).toHaveURL(/\/(dashboard|onboarding)/, { timeout: 15000 });
   });
 
   test('should require password field', async ({ page }) => {

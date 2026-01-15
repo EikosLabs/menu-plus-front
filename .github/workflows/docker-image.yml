@@ -64,6 +64,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          command_timeout: 20m
           script: |
             set +e
             echo "⏳ Waiting for frontend to be ready..."

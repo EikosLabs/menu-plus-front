@@ -11,6 +11,10 @@ FROM node:18-alpine AS base
 # Set environment variable for increased request body size (50MB)
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
+# Argument to allow setting API backend URL at build time
+ARG API_BACKEND_URL=http://localhost:5000
+ENV API_BACKEND_URL=${API_BACKEND_URL}
+
 # ----- Dependencies layer -----------------------------------------------------
 FROM base AS deps
 WORKDIR /app
@@ -28,12 +32,15 @@ WORKDIR /app
 # Copy installed node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy the rest of the application source code
+# Copy rest of application source code
 # Force cache bust
 ENV CACHE_BUST=20250113-2
 COPY . .
 
 # Set environment variables for build time (needed for Astro static generation)
+# These URLs will be overridden by docker-compose environment variables at runtime
+ENV PUBLIC_API_URL=/api
+ENV PUBLIC_FRONTEND_URL=
 ENV PUBLIC_GA_MEASUREMENT_ID=G-4CR1T8KDNS
 
 # Build the project for production
@@ -45,8 +52,6 @@ FROM base AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PUBLIC_API_URL=https://menusesqr.online/api
-ENV PUBLIC_FRONTEND_URL=https://menusesqr.online
 ENV HOST=0.0.0.0
 ENV PORT=4321
 

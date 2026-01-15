@@ -62,20 +62,20 @@ PUBLIC_API_URL="http://localhost:8080/api" API_BACKEND_URL="http://localhost:808
 DEV_PID=$!
 echo "Dev server started with PID: $DEV_PID"
 
-echo "⏳ Waiting for dev server to be ready (up to 30s)..."
-for i in {1..30}; do
+echo "⏳ Waiting for dev server to be ready (up to 60s)..."
+for i in {1..60}; do
   if curl -s http://localhost:4321 > /dev/null 2>&1; then
     echo "✅ Dev server is ready!"
     break
   fi
-  echo "Waiting for dev server... ($i/30)"
+  echo "Waiting for dev server... ($i/60)"
   sleep 1
 done
 
 # Verificar que el servidor esté listo
 if ! curl -s http://localhost:4321 > /dev/null 2>&1; then
   echo "❌ Dev server failed to start. Check logs:"
-  tail -50 /tmp/astro-dev.log
+  tail -100 /tmp/astro-dev.log
   exit 1
 fi
 

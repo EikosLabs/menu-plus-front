@@ -16,7 +16,7 @@ export const ADMIN_USER = {
 };
 
 // API URL
-export const API_URL = process.env.PUBLIC_API_URL || 'http://localhost:5000/api';
+export const API_URL = process.env.PUBLIC_API_URL || 'http://localhost:8080/api';
 
 // Extended test fixture with authenticated page
 export interface TestFixtures {

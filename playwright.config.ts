@@ -24,7 +24,12 @@ export default defineConfig({
   reporter: [['list']],
 
   // Shorter timeout
-  timeout: 60000,
+  timeout: 30000,
+
+  // Expect timeout for assertions
+  expect: {
+    timeout: 10000,
+  },
 
   // Shared settings for all the projects below
   use: {

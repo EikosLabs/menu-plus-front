@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 
-const API_URL = process.env.PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.PUBLIC_API_URL || 'http://localhost:8080/api';
 
 export interface LoginCredentials {
   email: string;
@@ -42,11 +42,11 @@ export class AuthHelper {
     // Submit the form
     await this.page.click('button[type="submit"]');
 
-    // Wait for navigation or success indicator
+    // Wait for navigation or success indicator with increased timeout
     await Promise.race([
-      this.page.waitForURL('**/dashboard**', { timeout: 15000 }),
-      this.page.waitForURL('**/onboarding**', { timeout: 15000 }),
-      this.page.waitForSelector('[data-testid="login-success"]', { timeout: 15000 }),
+      this.page.waitForURL('**/dashboard**', { timeout: 20000 }),
+      this.page.waitForURL('**/onboarding**', { timeout: 20000 }),
+      this.page.waitForSelector('[data-testid="login-success"]', { timeout: 20000 }),
     ]);
   }
 
@@ -158,6 +158,7 @@ export class AuthHelper {
    */
   static async createUserViaAPI(data: RegisterData): Promise<boolean> {
     try {
+      console.log(`Creating user via API at ${API_URL}/users/owner`);
       const response = await fetch(`${API_URL}/users/owner`, {
         method: 'POST',
         headers: {
@@ -171,8 +172,15 @@ export class AuthHelper {
         }),
       });
 
+      if (!response.ok && response.status !== 409) {
+        console.error(`Failed to create user: ${response.status} ${response.statusText}`);
+        const text = await response.text().catch(() => 'Unable to read response');
+        console.error('Response:', text);
+      }
+
       return response.ok || response.status === 409; // 409 = already exists
-    } catch {
+    } catch (error) {
+      console.error('Error creating user via API:', error);
       return false;
     }
   }
