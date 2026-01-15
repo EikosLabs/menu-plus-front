@@ -4,6 +4,9 @@ import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import node from "@astrojs/node";
 
+const API_BACKEND_URL = process.env.API_BACKEND_URL || 'http://localhost:5000';
+console.log('🔧 Vite proxy target:', API_BACKEND_URL);
+
 // https://astro.build/config
 export default defineConfig({
     output: "server",
@@ -26,13 +29,13 @@ export default defineConfig({
             ],
             proxy: {
                 '/api': {
-                    target: import.meta.env.API_BACKEND_URL || 'http://localhost:5000',
+                    target: API_BACKEND_URL,
                     changeOrigin: true,
                     rewrite: (path) => path,
                     bodyLimit: 50 * 1024 * 1024, // 50MB
                     configure: (proxy, options) => {
                         proxy.on('proxyReq', (proxyReq, req, res) => {
-                            if (req.headers['content-length'] && parseInt(req.headers['content-length']) > 50 * 1024 * 1024) {
+                            if (req.headers['content-length'] && Number.parseInt(req.headers['content-length'], 10) > 50 * 1024 * 1024) {
                                 proxyReq.setHeader('content-length', req.headers['content-length']);
                             }
                         });
