@@ -22,9 +22,10 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "."
+          source: "./*,!.git"
           target: "/home/ubuntu/menu-plus/menu-plus-front"
           overwrite: true
+          strip_components: 0
 
       - name: Build and Deploy (Zero Downtime)
         uses: appleboy/ssh-action@v1.0.0
