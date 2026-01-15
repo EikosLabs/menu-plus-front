@@ -2,30 +2,23 @@
 set -e
 
 cleanup() {
-  echo "🧹 Cleaning up..."
-
-  # Matar proceso dev si está corriendo
-  if [ -n "$DEV_PID" ] && ps -p $DEV_PID > /dev/null 2>&1; then
-    echo "🛑 Killing dev server (PID: $DEV_PID)..."
-    kill $DEV_PID 2>/dev/null || true
-    wait $DEV_PID 2>/dev/null || true
-  fi
+  echo "🧹 Final cleanup (if needed)..."
 
   # Matar cualquier proceso node que esté usando el puerto 4321
   pkill -f "astro dev" 2>/dev/null || true
   pkill -f "node.*4321" 2>/dev/null || true
 
-  # Reiniciar contenedor de producción
-  echo "🚀 Restarting production frontend container..."
-  cd /home/ubuntu
-  docker start menusesqr-front || true
-  echo "⏳ Waiting for production to be ready..."
-  sleep 5
+  # Reiniciar contenedor de producción si no está corriendo
+  if ! docker ps | grep -q menusesqr-front; then
+    echo "🚀 Restarting production frontend container..."
+    cd /home/ubuntu
+    docker start menusesqr-front || true
+  fi
 
   echo "✅ Cleanup completed"
 }
 
-# Configurar cleanup para ejecutar al salir
+# Configurar cleanup para ejecutar al salir (solo como backup)
 trap cleanup EXIT INT TERM
 
 echo "🧪 Running Playwright E2E Tests on VPS"
@@ -92,3 +85,21 @@ if npm test; then
 else
   echo "⚠️ Some tests failed, but this is expected during CI/CD"
 fi
+
+# Immediately restart production after tests (minimize downtime)
+echo "🔄 Restarting production immediately after tests..."
+pkill -f "astro dev" 2>/dev/null || true
+pkill -f "node.*4321" 2>/dev/null || true
+sleep 2
+
+cd /home/ubuntu
+docker start menusesqr-front || true
+echo "⏳ Waiting for production to be ready (max 30s)..."
+for i in {1..30}; do
+  if curl -s http://localhost:4321 > /dev/null 2>&1; then
+    echo "✅ Production is back up!"
+    break
+  fi
+  echo "Waiting for production... ($i/30)"
+  sleep 1
+done
