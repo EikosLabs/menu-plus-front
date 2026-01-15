@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables - prefer .env.local for test configuration
+dotenv.config({ path: '.env.local', override: true });
 
 export default defineConfig({
   // Test directory
@@ -59,4 +59,7 @@ export default defineConfig({
 
   // Don't auto-start dev server (we'll run it manually)
   webServer: undefined,
+
+  // Global setup for creating test users and health check
+  globalSetup: './tests/global-setup.ts',
 });

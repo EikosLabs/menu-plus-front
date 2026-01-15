@@ -3,7 +3,7 @@
  * Forwards /api requests to backend server
  */
 
-const BACKEND_URL = process.env.API_BACKEND_URL || 'http://menusesqr-back:8080';
+const BACKEND_URL = process.env.API_BACKEND_URL || 'http://localhost:8080';
 
 export async function proxyApiRequest(request) {
   const url = new URL(request.url);

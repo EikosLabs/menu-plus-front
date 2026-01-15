@@ -32,10 +32,8 @@ echo "🌐 Setting environment variables..."
 export PLAYWRIGHT_BASE_URL="http://localhost:4321"
 export CI=true
 
-echo "🔧 Overriding .env for tests..."
-echo "PUBLIC_API_URL=http://localhost:8080/api" > .env.local
-echo "PLAYWRIGHT_BASE_URL=http://localhost:4321" >> .env.local
-echo "API_BACKEND_URL=http://localhost:8080" >> .env.local
+echo "🔧 Using .env.test configuration for test environment..."
+cp .env.test .env.local
 
 echo "✅ Verifying services are running..."
 if ! docker ps | grep -q menusesqr-back; then
@@ -58,7 +56,7 @@ docker stop menusesqr-front || true
 sleep 2
 
 echo "🚀 Starting frontend in dev mode..."
-PUBLIC_API_URL="http://localhost:8080/api" API_BACKEND_URL="http://localhost:8080" npm run dev > /tmp/astro-dev.log 2>&1 &
+PUBLIC_API_URL="/api" API_BACKEND_URL="http://localhost:8080" npm run dev > /tmp/astro-dev.log 2>&1 &
 DEV_PID=$!
 echo "Dev server started with PID: $DEV_PID"
 

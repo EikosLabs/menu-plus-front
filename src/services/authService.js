@@ -104,7 +104,7 @@ export const authService = {
 			errorLogger.error(error, { endpoint: '/auth/login', email });
 			// Forzar mensaje de error de conexión si es un error de red
 			if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
-				throw new AppError(ERROR_TYPES.NO_INTERNET, 'No se pudo conectar al servidor. Verifica que el backend esté corriendo en http://localhost:5000');
+				throw new AppError(ERROR_TYPES.NO_INTERNET, 'No se pudo conectar al servidor. Por favor verifica tu conexión a internet e intenta nuevamente.');
 			}
 			throw AppError.fromNetworkError(error, { endpoint: '/auth/login' });
 		}

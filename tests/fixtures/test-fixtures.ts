@@ -1,4 +1,5 @@
-import { test as base, Page, expect } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // Test user credentials
 export const TEST_USER = {
@@ -62,7 +63,7 @@ export const test = base.extend<TestFixtures>({
   authenticatedPage: async ({ page }, use) => {
     // Login as test user
     await loginUser(page, TEST_USER.email, TEST_USER.password);
-    
+
     // Use the authenticated page
     await use(page);
   },

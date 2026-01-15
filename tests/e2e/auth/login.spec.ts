@@ -39,13 +39,23 @@ test.describe('Login Flow', () => {
   });
 
   test('should login successfully with valid credentials', async ({ page }) => {
+    // Verify API is accessible first
+    const apiHealthy = await AuthHelper.checkAPIHealth();
+    if (!apiHealthy) {
+      throw new Error(`API is not accessible at ${AuthHelper.getAPIUrl()}. Ensure backend is running.`);
+    }
+
     // Ensure test user exists
-    await AuthHelper.createUserViaAPI({
+    const userCreated = await AuthHelper.createUserViaAPI({
       email: TEST_USER.email,
       password: TEST_USER.password,
       fullName: TEST_USER.fullName,
       userName: TEST_USER.userName,
     });
+
+    if (!userCreated) {
+      console.warn('Could not create test user, proceeding anyway (may already exist)');
+    }
 
     await page.goto('/login');
     await page.waitForLoadState('networkidle');

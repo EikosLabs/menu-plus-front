@@ -1,6 +1,9 @@
-import { Page, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
-const API_URL = process.env.PUBLIC_API_URL || 'http://localhost:8080/api';
+const PUBLIC_API_URL = process.env.PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_URL = PUBLIC_API_URL.startsWith('http')
+  ? PUBLIC_API_URL
+  : 'http://localhost:8080/api';
 
 export interface LoginCredentials {
   email: string;
@@ -192,5 +195,24 @@ export class AuthHelper {
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(7);
     return `test-${timestamp}-${random}@menuplus.dev`;
+  }
+
+  /**
+   * Check if API is accessible
+   */
+  static async checkAPIHealth(): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_URL}/health`, { signal: AbortSignal.timeout(5000) });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Get API URL for use in logs
+   */
+  static getAPIUrl(): string {
+    return API_URL;
   }
 }
