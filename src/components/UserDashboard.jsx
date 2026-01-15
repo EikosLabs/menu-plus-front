@@ -76,7 +76,32 @@ export default function UserDashboard() {
 		setShowMenuScanner(true);
 	};
 
-	// ... (rest of methods)
+	const handleScannerCancel = () => {
+		setShowMenuScanner(false);
+		setAnalysisData(null);
+		setSelectedMenuId(null);
+		setSelectedFoodBusinessId(null);
+	};
+
+	const handleAnalysisComplete = (data) => {
+		setAnalysisData(data);
+		setShowMenuScanner(false);
+		setShowAnalysisReview(true);
+	};
+
+	const handleAnalysisBack = () => {
+		setShowAnalysisReview(false);
+		setShowMenuScanner(true);
+	};
+
+	const handleAnalysisSaveComplete = async () => {
+		setShowAnalysisReview(false);
+		setAnalysisData(null);
+		setSelectedMenuId(null);
+		setSelectedFoodBusinessId(null);
+		// Refresh businesses to show updated menu
+		await refreshBusinesses();
+	};
 
 	if (authLoading || businessLoading) {
 		return <LoadingSpinner />;
