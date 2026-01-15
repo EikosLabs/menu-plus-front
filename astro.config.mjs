@@ -3,7 +3,6 @@ import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import node from "@astrojs/node";
-import sentry from "@sentry/astro";
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,7 +10,7 @@ export default defineConfig({
     adapter: node({
         mode: "standalone"
     }),
-    integrations: [tailwind(), react(), sentry()],
+    integrations: [tailwind(), react()],
     server: {
         host: true,
     },

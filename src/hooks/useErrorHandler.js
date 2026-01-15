@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { AppError, parseValidationErrors } from '../utils/AppError';
 import { ERROR_TYPES, requiresReAuth, isRetryableError } from '../utils/errorTypes';
-import { useSentryError } from './useSentryError';
 import { localizeUrl } from '../i18n/utils';
 
 /**
@@ -12,7 +11,6 @@ export const useErrorHandler = () => {
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
   const [isRetryable, setIsRetryable] = useState(false);
-  const { captureException, captureMessage, addBreadcrumb } = useSentryError();
 
   /**
    * Maneja un error y lo convierte a AppError
@@ -26,35 +24,6 @@ export const useErrorHandler = () => {
     } else {
       appError = AppError.fromError(err, context);
     }
-
-    // Enviar error a Sentry (solo para errores que no son de validación)
-    if (appError.type !== ERROR_TYPES.VALIDATION_ERROR && appError.type !== ERROR_TYPES.BUSINESS_ERROR) {
-      captureException(appError, {
-        ...context,
-        errorType: appError.type,
-        errorCode: appError.code,
-        userMessage: appError.message,
-      });
-    } else {
-      // Para errores de validación o de negocio, solo enviar como mensaje de info
-      captureMessage(appError.message, 'info', {
-        ...context,
-        errorType: appError.type,
-        errorCode: appError.code,
-      });
-    }
-
-    // Agregar breadcrumb para seguimiento
-    addBreadcrumb({
-      message: `Error handled: ${appError.type}`,
-      category: 'error',
-      level: 'error',
-      data: {
-        errorType: appError.type,
-        errorCode: appError.code,
-        context,
-      },
-    });
 
     // Configurar estado
     setError(appError);
@@ -72,18 +41,13 @@ export const useErrorHandler = () => {
 
     // Redirigir a login si es necesario
     if (requiresReAuth(appError.type)) {
-      addBreadcrumb({
-        message: 'Redirecting to login due to auth error',
-        category: 'auth',
-        level: 'info',
-      });
       setTimeout(() => {
         window.location.href = localizeUrl('/login');
       }, 2000);
     }
 
     return appError;
-  }, [captureException, captureMessage, addBreadcrumb]);
+  }, []);
 
   /**
    * Limpia el error actual

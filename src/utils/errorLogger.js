@@ -107,10 +107,9 @@ class ErrorLogger {
   }
 
   /**
-   * Envía logs a un servicio remoto (implementar según necesidad)
-   */
+    * Envía logs a un servicio remoto (implementar según necesidad)
+    */
   async _sendToRemote(logEntry) {
-    // TODO: Implementar envío a servicio de logging (ej: Sentry, LogRocket, etc.)
     // Por ahora solo almacenamos localmente
     try {
       // Ejemplo de implementación:
