@@ -13,6 +13,10 @@ export PUBLIC_API_URL="http://localhost:8080/api"
 export PLAYWRIGHT_BASE_URL="http://localhost:4321"
 export CI=true
 
+echo "🔧 Overriding .env for tests..."
+echo "PUBLIC_API_URL=http://localhost:8080/api" > .env.local
+echo "PLAYWRIGHT_BASE_URL=http://localhost:4321" >> .env.local
+
 echo "✅ Verifying services are running..."
 if ! docker ps | grep -q menusesqr-front; then
   echo "❌ Frontend container not running"
