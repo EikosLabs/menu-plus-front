@@ -14,7 +14,12 @@ const GoogleLoginButton = ({ onLoginStart, onLoginSuccess, onLoginError, disable
 
       // Redirect to Google OAuth endpoint
       const baseUrl = import.meta.env.PUBLIC_API_URL || '/api';
-      window.location.href = `${baseUrl}/auth/google-login`;
+      
+      // Capture current URL to return after authentication
+      const returnUrl = window.location.pathname + window.location.search;
+      const encodedReturnUrl = encodeURIComponent(returnUrl);
+      
+      window.location.href = `${baseUrl}/auth/google-login?returnUrl=${encodedReturnUrl}`;
 
     } catch (error) {
       console.error('Google login error:', error);

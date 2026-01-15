@@ -15,6 +15,7 @@ const userName = searchParams.get('userName');
 const fullName = searchParams.get('fullName');
 const email = searchParams.get('email');
 const role = searchParams.get('role');
+const returnUrl = searchParams.get('returnUrl');
 
 // Handle authentication
 if (token && refreshToken) {
@@ -52,8 +53,9 @@ if (token && refreshToken) {
     sameSite: 'lax'
   });
 
-  // Redirect to dashboard
-  return Astro.redirect('/dashboard');
+  // Redirect to dashboard or returnUrl
+  const redirectTo = returnUrl && returnUrl !== '/' ? returnUrl : '/dashboard';
+  return Astro.redirect(redirectTo);
 } else {
   // Handle error
   const error = searchParams.get('error');
