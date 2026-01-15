@@ -8,9 +8,6 @@ import PromotionalFlyerGenerator from "./FlyerEditor/PromotionalFlyerGenerator";
 import SavedFlyersList from "./FlyerEditor/SavedFlyersList";
 import { compareIds, normalizeMenuItemIds } from '../utils/idNormalization';
 import SmartHint from "./ui/SmartHint";
-
-import UpgradeModal from "./subscription/UpgradeModal";
-import { useSubscription } from "../hooks/useSubscription";
 import { useTranslation } from "../i18n/utils";
 
 export default function BusinessList({
@@ -22,10 +19,7 @@ export default function BusinessList({
 	onRefresh,
 	isRefreshing,
 }) {
-	const { checkLimit, isPro } = useSubscription();
 	const { t } = useTranslation();
-	const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-	const [upgradeTrigger, setUpgradeTrigger] = useState("feature");
 
 	const [showAddMenuItem, setShowAddMenuItem] = useState({});
 	const [menuItemToEdit, setMenuItemToEdit] = useState(null);
@@ -42,48 +36,15 @@ export default function BusinessList({
 	const [showPromotionalFlyer, setShowPromotionalFlyer] = useState(null);
 	const [showSavedFlyers, setShowSavedFlyers] = useState(null);
 
-
-	const checkAndExecute = (feature, currentUsage, callback) => {
-		if (checkLimit(feature, currentUsage)) {
-			callback();
-		} else {
-			setUpgradeTrigger(feature);
-			setShowUpgradeModal(true);
-		}
-	};
-
-	// Helper to count total items
-	const getTotalItems = (businesses) => {
-		let count = 0;
-		businesses.forEach(b => {
-			b.menus?.forEach(m => {
-				m.sections?.forEach(s => {
-					count += s.menuItems?.length || 0;
-				});
-				// Also count unsectioned items if any? usually they are in sections
-				count += m.menuItems?.length || 0;
-			});
-		});
-		return count;
-	};
-
+	// No limits - removed checkAndExecute
 	// Wrappers for actions
 	const handleAddMenuItemClick = (menuId, sectionId, currency) => {
-		const totalItems = getTotalItems(businesses);
-		checkAndExecute('items', totalItems, () => {
-			handleShowAddMenuItem(menuId, sectionId, currency);
-		});
+		handleShowAddMenuItem(menuId, sectionId, currency);
 	};
 
 	const handleAiScanClick = (businessId, menuId) => {
-		// Assuming we track scans in backend, or just block for now if not Pro
-		// For demo, just check isPro
-		if (isPro) {
-			onMenuScanner(businessId, menuId);
-		} else {
-			setUpgradeTrigger('aiScans');
-			setShowUpgradeModal(true);
-		}
+		// No limits - always allow AI scan
+		onMenuScanner(businessId, menuId);
 	};
 
 	// Handlers
@@ -171,12 +132,6 @@ export default function BusinessList({
 
 	return (
 		<div className="space-y-6 sm:space-y-8 lg:space-y-10">
-			<UpgradeModal
-				isOpen={showUpgradeModal}
-				onClose={() => setShowUpgradeModal(false)}
-				trigger={upgradeTrigger}
-			/>
-
 			{/* Indicador de refresco */}
 			{isRefreshing && (
 				<div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mb-6 flex items-center">

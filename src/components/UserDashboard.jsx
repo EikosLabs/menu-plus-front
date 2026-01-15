@@ -15,13 +15,9 @@ const BusinessSection = lazy(() => import("./sections/BusinessSection"));
 const ProfileSection = lazy(() => import("./sections/ProfileSection"));
 const TemplateSection = lazy(() => import("./sections/TemplateSection"));
 
-import UpgradeModal from "./subscription/UpgradeModal";
-import { useSubscription } from "../hooks/useSubscription";
-
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
 	const { businesses, setBusinesses, loading: businessLoading, error, setError, isRefreshing, addBusiness, addMenu, fetchBusinesses, refreshBusinesses } = useBusinesses();
-	const { checkLimit } = useSubscription();
 
 	const [showAddBusiness, setShowAddBusiness] = useState(false);
 	const [showAddMenu, setShowAddMenu] = useState(false);
@@ -34,36 +30,13 @@ export default function UserDashboard() {
 	const [selectedMenuId, setSelectedMenuId] = useState(null);
 	const [selectedFoodBusinessId, setSelectedFoodBusinessId] = useState(null);
 
-	const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-	const [upgradeTrigger, setUpgradeTrigger] = useState("feature");
-
-	// Wrappers for limits
+	// No limits - removed upgrade modal
 	const handleSetShowAddBusiness = (show) => {
-		if (show) {
-			if (checkLimit('businesses', businesses?.length || 0)) {
-				setShowAddBusiness(true);
-			} else {
-				setUpgradeTrigger('businesses');
-				setShowUpgradeModal(true);
-			}
-		} else {
-			setShowAddBusiness(false);
-		}
+		setShowAddBusiness(show);
 	};
 
 	const handleSetShowAddMenu = (show) => {
-		if (show) {
-			// Find total menus count? Or per business? usually global limit for free tier
-			const totalMenus = businesses?.reduce((acc, b) => acc + (b.menus?.length || 0), 0) || 0;
-			if (checkLimit('menus', totalMenus)) {
-				setShowAddMenu(true);
-			} else {
-				setUpgradeTrigger('menus');
-				setShowUpgradeModal(true);
-			}
-		} else {
-			setShowAddMenu(false);
-		}
+		setShowAddMenu(show);
 	};
 
 	// Verificar si el usuario necesita completar el onboarding
@@ -111,12 +84,6 @@ export default function UserDashboard() {
 
 	return (
 		<div className="flex min-h-screen flex-col bg-neo-lavender relative">
-			<UpgradeModal
-				isOpen={showUpgradeModal}
-				onClose={() => setShowUpgradeModal(false)}
-				trigger={upgradeTrigger}
-			/>
-
 			{/* Animated Background Pattern */}
 			<div className="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none"></div>
 
