@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "./*,!.git"
+          source: "./*,!.git,!.env.local"
           target: "/home/ubuntu/menu-plus/menu-plus-front"
           overwrite: true
           strip_components: 0
