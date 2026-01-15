@@ -6,7 +6,7 @@ echo "🧪 Running Playwright E2E Tests on VPS"
 cd /home/ubuntu/menu-plus/menu-plus-front
 
 echo "📦 Installing dependencies..."
-npm ci
+npm install
 
 echo "🌐 Setting environment variables..."
 export PUBLIC_API_URL="http://localhost:8080/api"

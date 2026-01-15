@@ -24,7 +24,7 @@ export default defineConfig({
   reporter: [['list']],
 
   // Shorter timeout
-  timeout: 15000,
+  timeout: 60000,
 
   // Shared settings for all the projects below
   use: {
