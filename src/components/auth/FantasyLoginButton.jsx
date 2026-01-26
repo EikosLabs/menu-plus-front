@@ -13,7 +13,7 @@ export default function FantasyLoginButton() {
 
     try {
       // Create anonymous user with all null fields
-      const userData = await authService.register(null, null, null, null);
+      const userData = await authService.registerFantasy();
       
       // Since backend doesn't return password, use fantasy-token endpoint
       // This allows login without password for fantasy users

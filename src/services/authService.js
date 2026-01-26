@@ -190,6 +190,47 @@ export const authService = {
 		}
 	},
 
+	async registerFantasy() {
+		const requestBody = {
+			FullName: null,
+			Email: null,
+			UserName: null,
+			Password: null,
+		};
+
+		try {
+			const response = await fetch(`${API_URL}/users/owner`, {
+				method: "POST",
+				headers: addCsrfHeader({
+					"Content-Type": "application/json",
+				}),
+				body: JSON.stringify(requestBody),
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				if (response.status === 409) {
+					throw new AppError(
+						ERROR_TYPES.CONFLICT,
+						'Ya existe un usuario con este correo'
+					);
+				}
+				throw await AppError.fromResponse(response);
+			}
+
+			const data = await response.json();
+			errorLogger.info('Fantasy user registered', { userId: data?.userId });
+			return data;
+		} catch (error) {
+			if (error instanceof AppError) {
+				errorLogger.error(error, { endpoint: '/users/owner' });
+				throw error;
+			}
+			errorLogger.error(error, { endpoint: '/users/owner' });
+			throw AppError.fromNetworkError(error, { endpoint: '/users/owner' });
+		}
+	},
+
 	async refreshToken() {
 		const refreshToken = this.getRefreshToken();
 
