@@ -108,6 +108,16 @@ export default function OnboardingFlowQuickStart({ userId: propUserId = null, on
             }
         } catch (error) {
             console.error('Error al crear negocio:', error);
+            try {
+                const existingBusinesses = await menuService.getUserBusinesses();
+                if (existingBusinesses && existingBusinesses.length > 0) {
+                    localStorage.removeItem('needs_onboarding');
+                    setIsComplete(true);
+                    return;
+                }
+            } catch (fetchError) {
+                console.error('Error al verificar negocios existentes:', fetchError);
+            }
             setSubmitError(error.message || 'Error al crear el negocio. Por favor intenta nuevamente.');
         } finally {
             setIsSaving(false);
