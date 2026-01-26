@@ -17,7 +17,7 @@ const TemplateSection = lazy(() => import("./sections/TemplateSection"));
 
 export default function UserDashboard() {
 	const { userData, setUserData, loading: authLoading, logout, refreshUserData } = useAuth();
-	const { businesses, setBusinesses, loading: businessLoading, error, setError, isRefreshing, addBusiness, addMenu, fetchBusinesses, refreshBusinesses } = useBusinesses();
+	const { businesses, setBusinesses, loading: businessLoading, error, setError, isRefreshing, addBusiness, addMenu, fetchBusinesses, refreshBusinesses, hasFetchError } = useBusinesses();
 
 	const [showAddBusiness, setShowAddBusiness] = useState(false);
 	const [showAddMenu, setShowAddMenu] = useState(false);
@@ -42,6 +42,7 @@ export default function UserDashboard() {
 	// Verificar si el usuario necesita completar el onboarding
 	useEffect(() => {
 		if (businessLoading) return; // Esperar a que carguen los negocios
+		if (hasFetchError) return;
 
 		const hasBusinesses = businesses && businesses.length > 0;
 
@@ -53,7 +54,7 @@ export default function UserDashboard() {
 			return;
 		}
 
-	}, [businesses, businessLoading]);
+	}, [businesses, businessLoading, hasFetchError]);
 
 	const handleBusinessAdded = async (newBusiness) => {
 		try {
@@ -110,7 +111,7 @@ export default function UserDashboard() {
 	return (
 		<div className="flex min-h-screen flex-col bg-neo-lavender relative">
 			{/* Animated Background Pattern */}
-			<div className="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none"></div>
+			<div className="absolute inset-0 neo-bg-dots opacity-10 pointer-events-none" />
 
 			<Navigation
 				userData={userData}
@@ -182,21 +183,46 @@ export default function UserDashboard() {
 			{/* Menu Scanner Modal - Outside main to be above everything */}
 			{showMenuScanner && (
 				<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
-					<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
+					<dialog
+						open
+						className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto relative shadow-2xl"
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => {
+							if (e.key === "Escape") handleScannerCancel();
+						}}
+						tabIndex={-1}
+					>
 						<MultiImageMenuScanner
 							onAnalysisComplete={handleAnalysisComplete}
 							onCancel={handleScannerCancel}
 							menuId={selectedMenuId}
 							foodBusinessId={selectedFoodBusinessId}
 						/>
-					</div>
+					</dialog>
 				</div>
 			)}
 
 			{/* Analysis Review Modal - Outside main to be above everything */}
 			{showAnalysisReview && analysisData && (
-				<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md" onClick={handleAnalysisBack}>
-					<div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
+				<button
+					type="button"
+					className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
+					onClick={handleAnalysisBack}
+					onKeyDown={(e) => {
+						if (e.key === "Escape") handleAnalysisBack();
+					}}
+					aria-label="Cerrar revisión"
+					aria-pressed="false"
+				>
+					<dialog
+						open
+						className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto relative shadow-2xl"
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => {
+							if (e.key === "Escape") handleAnalysisBack();
+						}}
+						tabIndex={-1}
+					>
 						<MenuAnalysisReview
 							analysisData={analysisData}
 							onBack={handleAnalysisBack}
@@ -204,8 +230,8 @@ export default function UserDashboard() {
 							menuId={selectedMenuId}
 							foodBusinessId={selectedFoodBusinessId}
 						/>
-					</div>
-				</div>
+					</dialog>
+				</button>
 			)}
 
 			<style jsx="true">{`

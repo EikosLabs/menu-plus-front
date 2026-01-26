@@ -1,30 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import menuService from "../services/menuService";
 
 export const useBusinesses = () => {
 	const [businesses, setBusinesses] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [hasFetchError, setHasFetchError] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 
-	const fetchBusinesses = async () => {
+	const fetchBusinesses = useCallback(async () => {
 		setLoading(true);
 		try {
 			// El backend obtiene el userId del token
 			const userBusinesses = await menuService.getUserBusinesses();
 			setBusinesses(userBusinesses);
 			setError(null);
+			setHasFetchError(false);
 		} catch (error) {
 			setError("No se pudieron cargar los datos del dashboard. Por favor, verifique su conexión e intente de nuevo.");
 			setBusinesses([]);
+			setHasFetchError(true);
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		fetchBusinesses();
-	}, []);
+	}, [fetchBusinesses]);
 
 	// Función para refrescar datos manualmente
 	const refreshBusinesses = async () => {
@@ -36,11 +39,13 @@ export const useBusinesses = () => {
 			const userBusinesses = await menuService.getUserBusinesses();
 			setBusinesses(userBusinesses);
 			setError(null);
+			setHasFetchError(false);
 
 			console.log('Negocios del dashboard actualizados');
 		} catch (error) {
 			console.error('Error al refrescar negocios:', error);
 			setError("No se pudieron actualizar los datos. Por favor, intente de nuevo.");
+			setHasFetchError(true);
 		} finally {
 			setIsRefreshing(false);
 		}
@@ -80,6 +85,7 @@ export const useBusinesses = () => {
 		error,
 		setError,
 		isRefreshing,
+		hasFetchError,
 		addBusiness,
 		addMenu,
 		fetchBusinesses,
