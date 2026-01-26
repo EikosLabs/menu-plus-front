@@ -329,6 +329,11 @@ export const authService = {
 				refreshToken,
 				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN
 			);
+		} else {
+			cookieManager.delete(
+				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.name,
+				cookieManager.COOKIE_OPTIONS.REFRESH_TOKEN.path
+			);
 		}
 	},
 
