@@ -231,7 +231,8 @@ export const authService = {
 		}
 	},
 
-	async refreshToken() {
+	async refreshToken(options = {}) {
+		const { clearAuthOnFailure = true } = options;
 		const refreshToken = this.getRefreshToken();
 
 		if (!refreshToken) {
@@ -254,8 +255,10 @@ export const authService = {
 
 			if (!response.ok) {
 				if (response.status === 401 || response.status === 400) {
-					// Limpiar cookies si el refresh token es inválido
-					cookieManager.clearAuthCookies();
+					if (clearAuthOnFailure) {
+						// Limpiar cookies si el refresh token es inválido
+						cookieManager.clearAuthCookies();
+					}
 					throw new AppError(
 						ERROR_TYPES.UNAUTHORIZED,
 						'El refresh token ha expirado. Por favor inicia sesión nuevamente.'
