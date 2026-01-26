@@ -156,8 +156,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	const isPublicRoute =
 		currentPath === "/login" ||
 		currentPath === "/register" ||
+		currentPath === "/forgot-password" ||
+		currentPath.startsWith("/reset-password/") ||
 		currentPath === "/en/login" ||
 		currentPath === "/en/register" ||
+		currentPath === "/en/forgot-password" ||
+		currentPath.startsWith("/en/reset-password/") ||
 		currentPath.startsWith("/login/") ||
 		currentPath.startsWith("/register/") ||
 		currentPath.startsWith("/en/login/") ||

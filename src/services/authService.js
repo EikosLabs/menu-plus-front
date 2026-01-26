@@ -448,6 +448,154 @@ export const authService = {
 			console.warn('Could not fetch subscription', error);
 			return { planType: 'free', isPro: false };
 		}
+	},
+
+	/**
+	 * Request a password reset link
+	 * @param {string} email - User's email address
+	 * @returns {Promise<{success: boolean, message: string}>}
+	 */
+	async requestPasswordReset(email) {
+		// Validación de entrada
+		const emailError = validateEmail(email);
+		if (emailError) {
+			throw new AppError(ERROR_TYPES.INVALID_EMAIL, emailError);
+		}
+
+		try {
+			const response = await fetch(`${API_URL}/auth/request-password-reset`, {
+				method: "POST",
+				headers: addCsrfHeader({
+					"Content-Type": "application/json",
+				}),
+				body: JSON.stringify({ email: email.trim() }),
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				throw await AppError.fromResponse(response);
+			}
+
+			const data = await response.json();
+			
+			errorLogger.info('Password reset requested', { email });
+
+			return data;
+
+		} catch (error) {
+			if (error instanceof AppError) {
+				errorLogger.error(error, { endpoint: '/auth/request-password-reset', email });
+				throw error;
+			}
+
+			errorLogger.error(error, { endpoint: '/auth/request-password-reset', email });
+			throw AppError.fromNetworkError(error, { endpoint: '/auth/request-password-reset' });
+		}
+	},
+
+	/**
+	 * Reset password with token
+	 * @param {string} token - Password reset token from email
+	 * @param {string} newPassword - New password
+	 * @returns {Promise<{success: boolean, message: string}>}
+	 */
+	async resetPassword(token, newPassword) {
+		// Validación de entrada
+		const tokenError = validateRequired(token, 'El token');
+		if (tokenError) {
+			throw new AppError(ERROR_TYPES.REQUIRED_FIELD, tokenError);
+		}
+
+		const passwordError = validateRequired(newPassword, 'La contraseña');
+		if (passwordError) {
+			throw new AppError(ERROR_TYPES.REQUIRED_FIELD, passwordError);
+		}
+
+		try {
+			const response = await fetch(`${API_URL}/auth/reset-password`, {
+				method: "POST",
+				headers: addCsrfHeader({
+					"Content-Type": "application/json",
+				}),
+				body: JSON.stringify({ 
+					token: token.trim(), 
+					newPassword: newPassword 
+				}),
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				// Handle specific error cases
+				if (response.status === 400) {
+					const errorData = await response.json().catch(() => ({}));
+					const message = errorData.message || 'Token inválido o expirado. Por favor solicita un nuevo enlace.';
+					throw new AppError(ERROR_TYPES.VALIDATION_ERROR, message);
+				}
+
+				throw await AppError.fromResponse(response);
+			}
+
+			const data = await response.json();
+			
+			errorLogger.info('Password reset successful');
+
+			return data;
+
+		} catch (error) {
+			if (error instanceof AppError) {
+				errorLogger.error(error, { endpoint: '/auth/reset-password' });
+				throw error;
+			}
+
+			errorLogger.error(error, { endpoint: '/auth/reset-password' });
+			throw AppError.fromNetworkError(error, { endpoint: '/auth/reset-password' });
+		}
+	},
+
+	/**
+	 * Login with fantasy token (for anonymous users)
+	 * @param {string} email - Fantasy user email
+	 * @returns {Promise<{success: boolean, token: string, refreshToken: string}>}
+	 */
+	async fantasyTokenLogin(email) {
+		// Validación de entrada
+		const emailError = validateEmail(email);
+		if (emailError) {
+			throw new AppError(ERROR_TYPES.INVALID_EMAIL, emailError);
+		}
+
+		try {
+			const response = await fetch(`${API_URL}/auth/login/fantasy-token`, {
+				method: "POST",
+				headers: addCsrfHeader({
+					"Content-Type": "application/json",
+				}),
+				body: JSON.stringify({ email: email.trim() }),
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				throw await AppError.fromResponse(response);
+			}
+
+			const data = await response.json();
+			
+			// Store tokens
+			this._storeTokens(data.token, data.refreshToken);
+			
+			errorLogger.info('Fantasy token login successful', { email });
+
+			return { success: true, token: data.token, refreshToken: data.refreshToken };
+
+		} catch (error) {
+			if (error instanceof AppError) {
+				errorLogger.error(error, { endpoint: '/auth/login/fantasy-token', email });
+				throw error;
+			}
+
+			errorLogger.error(error, { endpoint: '/auth/login/fantasy-token', email });
+			throw AppError.fromNetworkError(error, { endpoint: '/auth/login/fantasy-token' });
+		}
 	}
 };
 

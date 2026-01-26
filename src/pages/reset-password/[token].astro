@@ -1,0 +1,22 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ResetPasswordForm from "../../components/ResetPasswordForm.jsx";
+
+// Get token from URL params
+const { token } = Astro.params;
+
+// If no token, redirect to login
+if (!token) {
+  return Astro.redirect('/login');
+}
+---
+
+<Layout title="Reset Password">
+  <main class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="max-w-md w-full">
+      <div class="neo-card neo-card-flat p-8">
+        <ResetPasswordForm token={token} client:load />
+      </div>
+    </div>
+  </main>
+</Layout>

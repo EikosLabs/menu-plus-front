@@ -122,7 +122,7 @@ export default function LoginForm() {
 
       {/* Forgot Password Link */}
       <div className="text-right">
-        <a href="#" className="neo-text text-neo-flame hover:underline neo-text-bold text-sm">
+        <a href="/forgot-password" className="neo-text text-neo-flame hover:underline neo-text-bold text-sm">
           {t("auth.forgotPassword")}
         </a>
       </div>
