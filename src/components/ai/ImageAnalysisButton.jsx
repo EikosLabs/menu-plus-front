@@ -119,8 +119,8 @@ const ErrorDisplay = ({ error, onRetry, file }) => {
 						<div className="mt-2">
 							<p className="text-xs text-red-700 font-medium">Sugerencias:</p>
 							<ul className="mt-1 text-xs text-red-600 list-disc list-inside space-y-1">
-								{getSuggestions().map((suggestion, index) => (
-									<li key={index}>{suggestion}</li>
+								{getSuggestions().map((suggestion) => (
+									<li key={suggestion}>{suggestion}</li>
 								))}
 							</ul>
 						</div>
@@ -141,18 +141,15 @@ const ErrorDisplay = ({ error, onRetry, file }) => {
 					)}
 
 					{/* Botón para mostrar/ocultar detalles técnicos */}
-					{import.meta.env.DEV && (
-						<button
-							type="button"
-							onClick={() => setShowDetails(!showDetails)}
-							className="mt-2 text-xs text-red-500 hover:text-red-700 underline"
-						>
-							{showDetails ? "Ocultar" : "Mostrar"} detalles técnicos
-						</button>
-					)}
+					<button
+						type="button"
+						onClick={() => setShowDetails(!showDetails)}
+						className="mt-2 text-xs text-red-500 hover:text-red-700 underline"
+					>
+						{showDetails ? "Ocultar" : "Mostrar"} detalles técnicos
+					</button>
 
-					{/* Detalles técnicos en modo desarrollo */}
-					{showDetails && import.meta.env.DEV && (
+					{showDetails && (
 						<div className="mt-2 p-2 bg-red-100 rounded text-xs text-red-800">
 							<p>
 								<strong>Tipo:</strong> {error.type || "Desconocido"}
@@ -621,7 +618,7 @@ const ImageAnalysisButton = ({
 			>
 				{isAnalyzing ? (
 					<>
-						<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+						<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
 						<span>Analizando imagen...</span>
 					</>
 				) : (
@@ -686,9 +683,9 @@ const ImageAnalysisButton = ({
 					<div className="space-y-3">
 						{analysis.suggestions.title && (
 							<div className="bg-white p-3 rounded border border-green-100">
-								<label className="block text-sm font-medium text-gray-700 mb-1">
-									📝 Título sugerido:
-								</label>
+							<div className="block text-sm font-medium text-gray-700 mb-1">
+								📝 Título sugerido:
+							</div>
 								<p className="text-sm text-gray-900 font-medium">
 									{analysis.suggestions.title}
 								</p>
@@ -697,9 +694,9 @@ const ImageAnalysisButton = ({
 
 						{analysis.suggestions.description && (
 							<div className="bg-white p-3 rounded border border-green-100">
-								<label className="block text-sm font-medium text-gray-700 mb-1">
-									✨ Descripción sugerida:
-								</label>
+							<div className="block text-sm font-medium text-gray-700 mb-1">
+								✨ Descripción sugerida:
+							</div>
 								<p className="text-sm text-gray-900">
 									{analysis.suggestions.description}
 								</p>
@@ -709,6 +706,7 @@ const ImageAnalysisButton = ({
 
 					<div className="flex gap-2 justify-end">
 						<button
+							type="button"
 							onClick={handleRejectAnalysis}
 							className="px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors flex items-center gap-1"
 						>
@@ -716,6 +714,7 @@ const ImageAnalysisButton = ({
 							Rechazar
 						</button>
 						<button
+							type="button"
 							onClick={handleAcceptAnalysis}
 							className="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-1"
 						>

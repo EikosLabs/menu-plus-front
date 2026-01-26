@@ -20,17 +20,12 @@ export default function LoginWithOptions() {
                 <GoogleLoginButton />
             </div>
 
-            {/* Fantasy Login Button - Only in development */}
-            {import.meta.env.DEV && (
-                <>
-                    <div className="flex items-center my-4">
-                        <div className="flex-1 h-px bg-gray-400" />
-                        <span className="px-4 text-sm text-gray-600 font-medium">o</span>
-                        <div className="flex-1 h-px bg-gray-400" />
-                    </div>
-                    <FantasyLoginButton />
-                </>
-            )}
+            <div className="flex items-center my-4">
+                <div className="flex-1 h-px bg-gray-400" />
+                <span className="px-4 text-sm text-gray-600 font-medium">o</span>
+                <div className="flex-1 h-px bg-gray-400" />
+            </div>
+            <FantasyLoginButton />
 
             {/* Divider with "or" */}
             <div className="flex items-center my-4">

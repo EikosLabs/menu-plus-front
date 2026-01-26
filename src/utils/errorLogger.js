@@ -15,7 +15,7 @@ const LOG_LEVELS = {
 class ErrorLogger {
   constructor() {
     this.enabled = true;
-    this.logToConsole = import.meta.env.DEV; // Solo en desarrollo
+    this.logToConsole = true;
     this.logs = []; // Almacenar logs localmente
     this.maxLogs = 50; // Máximo de logs en memoria
   }
@@ -45,9 +45,7 @@ class ErrorLogger {
    * Log de debug
    */
   debug(message, context = {}) {
-    if (import.meta.env.DEV) {
-      this._log(LOG_LEVELS.DEBUG, message, context);
-    }
+    this._log(LOG_LEVELS.DEBUG, message, context);
   }
 
   /**
@@ -100,8 +98,7 @@ class ErrorLogger {
       });
     }
 
-    // En producción, enviar a servicio de logging
-    if (import.meta.env.PROD && level === LOG_LEVELS.ERROR) {
+    if (level === LOG_LEVELS.ERROR) {
       this._sendToRemote(logEntry);
     }
   }
@@ -110,20 +107,7 @@ class ErrorLogger {
     * Envía logs a un servicio remoto (implementar según necesidad)
     */
   async _sendToRemote(logEntry) {
-    // Por ahora solo almacenamos localmente
-    try {
-      // Ejemplo de implementación:
-      // await fetch('/api/logs', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(logEntry),
-      // });
-    } catch (error) {
-      // Falló el envío, solo log local
-      if (this.logToConsole) {
-        console.warn('Failed to send log to remote:', error);
-      }
-    }
+    void logEntry;
   }
 
   /**
@@ -191,13 +175,12 @@ class ErrorLogger {
       this.logs.shift();
     }
 
-    // Log a console en desarrollo
+    // Log a console
     if (this.logToConsole) {
       console.log(`[ImageAnalysis] ${event}`, data);
     }
 
-    // En producción, enviar eventos importantes al remoto
-    if (import.meta.env.PROD && ['error', 'analysis_failed'].includes(event)) {
+    if (['error', 'analysis_failed'].includes(event)) {
       this._sendToRemote({
         ...logEntry,
         level: LOG_LEVELS.ERROR
@@ -223,7 +206,7 @@ class ErrorLogger {
     };
 
     // Calcular tipos de error más comunes
-    imageLogs.forEach(log => {
+    for (const log of imageLogs) {
       if (log.errorType) {
         stats.errorTypes[log.errorType] = (stats.errorTypes[log.errorType] || 0) + 1;
       }
@@ -232,7 +215,7 @@ class ErrorLogger {
       if (log.confidenceScore) {
         stats.averageConfidence += log.confidenceScore;
       }
-    });
+    }
 
     // Promedio de confidence
     const successfulAnalyses = imageLogs.filter(log => log.confidenceScore);

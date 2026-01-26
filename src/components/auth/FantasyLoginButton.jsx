@@ -83,11 +83,9 @@ export default function FantasyLoginButton() {
         )}
       </button>
       
-      {import.meta.env.DEV && (
-        <p className="text-xs text-gray-600 text-center mt-2">
-          Modo demo: Se creará un usuario temporal
-        </p>
-      )}
+      <p className="text-xs text-gray-600 text-center mt-2">
+        Se creará un usuario temporal
+      </p>
     </div>
   );
 }
