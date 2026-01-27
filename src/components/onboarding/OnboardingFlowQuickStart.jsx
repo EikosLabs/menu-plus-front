@@ -94,10 +94,23 @@ export default function OnboardingFlowQuickStart({ userId: propUserId = null, on
             const result = await menuService.createFoodBusiness(businessData);
 
             // Refrescar token para obtener FoodBusinessId
-            try {
-                await authService.refreshToken({ clearAuthOnFailure: false });
-            } catch (refreshError) {
-                console.error('Error al refrescar token:', refreshError);
+            const isFantasyUser = localStorage.getItem('is_fantasy_user') === 'true';
+            const fantasyEmail = localStorage.getItem('fantasy_user_email');
+
+            if (isFantasyUser && fantasyEmail) {
+                // Para usuarios fantasy, obtener nuevo token con FoodBusinessId actualizado
+                try {
+                    await authService.fantasyTokenLogin(fantasyEmail);
+                } catch (refreshError) {
+                    console.error('Error al refrescar token fantasy:', refreshError);
+                }
+            } else {
+                // Para usuarios normales, usar refresh token
+                try {
+                    await authService.refreshToken({ clearAuthOnFailure: false });
+                } catch (refreshError) {
+                    console.error('Error al refrescar token:', refreshError);
+                }
             }
 
             localStorage.removeItem('needs_onboarding');

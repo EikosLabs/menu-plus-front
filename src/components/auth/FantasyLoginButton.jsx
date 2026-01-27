@@ -24,6 +24,7 @@ export default function FantasyLoginButton() {
         // Store that this is a new fantasy user for onboarding
         localStorage.setItem('needs_onboarding', 'true');
         localStorage.setItem('is_fantasy_user', 'true');
+        localStorage.setItem('fantasy_user_email', userData.email);
         
         // Redirect to onboarding
         window.location.href = '/onboarding';
