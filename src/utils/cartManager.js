@@ -13,6 +13,7 @@ class CartManager {
 
     // Initialize with business data
     init(business) {
+        console.log('CartManager init with business:', business);
         this.businessInfo = business;
     }
 
@@ -123,6 +124,19 @@ class CartManager {
         return this.items[0]?.currency || 'USD';
     }
 
+    // Get WhatsApp number from business info (handles case variants)
+    getWhatsAppNumber() {
+        if (!this.businessInfo) return null;
+        
+        // Try different property names
+        const number = this.businessInfo.whatsAppNumber || 
+                       this.businessInfo.whatsappNumber || 
+                       this.businessInfo.WhatsAppNumber || 
+                       this.businessInfo.whatsapp;
+                       
+        return number;
+    }
+
     // Generate WhatsApp message with customer data
     generateWhatsAppMessage(customerData = null) {
         if (this.items.length === 0) return '';
@@ -164,14 +178,16 @@ class CartManager {
 
     // Get WhatsApp URL with optional customer data
     getWhatsAppUrl(customerData = null) {
-        const phone = this.businessInfo?.whatsAppNumber?.replace(/[^0-9]/g, '') || '';
+        const rawNumber = this.getWhatsAppNumber();
+        const phone = rawNumber?.replace(/[^0-9]/g, '') || '';
         const message = encodeURIComponent(this.generateWhatsAppMessage(customerData));
         return `https://wa.me/${phone}?text=${message}`;
     }
 
     // Check if business has WhatsApp
     hasWhatsApp() {
-        const number = this.businessInfo?.whatsAppNumber;
+        const number = this.getWhatsAppNumber();
+        console.log('Checking WhatsApp number:', number, 'Is valid?', !!number && number.trim().length > 0);
         return !!number && number.trim().length > 0;
     }
 }

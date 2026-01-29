@@ -131,6 +131,7 @@ export function renderCartDrawer(business) {
 
 // Initialize cart UI interactions
 export function initCartUI(business) {
+  console.log('Initializing Cart UI with business:', business);
   cart.init(business);
 
   const fab = document.getElementById('cart-fab');
@@ -293,7 +294,8 @@ export function initCartUI(business) {
       whatsappFormModal?.classList.add('open');
       closeDrawer();
     } else {
-      alert('Este negocio no tiene número de WhatsApp configurado. Por favor usa "Pedir en Mostrador".');
+      console.log('WhatsApp check failed. Business info:', cart.businessInfo);
+      alert('Este negocio no tiene número de WhatsApp configurado (o es inválido). Por favor usa "Pedir en Mostrador".');
     }
   });
 
