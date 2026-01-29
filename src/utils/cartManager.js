@@ -123,14 +123,29 @@ class CartManager {
         return this.items[0]?.currency || 'USD';
     }
 
-    // Generate WhatsApp message
-    generateWhatsAppMessage() {
+    // Generate WhatsApp message with customer data
+    generateWhatsAppMessage(customerData = null) {
         if (this.items.length === 0) return '';
 
         const businessName = this.businessInfo?.name || 'el restaurante';
         const currency = this.getCurrency();
 
         let message = `🍽️ *Pedido para ${businessName}*\n\n`;
+
+        // Add customer info if provided
+        if (customerData) {
+            if (customerData.name) {
+                message += `👤 *Cliente:* ${customerData.name}\n\n`;
+            }
+            if (customerData.address) {
+                message += `📍 *Entregar en:*\n${customerData.address}\n`;
+                if (customerData.references) {
+                    message += `Ref: ${customerData.references}\n`;
+                }
+                message += `\n`;
+            }
+        }
+
         message += `📋 *Detalle del pedido:*\n`;
         message += `─────────────────\n`;
 
@@ -147,10 +162,10 @@ class CartManager {
         return message;
     }
 
-    // Get WhatsApp URL
-    getWhatsAppUrl() {
+    // Get WhatsApp URL with optional customer data
+    getWhatsAppUrl(customerData = null) {
         const phone = this.businessInfo?.whatsAppNumber?.replace(/[^0-9]/g, '') || '';
-        const message = encodeURIComponent(this.generateWhatsAppMessage());
+        const message = encodeURIComponent(this.generateWhatsAppMessage(customerData));
         return `https://wa.me/${phone}?text=${message}`;
     }
 

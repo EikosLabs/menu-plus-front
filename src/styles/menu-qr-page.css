@@ -1092,6 +1092,206 @@ body {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                            WHATSAPP FORM MODAL                              */
+/* -------------------------------------------------------------------------- */
+
+.whatsapp-form-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.whatsapp-form-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.whatsapp-form-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.whatsapp-form-content {
+  position: relative;
+  background: white;
+  border-radius: 24px;
+  padding: 1.75rem;
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.whatsapp-form-modal.open .whatsapp-form-content {
+  transform: scale(1) translateY(0);
+}
+
+.whatsapp-form-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.whatsapp-form-close:hover {
+  background: #e0e0e0;
+}
+
+.whatsapp-form-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.whatsapp-form-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  padding-right: 2rem;
+}
+
+.whatsapp-form-field {
+  margin-bottom: 1rem;
+}
+
+.whatsapp-form-field label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
+.whatsapp-form-field input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fafafa;
+  transition: border-color 0.2s, background 0.2s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.whatsapp-form-field input:focus {
+  border-color: var(--brand-primary, #1a1a1a);
+  background: white;
+}
+
+.whatsapp-form-field input::placeholder {
+  color: #999;
+}
+
+.whatsapp-location-btn {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  margin: 1rem 0;
+  background: #f0f7ff;
+  border: 2px dashed #3b82f6;
+  border-radius: 12px;
+  color: #3b82f6;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.whatsapp-location-btn:hover {
+  background: #e0efff;
+  border-color: #2563eb;
+}
+
+.whatsapp-location-btn.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.whatsapp-location-btn.loading svg {
+  animation: spin 1s linear infinite;
+}
+
+.whatsapp-location-btn.success {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #059669;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.whatsapp-location-error {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.whatsapp-validation-error {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.whatsapp-send-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+}
+
+.whatsapp-send-btn:hover {
+  background: #22c55e;
+}
+
+.whatsapp-send-btn:active {
+  transform: scale(0.98);
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                RESPONSIVE                                  */
 /* -------------------------------------------------------------------------- */
 
