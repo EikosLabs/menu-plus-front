@@ -1,5 +1,4 @@
 import { sanitizeHtml, sanitizeUrl } from './security.js';
-import { renderBusinessInfo } from './renderBusinessInfo.js';
 import { renderSection, getEmojiForSection } from './menuHelpers.js';
 import { renderCartButton, renderCartDrawer } from './cartUI.js';
 
@@ -74,9 +73,6 @@ export function renderMenu(menu, business, itemsBySection) {
       </div>
     `;
   }
-
-  // Business Info
-  html += renderBusinessInfo(business);
 
   // --------------------------------------------------------------------------
   // SEARCH BAR
