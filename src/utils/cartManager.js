@@ -171,7 +171,8 @@ class CartManager {
 
     // Check if business has WhatsApp
     hasWhatsApp() {
-        return !!this.businessInfo?.whatsAppNumber;
+        const number = this.businessInfo?.whatsAppNumber;
+        return !!number && number.trim().length > 0;
     }
 }
 
