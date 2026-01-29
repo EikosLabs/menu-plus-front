@@ -1,88 +1,93 @@
 import React, { useState, useEffect } from "react";
 import menuService from "../../services/menuService";
+import { useTranslation } from "../../i18n/utils";
 
 const availableFonts = [
-	{ id: 'poppins', name: 'Poppins', family: "'Poppins', sans-serif", description: 'Moderna y legible', preview: 'Aa' },
-	{ id: 'playfair', name: 'Playfair Display', family: "'Playfair Display', serif", description: 'Elegante y sofisticada', preview: 'Aa' },
-	{ id: 'roboto', name: 'Roboto', family: "'Roboto', sans-serif", description: 'Limpia y profesional', preview: 'Aa' },
-	{ id: 'montserrat', name: 'Montserrat', family: "'Montserrat', sans-serif", description: 'Geométrica y moderna', preview: 'Aa' },
-	{ id: 'lora', name: 'Lora', family: "'Lora', serif", description: 'Clásica y legible', preview: 'Aa' },
-	{ id: 'opensans', name: 'Open Sans', family: "'Open Sans', sans-serif", description: 'Neutral y versátil', preview: 'Aa' },
-	{ id: 'raleway', name: 'Raleway', family: "'Raleway', sans-serif", description: 'Elegante y delgada', preview: 'Aa' },
-	{ id: 'merriweather', name: 'Merriweather', family: "'Merriweather', serif", description: 'Tradicional y cálida', preview: 'Aa' }
+	{ id: 'poppins', name: 'Poppins', family: "'Poppins', sans-serif", description: 'Moderna', preview: 'Aa' },
+	{ id: 'playfair', name: 'Playfair', family: "'Playfair Display', serif", description: 'Elegante', preview: 'Aa' },
+	{ id: 'roboto', name: 'Roboto', family: "'Roboto', sans-serif", description: 'Limpia', preview: 'Aa' },
+	{ id: 'montserrat', name: 'Montserrat', family: "'Montserrat', sans-serif", description: 'Geométrica', preview: 'Aa' },
+	{ id: 'lora', name: 'Lora', family: "'Lora', serif", description: 'Clásica', preview: 'Aa' },
+	{ id: 'opensans', name: 'Open Sans', family: "'Open Sans', sans-serif", description: 'Neutral', preview: 'Aa' },
+	{ id: 'raleway', name: 'Raleway', family: "'Raleway', sans-serif", description: 'Delgada', preview: 'Aa' },
+	{ id: 'merriweather', name: 'Merriweather', family: "'Merriweather', serif", description: 'Cálida', preview: 'Aa' }
 ];
 
 const templates = [
 	{
 		id: 0,
 		name: "Modern",
-		description: "Neobrutalist: Bordes gruesos (4px), sombras pronunciadas y animaciones audaces.",
+		description: "Neobrutalist: Bordes gruesos y sombras.",
 		preview: "/templates/modern-preview.jpg",
-		style: "Bordes gruesos, sombras sólidas, transformaciones dinámicas",
+		style: "Neobrutalism",
 		icon: "🎨",
 		recommendedFont: 'poppins'
 	},
 	{
 		id: 1,
 		name: "Elegant",
-		description: "Sofisticado: Sin bordes, sombras suaves y transiciones elegantes.",
+		description: "Sofisticado: Sombras suaves.",
 		preview: "/templates/elegant-preview.jpg",
-		style: "Sin bordes, sombras difusas, movimientos suaves",
+		style: "Minimal",
 		icon: "👔",
 		recommendedFont: 'playfair'
 	},
 	{
 		id: 2,
 		name: "Casual",
-		description: "Playful: Bordes redondeados (25px), rotaciones leves y diseño amigable.",
+		description: "Playful: Diseño amigable.",
 		preview: "/templates/casual-preview.jpg",
-		style: "Bordes medianos, rotaciones playful, bordes punteados",
+		style: "Fun",
 		icon: "🍔",
 		recommendedFont: 'montserrat'
 	},
 	{
 		id: 3,
 		name: "Minimalist",
-		description: "Limpio: Bordes delgados (1px), sombras sutiles y espacios amplios.",
+		description: "Limpio: Espacios amplios.",
 		preview: "/templates/minimalist-preview.jpg",
-		style: "Bordes finos, sombras mínimas, diseño espacioso",
+		style: "Clean",
 		icon: "⚪",
 		recommendedFont: 'roboto'
 	},
 	{
 		id: 4,
 		name: "Colorful",
-		description: "Explosivo: Bordes gruesos variados, sombras grandes y transformaciones llamativas.",
+		description: "Explosivo: Efectos vibrantes.",
 		preview: "/templates/colorful-preview.jpg",
-		style: "Bordes alternados, sombras grandes, efectos vibrantes",
+		style: "Vibrant",
 		icon: "🌈",
 		recommendedFont: 'poppins'
 	},
 	{
 		id: 5,
 		name: "Dark",
-		description: "Premium: Glassmorphism, blur effects y sombras profundas para ambiente nocturno.",
+		description: "Premium: Modo nocturno.",
 		preview: "/templates/dark-preview.jpg",
-		style: "Backdrop blur, transparencias, sombras profundas",
+		style: "Dark",
 		icon: "🌙",
 		recommendedFont: 'lora'
 	},
 	{
 		id: 6,
 		name: "Classic",
-		description: "Tradicional: Bordes dobles (double), fuentes serif y diseño atemporal.",
+		description: "Tradicional: Diseño atemporal.",
 		preview: "/templates/classic-preview.jpg",
-		style: "Bordes dobles, fuentes serif, diseño clásico",
+		style: "Retro",
 		icon: "📜",
 		recommendedFont: 'merriweather'
 	}
 ];
 
 const TemplateSection = ({ businesses, onTemplateUpdated }) => {
+	const { t } = useTranslation();
+	const [activeTab, setActiveTab] = useState('style'); // style, shape, font
 	const [selectedTemplate, setSelectedTemplate] = useState(0);
 	const [currentTemplate, setCurrentTemplate] = useState(0);
 	const [selectedFont, setSelectedFont] = useState('poppins');
 	const [currentFont, setCurrentFont] = useState('poppins');
+	const [selectedBorderRadius, setSelectedBorderRadius] = useState(12);
+	const [currentBorderRadius, setCurrentBorderRadius] = useState(12);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState(null);
@@ -90,46 +95,37 @@ const TemplateSection = ({ businesses, onTemplateUpdated }) => {
 	const business = businesses && businesses.length > 0 ? businesses[0] : null;
 
 	useEffect(() => {
-		if (business && business.template !== undefined) {
-			setCurrentTemplate(business.template);
-			setSelectedTemplate(business.template);
-		}
-		if (business && business.fontFamily) {
-			setCurrentFont(business.fontFamily);
-			setSelectedFont(business.fontFamily);
-		} else if (business && business.template !== undefined) {
-			// Set recommended font for the template
-			const template = templates.find(t => t.id === business.template);
-			if (template) {
-				setCurrentFont(template.recommendedFont);
-				setSelectedFont(template.recommendedFont);
+		if (business) {
+			if (business.template !== undefined) {
+				setCurrentTemplate(business.template);
+				setSelectedTemplate(business.template);
+			}
+			if (business.fontFamily) {
+				setCurrentFont(business.fontFamily);
+				setSelectedFont(business.fontFamily);
+			}
+			if (business.borderRadius !== undefined) {
+				setCurrentBorderRadius(business.borderRadius);
+				setSelectedBorderRadius(business.borderRadius);
 			}
 		}
 	}, [business]);
 
 	const handleTemplateSelect = (templateId) => {
 		setSelectedTemplate(templateId);
-		// Auto-select recommended font when changing template
 		const template = templates.find(t => t.id === templateId);
 		if (template) {
 			setSelectedFont(template.recommendedFont);
 		}
 	};
 
-	const handleFontSelect = (fontId) => {
-		setSelectedFont(fontId);
-	};
-
-	const hasChanges = selectedTemplate !== currentTemplate || selectedFont !== currentFont;
+	const hasChanges = selectedTemplate !== currentTemplate || 
+	                  selectedFont !== currentFont || 
+	                  selectedBorderRadius !== currentBorderRadius;
 
 	const handleSaveTemplate = async () => {
 		if (!business) {
 			setError("No se encontró ningún negocio");
-			return;
-		}
-
-		if (!hasChanges) {
-			setError("No hay cambios para guardar");
 			return;
 		}
 
@@ -138,18 +134,17 @@ const TemplateSection = ({ businesses, onTemplateUpdated }) => {
 		setSuccess(false);
 
 		try {
-			// Usar menuService para actualizar el negocio
 			await menuService.updateFoodBusiness(business.id, {
 				template: selectedTemplate,
-				fontFamily: selectedFont
+				fontFamily: selectedFont,
+				borderRadius: selectedBorderRadius
 			});
 
-			// Actualizar estado local
 			setCurrentTemplate(selectedTemplate);
 			setCurrentFont(selectedFont);
+			setCurrentBorderRadius(selectedBorderRadius);
 			setSuccess(true);
 
-			// Recargar los datos del servidor si hay callback
 			if (onTemplateUpdated) {
 				await onTemplateUpdated();
 			}
@@ -157,202 +152,251 @@ const TemplateSection = ({ businesses, onTemplateUpdated }) => {
 			setTimeout(() => setSuccess(false), 3000);
 		} catch (err) {
 			console.error("Error:", err);
-			setError(err.message || "Error al guardar el template");
+			setError(err.message || "Error al guardar los cambios");
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	if (!business) {
-		return (
-			<section className="mb-6 animate-fadeIn">
-				<div className="neo-card-3d p-8 text-center">
-					<svg className="mx-auto h-16 w-16 text-neo-gray mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-					</svg>
-					<h3 className="neo-heading neo-h3 mb-2">No tienes negocios</h3>
-					<p className="neo-text text-neo-gray">Primero debes crear un negocio para personalizar su template.</p>
-				</div>
-			</section>
-		);
-	}
+	if (!business) return null;
+
+	const getPreviewFont = () => {
+		return availableFonts.find(f => f.id === selectedFont)?.family || 'inherit';
+	};
 
 	return (
-		<section className="mb-6 animate-fadeIn">
-			<div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+		<section className="animate-fadeIn pb-32 md:pb-0">
+			{/* Header Simplificado */}
+			<div className="mb-6 flex items-center justify-between">
 				<div>
-					<h2 className="flex items-center neo-heading neo-h3 text-2xl mb-2">
-						<svg className="mr-2 h-7 w-7 text-neo-flame" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 1 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-						</svg>
-						Estilo del Menú (Template)
-					</h2>
-					<p className="neo-text text-neo-gray mb-2">
-						<strong>Los templates definen el ESTILO visual</strong> (tipos de botones, bordes, sombras, animaciones).
-					</p>
-					<p className="neo-text text-neo-gray">
-						Los <strong>colores vienen de tu negocio</strong> (configurados en la sección de Información del Negocio).
-					</p>
+					<h2 className="neo-heading neo-h3 text-2xl">{t("templates.title")}</h2>
+					<p className="hidden md:block neo-text text-sm text-neo-gray">Personaliza el diseño de tu menú.</p>
 				</div>
-
-				{hasChanges && (
-					<button
-						onClick={handleSaveTemplate}
-						disabled={loading}
-						className="neo-btn neo-btn-primary flex items-center w-full sm:w-auto"
-					>
-						{loading ? (
-							<>
-								<svg className="animate-spin mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24">
-									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-									<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-								</svg>
-								Guardando...
-							</>
-						) : (
-							<>
-								<svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-								</svg>
-								Guardar Template
-							</>
-						)}
-					</button>
-				)}
+				<div className="hidden md:block">
+					{hasChanges && (
+						<button
+							onClick={handleSaveTemplate}
+							disabled={loading}
+							className="neo-btn neo-btn-primary flex items-center shadow-lg"
+						>
+							{loading ? "Guardando..." : "Guardar Cambios"}
+						</button>
+					)}
+				</div>
 			</div>
 
 			{success && (
-				<div className="mb-6 neo-card-3d-success p-4 flex items-center animate-fadeIn">
-					<svg className="mr-3 h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-					</svg>
-					<p className="neo-text-bold">¡Template y fuente actualizados exitosamente! Los cambios se verán reflejados en tu menú.</p>
+				<div className="mb-4 neo-card-3d-success p-3 flex items-center animate-fadeIn rounded-xl">
+					<span className="mr-2">✅</span>
+					<p className="neo-text-bold text-sm">¡Cambios guardados!</p>
 				</div>
 			)}
 
-			{error && (
-				<div className="mb-6 neo-card-3d-warning p-4 flex items-center animate-fadeIn">
-					<svg className="mr-3 h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-					</svg>
-					<p className="neo-text">{error}</p>
-				</div>
-			)}
-
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{templates.map((template) => (
-					<div
-						key={template.id}
-						onClick={() => handleTemplateSelect(template.id)}
-						className={`neo-card-3d cursor-pointer transition-all duration-300 hover:scale-105 ${
-							selectedTemplate === template.id ? "ring-4 ring-neo-flame ring-offset-4" : ""
-						} ${currentTemplate === template.id ? "border-4 border-green-500" : ""}`}
-					>
-						{/* Style Preview */}
-						<div className="h-32 rounded-t-lg overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-							<div className="text-center">
-								<span className="text-5xl mb-2 block">{template.icon}</span>
-								<p className="text-xs text-gray-600 font-semibold px-2">{template.style}</p>
+			<div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+				
+				{/* LIVE PREVIEW - Sticky on Mobile */}
+				<div className="w-full lg:w-1/3 lg:sticky lg:top-24 z-10">
+					<div className="neo-card-3d bg-white p-1 overflow-hidden sticky top-20 shadow-2xl ring-4 ring-neo-black/5">
+						<div className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden transition-all duration-300">
+							{/* Background Decoration */}
+							<div className="absolute inset-0 opacity-5 pointer-events-none" 
+								style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
 							</div>
-						</div>
 
-						{/* Template Info */}
-						<div className="p-4">
-							<div className="flex items-center justify-between mb-2">
-								<h3 className="neo-heading neo-h4">
-									{template.name}
-								</h3>
-								{currentTemplate === template.id && (
-									<span className="neo-badge neo-badge-success text-xs">Activo</span>
-								)}
-								{selectedTemplate === template.id && currentTemplate !== template.id && (
-									<span className="neo-badge neo-badge-primary text-xs">Seleccionado</span>
-								)}
-							</div>
-							<p className="neo-text text-sm text-neo-gray">{template.description}</p>
-						</div>
-
-						{/* Selection indicator */}
-						{selectedTemplate === template.id && (
-							<div className="absolute top-2 right-2 bg-neo-flame text-white rounded-full p-2">
-								<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-								</svg>
-							</div>
-						)}
-					</div>
-				))}
-			</div>
-
-			{/* Font Selection Section */}
-			<div className="mt-8">
-				<h3 className="flex items-center neo-heading neo-h4 text-xl mb-4">
-					<svg className="mr-2 h-6 w-6 text-neo-flame" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-					</svg>
-					Tipografía
-				</h3>
-				<p className="neo-text text-neo-gray mb-4">
-					Selecciona la fuente que mejor represente tu marca. Cada template tiene una fuente recomendada, pero puedes elegir la que prefieras.
-				</p>
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-					{availableFonts.map((font) => {
-						const currentSelectedTemplate = templates.find(t => t.id === selectedTemplate);
-						const isRecommended = currentSelectedTemplate && currentSelectedTemplate.recommendedFont === font.id;
-						
-						return (
-							<div
-								key={font.id}
-								onClick={() => handleFontSelect(font.id)}
-								className={`neo-card-3d cursor-pointer p-4 text-center transition-all duration-300 hover:scale-105 ${
-									selectedFont === font.id ? "ring-4 ring-neo-flame ring-offset-4" : ""
-								} ${currentFont === font.id ? "border-4 border-green-500" : ""}`}
+							{/* Mock Menu Item Card */}
+							<div 
+								className="w-full max-w-[240px] bg-white border border-gray-200 shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+								style={{ 
+									borderRadius: `${selectedBorderRadius}px`,
+									fontFamily: getPreviewFont()
+								}}
 							>
-								<div 
-									className="text-5xl mb-2 font-bold"
-									style={{ fontFamily: font.family }}
-								>
-									{font.preview}
+								<div className="h-28 bg-gray-200 relative overflow-hidden">
+									<div className="absolute inset-0 flex items-center justify-center text-4xl">🍔</div>
+									{/* Style Badge based on Template */}
+									<div className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-1 rounded-full text-[10px] font-bold uppercase shadow-sm">
+										{templates.find(t => t.id === selectedTemplate)?.style}
+									</div>
 								</div>
-								<h4 className="neo-text-bold text-sm mb-1">{font.name}</h4>
-								<p className="neo-text text-xs text-neo-gray mb-2">{font.description}</p>
-								
-								<div className="flex gap-2 justify-center flex-wrap">
-									{currentFont === font.id && (
-										<span className="neo-badge neo-badge-success text-xs">Activa</span>
-									)}
-									{selectedFont === font.id && currentFont !== font.id && (
-										<span className="neo-badge neo-badge-primary text-xs">Seleccionada</span>
-									)}
-									{isRecommended && (
-										<span className="neo-badge neo-badge-warning text-xs">⭐ Recomendada</span>
-									)}
+								<div className="p-4">
+									<div className="h-4 w-3/4 bg-gray-800 rounded mb-2"></div>
+									<div className="h-3 w-1/2 bg-gray-300 rounded mb-4"></div>
+									<div className="flex justify-between items-center mt-2">
+										<div className="h-5 w-16 bg-neo-flame rounded text-white text-xs flex items-center justify-center font-bold"
+											style={{ borderRadius: `${Math.max(4, selectedBorderRadius/2)}px` }}
+										>
+											$12.00
+										</div>
+										<div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-lg shadow-sm">+</div>
+									</div>
 								</div>
 							</div>
-						);
-					})}
+							
+							<div className="mt-6 text-center">
+								<p className="text-xs text-gray-400 font-medium uppercase tracking-widest mb-1">Vista Previa</p>
+								<p className="text-sm font-bold text-gray-700" style={{ fontFamily: getPreviewFont() }}>
+									{availableFonts.find(f => f.id === selectedFont)?.name} • {selectedBorderRadius}px
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* CONTROLS - Tabs Layout */}
+				<div className="w-full lg:w-2/3">
+					
+					{/* Tabs Navigation */}
+					<div className="flex p-1 bg-gray-100 rounded-xl mb-6 relative">
+						<button 
+							onClick={() => setActiveTab('style')}
+							className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 z-10 ${
+								activeTab === 'style' ? 'bg-white text-neo-black shadow-md' : 'text-gray-500 hover:text-gray-700'
+							}`}
+						>
+							🎨 Estilo
+						</button>
+						<button 
+							onClick={() => setActiveTab('shape')}
+							className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 z-10 ${
+								activeTab === 'shape' ? 'bg-white text-neo-black shadow-md' : 'text-gray-500 hover:text-gray-700'
+							}`}
+						>
+							📐 Forma
+						</button>
+						<button 
+							onClick={() => setActiveTab('font')}
+							className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 z-10 ${
+								activeTab === 'font' ? 'bg-white text-neo-black shadow-md' : 'text-gray-500 hover:text-gray-700'
+							}`}
+						>
+							🔡 Texto
+						</button>
+					</div>
+
+					{/* Tab Content: Styles */}
+					{activeTab === 'style' && (
+						<div className="grid grid-cols-2 sm:grid-cols-3 gap-3 animate-fadeIn">
+							{templates.map((template) => (
+								<div
+									key={template.id}
+									onClick={() => handleTemplateSelect(template.id)}
+									className={`cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-200 relative group ${
+										selectedTemplate === template.id 
+											? "border-neo-flame ring-2 ring-neo-flame/20 shadow-lg scale-[1.02]" 
+											: "border-transparent bg-white shadow hover:shadow-md"
+									}`}
+								>
+									<div className="h-24 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative">
+										<span className="text-4xl transform group-hover:scale-110 transition-transform duration-300">{template.icon}</span>
+										{selectedTemplate === template.id && (
+											<div className="absolute top-2 right-2 bg-neo-flame text-white rounded-full p-1 shadow-sm">
+												<svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+													<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+												</svg>
+											</div>
+										)}
+									</div>
+									<div className="p-3 text-center">
+										<h4 className="font-bold text-sm text-gray-800">{template.name}</h4>
+										<p className="text-[10px] text-gray-500 mt-1 line-clamp-1">{template.description}</p>
+									</div>
+								</div>
+							))}
+						</div>
+					)}
+
+					{/* Tab Content: Shape (Border Radius) */}
+					{activeTab === 'shape' && (
+						<div className="animate-fadeIn bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+							<div className="mb-8">
+								<div className="flex justify-between items-center mb-4">
+									<h4 className="font-bold text-gray-800">Redondez</h4>
+									<span className="bg-gray-100 px-3 py-1 rounded-lg text-xs font-mono font-bold">{selectedBorderRadius}px</span>
+								</div>
+								
+								<input
+									type="range"
+									min="0"
+									max="24"
+									step="4"
+									value={selectedBorderRadius}
+									onChange={(e) => setSelectedBorderRadius(parseInt(e.target.value, 10))}
+									className="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer accent-neo-flame"
+								/>
+								<div className="flex justify-between mt-3 text-xs text-gray-400 font-bold uppercase">
+									<span>0px</span>
+									<span>12px</span>
+									<span>24px</span>
+								</div>
+							</div>
+
+							<div className="grid grid-cols-4 gap-3">
+								{[0, 8, 16, 24].map((v) => (
+									<button
+										key={v}
+										onClick={() => setSelectedBorderRadius(v)}
+										className={`aspect-square rounded-xl flex flex-col items-center justify-center gap-2 border-2 transition-all ${
+											selectedBorderRadius === v 
+												? "border-neo-flame bg-neo-flame/5 text-neo-flame" 
+												: "border-gray-100 hover:border-gray-200 text-gray-500"
+										}`}
+									>
+										<div className="w-8 h-8 border-2 border-current" style={{ borderRadius: `${v}px` }}></div>
+										<span className="text-xs font-bold">{v}px</span>
+									</button>
+								))}
+							</div>
+						</div>
+					)}
+
+					{/* Tab Content: Typography */}
+					{activeTab === 'font' && (
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fadeIn">
+							{availableFonts.map((font) => (
+								<button
+									key={font.id}
+									onClick={() => setSelectedFont(font.id)}
+									className={`flex items-center p-3 rounded-xl border-2 text-left transition-all ${
+										selectedFont === font.id 
+											? "border-neo-flame bg-white shadow-md" 
+											: "border-transparent bg-white shadow-sm hover:bg-gray-50"
+									}`}
+								>
+									<div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl font-bold text-gray-800 mr-4 shrink-0"
+										style={{ fontFamily: font.family }}>
+										Aa
+									</div>
+									<div>
+										<h4 className="font-bold text-sm text-gray-900 mb-0.5">{font.name}</h4>
+										<p className="text-xs text-gray-500">{font.description}</p>
+									</div>
+									{selectedFont === font.id && (
+										<div className="ml-auto text-neo-flame">
+											<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+												<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+											</svg>
+										</div>
+									)}
+								</button>
+							))}
+						</div>
+					)}
+
 				</div>
 			</div>
 
-			<div className="mt-6 neo-card-3d-sunset p-4">
-				<div className="flex items-start">
-					<svg className="mr-3 h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-					</svg>
-					<div>
-						<p className="neo-text-bold mb-1">💡 ¿Cómo funciona?</p>
-						<p className="neo-text text-sm mb-2">
-							<strong>Template = Estilo:</strong> Define cómo se ven los botones, bordes, sombras y animaciones.
-						</p>
-						<p className="neo-text text-sm mb-2">
-							<strong>Colores = Tu Negocio:</strong> Usa los colores primario, secundario y acento de tu marca (configurados en Información del Negocio).
-						</p>
-						<p className="neo-text text-sm">
-							<strong>Tipografía:</strong> Cada template tiene una fuente recomendada, pero puedes usar la que prefieras.
-						</p>
-					</div>
+			{/* Floating Save Button - Always Visible on Mobile */}
+			{hasChanges && (
+				<div className="fixed bottom-4 left-4 right-4 z-50 md:hidden animate-slide-up">
+					<button
+						onClick={handleSaveTemplate}
+						disabled={loading}
+						className="neo-btn neo-btn-primary w-full py-3.5 shadow-2xl flex items-center justify-center rounded-2xl font-bold text-base"
+					>
+						{loading ? "Guardando..." : "Guardar Cambios"}
+					</button>
 				</div>
-			</div>
+			)}
 		</section>
 	);
 };

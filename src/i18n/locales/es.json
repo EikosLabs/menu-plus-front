@@ -232,7 +232,7 @@
 		"dashboard": "Panel",
 		"businesses": "Negocios",
 		"menus": "Menús",
-		"templates": "Templates",
+		"templates": "Apariencia",
 		"profile": "Perfil",
 		"settings": "Configuración",
 		"help": "Ayuda"
@@ -335,9 +335,11 @@
 		"upgradeNow": "Mejora Ahora"
 	},
 	"templates": {
-		"title": "Plantillas",
-		"selectTemplate": "Seleccionar Plantilla",
-		"saveTemplate": "Guardar Template",
+		"title": "Apariencia",
+		"selectTemplate": "Seleccionar estilo",
+		"saveAppearance": "Guardar Apariencia",
+		"borderRadius": "Redondez de Bordes",
+		"borderRadiusDesc": "Ajusta qué tan redondos serán los bordes de tu menú.",
 		"preview": "Vista Previa",
 		"apply": "Aplicar"
 	},

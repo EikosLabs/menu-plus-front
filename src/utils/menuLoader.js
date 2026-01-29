@@ -129,6 +129,7 @@ function applyTheme(business) {
       ${customColors.secondary ? `--brand-secondary: ${customColors.secondary};` : ''}
       ${customColors.accent ? `--brand-accent: ${customColors.accent};` : ''}
       ${backgroundColor ? `--brand-background: ${backgroundColor};` : ''}
+      --brand-border-radius: ${business.borderRadius || 12}px;
       ${backgroundColor ? `--page-text-color: ${pageText};` : '--page-text-color: #111111;'}
       ${backgroundColor ? `--page-muted-text-color: ${pageMuted};` : '--page-muted-text-color: rgba(17,17,17,0.74);'}
       ${customColors.primary ? `--brand-primary-contrast: ${getContrastColor(customColors.primary)};` : '--brand-primary-contrast: #ffffff;'}

@@ -41,7 +41,8 @@ export class BusinessService {
 			AccentColor: businessData.accentColor || '',
 			DefaultCurrency: businessData.defaultCurrency ?? 0,
 			Template: businessData.template ?? 0,
-			FontFamily: businessData.fontFamily || ''
+			FontFamily: businessData.fontFamily || '',
+			BorderRadius: businessData.borderRadius ?? 12
 		};
 
 		// Usar retry para operaciones críticas de creación
@@ -90,7 +91,8 @@ export class BusinessService {
 			AccentColor: businessData.accentColor,
 			DefaultCurrency: businessData.defaultCurrency !== undefined ? Number.parseInt(businessData.defaultCurrency, 10) : undefined,
 			Template: businessData.template !== undefined ? Number.parseInt(businessData.template, 10) : undefined,
-			FontFamily: businessData.fontFamily
+			FontFamily: businessData.fontFamily,
+			BorderRadius: businessData.borderRadius !== undefined ? Number.parseInt(businessData.borderRadius, 10) : undefined
 		};
 
 		// Remover campos undefined

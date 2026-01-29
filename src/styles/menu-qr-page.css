@@ -7,7 +7,7 @@
   --accent-color: #FFD700;
   --text-active: #000000;
   --background-secondary: #f8f8f8;
-  --border-radius: 12px;
+  --border-radius: var(--brand-border-radius, 12px);
   --spacing-unit: 8px;
   --glass-substrate: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(255, 255, 255, 0.5);

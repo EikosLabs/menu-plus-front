@@ -232,7 +232,7 @@
 		"dashboard": "Dashboard",
 		"businesses": "Businesses",
 		"menus": "Menus",
-		"templates": "Templates",
+		"templates": "Appearance",
 		"profile": "Profile",
 		"settings": "Settings",
 		"help": "Help"
@@ -335,9 +335,11 @@
 		"upgradeNow": "Upgrade Now"
 	},
 	"templates": {
-		"title": "Templates",
-		"selectTemplate": "Select Template",
-		"saveTemplate": "Save Template",
+		"title": "Appearance",
+		"selectTemplate": "Select style",
+		"saveAppearance": "Save Appearance",
+		"borderRadius": "Border Radius",
+		"borderRadiusDesc": "Adjust how rounded your menu corners will be.",
 		"preview": "Preview",
 		"apply": "Apply"
 	},
