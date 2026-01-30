@@ -296,23 +296,6 @@ export default function BusinessList({
 							</div>
 							<div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto mt-4 lg:mt-0">
 								<button
-									onClick={() => {
-										if (business.slug) {
-											window.open(`/${business.slug}`, '_blank');
-										} else {
-											alert('Este negocio no tiene una URL pública configurada correctamente.');
-										}
-									}}
-									className={`group px-3 py-1.5 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center ${!business.slug ? 'opacity-50 cursor-not-allowed' : ''}`}
-									title={business.slug ? "Ver Landing Page pública" : "URL no disponible"}
-									disabled={!business.slug}
-								>
-									<svg className="h-4 w-4 mr-1.5 text-blue-500 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-									</svg>
-									Web
-								</button>
-								<button
 									onClick={() => onEditBusinessClick(business)}
 									className="group px-3 py-1.5 bg-white text-gray-800 font-bold text-xs sm:text-sm rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center"
 								>
